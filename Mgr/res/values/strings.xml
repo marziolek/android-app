@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Mgr</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">Posts</string>
+    <string name="title_section2">Record</string>
+    <string name="title_section3">Cosik</string>
+    <string name="button">Guzik</string>
+    <string name="edit_message">Edit message</string>
+    <string name="button_send">Send</string>
+    <string name="title_section4">Moja zakładeczka</string>
+
+</resources>
