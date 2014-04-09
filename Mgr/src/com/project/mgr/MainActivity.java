@@ -19,9 +19,7 @@ import com.project.mgr.fragments.tabs.Tab2Fragment;
 import com.project.mgr.fragments.tabs.Tab3Fragment;
 
 
-
 public class MainActivity extends FragmentActivity {
-
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -36,7 +34,7 @@ public class MainActivity extends FragmentActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,13 +78,13 @@ public class MainActivity extends FragmentActivity {
             // below) with the page number as its lone argument.
         	switch (position) {
             case 0:
-                // Top Rated fragment activity
+                // Posts fragment activity
                 return new Tab1Fragment();
             case 1:
-                // Games fragment activity
+                // Recording fragment activity
                 return new Tab2Fragment();
             case 2:
-                // Movies fragment activity
+                // Options fragment activity
                 return new Tab3Fragment();
         	}
             return null;
@@ -94,7 +92,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public int getCount() {
-            // Show 4 total pages.
+            // Show  total pages.
             return 3;
         }
 

@@ -10,5 +10,6 @@
     <string name="edit_message">Edit message</string>
     <string name="button_send">Send</string>
     <string name="title_section4">Moja zakładeczka</string>
+    <string name="created_by">by Marcin Ziółek</string>
 
 </resources>
