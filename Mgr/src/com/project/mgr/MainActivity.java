@@ -1,23 +1,20 @@
 package com.project.mgr;
 
-import java.util.Locale;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.MenuItem;
 
-import com.project.mgr.fragments.tabs.Tab1Fragment;
-import com.project.mgr.fragments.tabs.Tab2Fragment;
-import com.project.mgr.fragments.tabs.Tab3Fragment;
-
+import com.facebook.AppEventsLogger;
+import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.UiLifecycleHelper;
 
 public class MainActivity extends FragmentActivity {
     /**
@@ -28,146 +25,178 @@ public class MainActivity extends FragmentActivity {
      * intensive, it may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    SectionsPagerAdapter mSectionsPagerAdapter;
-
+    
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
     
+    private static final String USER_SKIPPED_LOGIN_KEY = "user_skipped_login";
+    
+    private static final int SPLASH = 0;
+    private static final int SELECTION = 1;
+    private static final int SETTINGS = 2;
+    private static final int FRAGMENT_COUNT = SETTINGS +1;
+
+    private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
+    private MenuItem settings;
+    private boolean isResumed = false;
+    private boolean userSkippedLogin = false;
+    private UiLifecycleHelper uiHelper;
+    private Session.StatusCallback callback = new Session.StatusCallback() {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            onSessionStateChange(session, state, exception);
+        }
+    };
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        if (savedInstanceState != null) {
+            userSkippedLogin = savedInstanceState.getBoolean(USER_SKIPPED_LOGIN_KEY);
+        }
+        uiHelper = new UiLifecycleHelper(this, callback);
+        uiHelper.onCreate(savedInstanceState);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the app.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        setContentView(R.layout.main);
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1,false);
+        FragmentManager fm = getSupportFragmentManager();
+        SplashFragment splashFragment = (SplashFragment) fm.findFragmentById(R.id.splashFragment);
+        fragments[SPLASH] = splashFragment;
+        fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
+        fragments[SETTINGS] = fm.findFragmentById(R.id.userSettingsFragment);
 
+        FragmentTransaction transaction = fm.beginTransaction();
+        for(int i = 0; i < fragments.length; i++) {
+            transaction.hide(fragments[i]);
+        }
+        transaction.commit();
+
+        splashFragment.setSkipLoginCallback(new SplashFragment.SkipLoginCallback() {
+            @Override
+            public void onSkipLoginPressed() {
+                userSkippedLogin = true;
+                showFragment(SELECTION, false);
+            }
+        });
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    public void onResume() {
+        super.onResume();
+        uiHelper.onResume();
+        isResumed = true;
+
+        // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in
+        // the onResume methods of the primary Activities that an app may be launched into.
+        AppEventsLogger.activateApp(this);
     }
-    
-    
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    @Override
+    public void onPause() {
+        super.onPause();
+        uiHelper.onPause();
+        isResumed = false;
+    }
 
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        uiHelper.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        uiHelper.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        uiHelper.onSaveInstanceState(outState);
+
+        outState.putBoolean(USER_SKIPPED_LOGIN_KEY, userSkippedLogin);
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        Session session = Session.getActiveSession();
+
+        if (session != null && session.isOpened()) {
+            // if the session is already open, try to show the selection fragment
+            showFragment(SELECTION, false);
+            userSkippedLogin = false;
+        } else if (userSkippedLogin) {
+            showFragment(SELECTION, false);
+        } else {
+            // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.
+            showFragment(SPLASH, false);
         }
+    }
 
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a DummySectionFragment (defined as a static inner class
-            // below) with the page number as its lone argument.
-        	switch (position) {
-            case 0:
-                // Posts fragment activity
-                return new Tab1Fragment();
-            case 1:
-                // Recording fragment activity
-                return new Tab2Fragment();
-            case 2:
-                // Options fragment activity
-                return new Tab3Fragment();
-        	}
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            // Show  total pages.
-            return 3;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            Locale l = Locale.getDefault();
-            switch (position) {
-                case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
-                case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
-                case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
-                case 3:
-                    return getString(R.string.title_section4).toUpperCase(l);
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // only add the menu when the selection fragment is showing
+        if (fragments[SELECTION].isVisible()) {
+            if (menu.size() == 0) {
+                settings = menu.add(R.string.settings);
             }
-            return null;
+            return true;
+        } else {
+            menu.clear();
+            settings = null;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.equals(settings)) {
+            showSettingsFragment();
+            return true;
+        }
+        return false;
+    }
+
+    public void showSettingsFragment() {
+        showFragment(SETTINGS, true);
+    }
+
+    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+        if (isResumed) {
+            FragmentManager manager = getSupportFragmentManager();
+            int backStackSize = manager.getBackStackEntryCount();
+            for (int i = 0; i < backStackSize; i++) {
+                manager.popBackStack();
+            }
+            // check for the OPENED state instead of session.isOpened() since for the
+            // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
+            if (state.equals(SessionState.OPENED)) {
+                showFragment(SELECTION, false);
+            } else if (state.isClosed()) {
+                showFragment(SPLASH, false);
+            }
         }
     }
 
-    public static class FirstSectionFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-        public FirstSectionFragment() {
+    private void showFragment(int fragmentIndex, boolean addToBackStack) {
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        for (int i = 0; i < fragments.length; i++) {
+            if (i == fragmentIndex) {
+                transaction.show(fragments[i]);
+            } else {
+                transaction.hide(fragments[i]);
+            }
         }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.tab_frag1_layout, container, false);
-            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
         }
+        transaction.commit();
     }
-    public static class SecondSectionFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-        public SecondSectionFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.tab_frag2_layout, container, false);
-            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-    public static class ThirdSectionFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        public static final String ARG_SECTION_NUMBER = "section_number";
-
-        public ThirdSectionFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.tab_frag3_layout, container, false);
-            TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
+    
 }
