@@ -1,8 +1,5 @@
 package com.project.mgr.fragments.tabs;
 
-import com.project.mgr.fragments.tabs.Tab1Fragment;
-import com.project.mgr.fragments.tabs.Tab2Fragment;
-import com.project.mgr.fragments.tabs.Tab3Fragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;

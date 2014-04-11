@@ -9,37 +9,6 @@
     android:background="#fff"
     tools:context=".MainActivity$DummySectionFragment" >
          
-    <LinearLayout 
-    android:orientation="horizontal"
-    android:id="@+id/topbar"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:padding="7dp"
-    >   
-	    <TextView 
-			android:id="@+id/textview"
-			android:layout_height="wrap_content"
-			android:layout_width="wrap_content"
-			android:layout_gravity="center_vertical"
-			android:textColor="#ffffff"
-			android:textSize="14sp"
-			android:layout_marginLeft="5dp"
-			android:textStyle="bold"
-		/>
-	</LinearLayout>
-	<View
-        android:id="@+id/view01"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#313437" />
-    <ListView 
-		android:id="@+id/listview"
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:layout_margin="10dp"
-		android:scrollingCache="false"
-		android:divider="#e4e4e4"
-		android:dividerHeight="2dp"
-	/>    
+     
 
 </RelativeLayout>

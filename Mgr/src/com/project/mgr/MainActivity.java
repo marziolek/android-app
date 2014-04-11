@@ -38,6 +38,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
+import com.project.mgr.fragments.tabs.SwipeTabs;
 
 public class MainActivity extends FragmentActivity implements OnClickListener,
 ConnectionCallbacks, OnConnectionFailedListener {
@@ -95,7 +96,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     private ConnectionResult mConnectionResult;
  
     private SignInButton btnSignIn;
-    private Button btnSignOut, btnRevokeAccess;
+    private Button btnSignOut, btnRevokeAccess, btnSignOutGFB;
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private LinearLayout llProfileLayout;
@@ -124,16 +125,9 @@ ConnectionCallbacks, OnConnectionFailedListener {
         }
         transaction.commit();
 
-        splashFragment.setSkipLoginCallback(new SplashFragment.SkipLoginCallback() {
-            @Override
-            public void onSkipLoginPressed() {
-                userSkippedLogin = true;
-                showFragment(SELECTION, false);
-            }
-        });
-        
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
         btnSignOut = (Button) findViewById(R.id.btn_sign_out);
+        btnSignOutGFB = (Button) findViewById(R.id.btn_sign_out_google_facebook);
         btnRevokeAccess = (Button) findViewById(R.id.btn_revoke_access);
         imgProfilePic = (ImageView) findViewById(R.id.imgProfilePic);
         txtName = (TextView) findViewById(R.id.txtName);
@@ -143,6 +137,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
         // Button click listeners
         btnSignIn.setOnClickListener(this);
         btnSignOut.setOnClickListener(this);
+        btnSignOutGFB.setOnClickListener(this);
         btnRevokeAccess.setOnClickListener(this);
  
         // Initializing google plus api client
@@ -276,7 +271,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
      
         // Update the UI after signin
         updateUI(true);
-     
+        
     }
      
     @Override
@@ -294,6 +289,8 @@ ConnectionCallbacks, OnConnectionFailedListener {
             btnSignOut.setVisibility(View.VISIBLE);
             btnRevokeAccess.setVisibility(View.VISIBLE);
             llProfileLayout.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, SwipeTabs.class);
+            startActivity(intent);
         } else {
             btnSignIn.setVisibility(View.VISIBLE);
             btnSignOut.setVisibility(View.GONE);

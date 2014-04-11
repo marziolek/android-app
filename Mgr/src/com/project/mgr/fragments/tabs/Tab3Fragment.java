@@ -12,10 +12,13 @@ import android.view.ViewGroup;
 import com.project.mgr.R;
 
 public class Tab3Fragment extends Fragment {
-
+    
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 		Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.tab_frag3_layout, container, false);
 		return rootView;
 	}
+	
+	
+	
 }
