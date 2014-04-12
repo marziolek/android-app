@@ -38,4 +38,8 @@
     <string name="btn_logout_from_google">Logout from Google</string>
     <string name="btn_revoke_access">Revoke Access</string>
     
+    <string name="record_button">Record</string>
+    <string name="play_button">Play</string>
+    <string name="return_button">Return</string>
+    
 </resources>

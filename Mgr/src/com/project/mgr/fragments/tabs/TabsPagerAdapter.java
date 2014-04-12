@@ -15,11 +15,11 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
  
         switch (index) {
         case 0:
-            return new Tab1Fragment();
+            return new Stream_tab1();
         case 1:
-            return new Tab2Fragment();
+            return new Record_tab2();
         case 2:
-            return new Tab3Fragment();
+            return new Settings_tab3();
 	    }
  
         return null;

@@ -11,14 +11,14 @@ import android.view.ViewGroup;
 
 import com.project.mgr.R;
 
-public class Tab1Fragment extends Fragment {
+public class Settings_tab3 extends Fragment {
     
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-    		Bundle savedInstanceState) {
-
-    		View rootView = inflater.inflate(R.layout.tab_frag1_layout, container, false);
-    		return rootView;
-    }
+		Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.settings_tab3, container, false);
+		return rootView;
+	}
+	
 	
 	
 }

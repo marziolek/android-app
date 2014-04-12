@@ -96,7 +96,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     private ConnectionResult mConnectionResult;
  
     private SignInButton btnSignIn;
-    private Button btnSignOut, btnRevokeAccess, btnSignOutGFB;
+    private Button btnSignOut, btnRevokeAccess;
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private LinearLayout llProfileLayout;
@@ -127,7 +127,6 @@ ConnectionCallbacks, OnConnectionFailedListener {
 
         btnSignIn = (SignInButton) findViewById(R.id.btn_sign_in);
         btnSignOut = (Button) findViewById(R.id.btn_sign_out);
-        btnSignOutGFB = (Button) findViewById(R.id.btn_sign_out_google_facebook);
         btnRevokeAccess = (Button) findViewById(R.id.btn_revoke_access);
         imgProfilePic = (ImageView) findViewById(R.id.imgProfilePic);
         txtName = (TextView) findViewById(R.id.txtName);
@@ -137,7 +136,6 @@ ConnectionCallbacks, OnConnectionFailedListener {
         // Button click listeners
         btnSignIn.setOnClickListener(this);
         btnSignOut.setOnClickListener(this);
-        btnSignOutGFB.setOnClickListener(this);
         btnRevokeAccess.setOnClickListener(this);
  
         // Initializing google plus api client
@@ -470,7 +468,9 @@ ConnectionCallbacks, OnConnectionFailedListener {
             // check for the OPENED state instead of session.isOpened() since for the
             // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
             if (state.equals(SessionState.OPENED)) {
-                showFragment(SELECTION, false);
+                //showFragment(SELECTION, false);
+                Intent intent = new Intent(this, SwipeTabs.class);
+                startActivity(intent);
             } else if (state.isClosed()) {
                 showFragment(SPLASH, false);
             }
