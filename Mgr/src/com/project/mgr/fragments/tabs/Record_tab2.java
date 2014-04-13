@@ -4,6 +4,10 @@
 package com.project.mgr.fragments.tabs;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -24,31 +28,14 @@ public class Record_tab2 extends Fragment {
 	
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
-
 	        private Button mRecordButton = null;
 	        private MediaRecorder mRecorder = null;
-
 	        private Button mPlayButton = null;
 	        private MediaPlayer mPlayer = null;
-
-	        private Button mReturnButton = null;
-	        
 	        private boolean mStartPlaying = false;
 	        private boolean mStartRecording = false;
-	        
 	        private AudioRecorderResultListener audioRecorderResultListener;
-	        
-	        /*
-	        public boolean onTouchEvent(MotionEvent me) {
-	        	switch (me.getAction()) {
-	            	case MotionEvent.ACTION_DOWN:
-	            		startRecording();
-	            	case MotionEvent.ACTION_UP:
-	            		stopRecording();
-	            }
-	            return true;
-	        }
-	        */
+	        private boolean maxDuration = false;
 	        
 	        public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                    Bundle savedInstanceState) {
@@ -60,35 +47,40 @@ public class Record_tab2 extends Fragment {
 	                        
 	                    mPlayButton = (Button) v.findViewById(R.id.play_button);
 	                    mPlayButton.setEnabled(false);
-	                    mPlayButton.setOnTouchListener(playListener);
-	                    
-	                    mReturnButton = (Button) v.findViewById(R.id.return_button) ;
-	                    mReturnButton.setEnabled(false);
-	                    //mReturnButton.setOnClickListener(Record_tab2.this);	                    
+	                    mPlayButton.setOnTouchListener(playListener);             
 	                    
 	                return v;
 	        }
+	        
+	        final Timer timer = new Timer();
 	        
 	        private OnTouchListener recordListener = new OnTouchListener(){
                 public boolean onTouch(View v, MotionEvent event) {
                 	switch ( event.getAction() ) {
                     	case MotionEvent.ACTION_DOWN: 
-                    		mStartRecording = !mStartRecording;
-	                        Log.v("xinxin**", "mRecord and mstartRecording=" + mStartRecording);
-	                        onRecord(mStartRecording);
-	                        if (mStartRecording) {
-	                                //mRecordButton.setImageResource(R.drawable.recorder_stop);
-	                                mPlayButton.setEnabled(false);
-	                                mReturnButton.setEnabled(false);
-	                                
-	                        }
+                    		timer.schedule(new TimerTask() {    	
+	                    		@Override
+	                    		public void run() {
+	                    			stopRecording();
+	                    			Log.v("xinxin**", "mRecord and mstartRecording=recording ended");
+	                    			if (!maxDuration) {
+	                    				maxDuration = true;
+	                    			}
+	                    		}
+                    		}, 10000);
+                    		startRecording();
+			                if (mStartRecording) {
+			                	mPlayButton.setEnabled(false);
+			                }
                     		return true;
                     	case MotionEvent.ACTION_UP:
-                    		mStartRecording = !mStartRecording;
-                    		onRecord(mStartRecording);
-                    		mPlayButton.setEnabled(true);
-                    		Log.v("xinxin**", "mRecord and mstartRecording=ju¿ siê zrobi³o");
-    	            		return true;
+                    		if (!maxDuration) {
+                    			stopRecording();
+                    			maxDuration = true;
+                    			Log.v("xinxin**", "mRecord and mstartRecording=recording ended");
+                    		}
+	                        mPlayButton.setEnabled(true);
+	                        return true;
 	                    }
                    return false;
                 }
@@ -98,85 +90,41 @@ public class Record_tab2 extends Fragment {
                 public boolean onTouch(View v, MotionEvent event) {
                 	switch ( event.getAction() ) {
                     	case MotionEvent.ACTION_DOWN: 
-                    		startPlaying();
+                    		mStartPlaying = !mStartPlaying;
+                            startPlaying();
+                            if (mStartPlaying) {
+                                    mRecordButton.setEnabled(false);
+                            } else {
+                                    mRecordButton.setEnabled(true);
+                            }
                     		return true;
                     	case MotionEvent.ACTION_UP:
-                    		stopPlaying();
+                    		mStartPlaying = !mStartPlaying;
+                            stopPlaying();
+                            if (mStartPlaying) {
+                                    mRecordButton.setEnabled(false);
+                            } else {
+                                    mRecordButton.setEnabled(true);
+                            }
                     		return true;
 	                    }
                    return false;
                 }
             };
-	        
+            
+	        /**
+	         * recording and playing
+	         */
 	        public void setAudioRecorderResultListener(AudioRecorderResultListener audioRecorderResultListener){
 	                this.audioRecorderResultListener = audioRecorderResultListener;
 	        }
 	        
-	        public void onClick(View v) {
-	                /*if (v == mRecordButton) {
-	                        
-	                        mStartRecording = !mStartRecording;
-	                        Log.v("xinxin**", "mRecord and mstartRecording=" + mStartRecording);
-	                        onRecord(mStartRecording);
-	                        if (mStartRecording) {
-	                                //mRecordButton.setImageResource(R.drawable.recorder_stop);
-	                                mPlayButton.setEnabled(false);
-	                                mReturnButton.setEnabled(false);
-	                                
-	                        } else {
-	                                //mRecordButton.setImageResource(R.drawable.recorder_record);
-	                                mPlayButton.setEnabled(true);
-	                                mReturnButton.setEnabled(true);
-	                        }
-	                }*/
-	                if(v == mPlayButton){
-	                        mStartPlaying = !mStartPlaying;
-	                        onPlay(mStartPlaying);
-	                        if (mStartPlaying) {
-	                                //mPlayButton.setImageResource(R.drawable.recorder_pause);
-	                                mRecordButton.setEnabled(false);
-	                                mReturnButton.setEnabled(false);
-	                        } else {
-	                                //mPlayButton.setImageResource(R.drawable.recorder_play);
-	                                mRecordButton.setEnabled(true);
-	                                mReturnButton.setEnabled(true);
-	                        }
-	                }
-	               /*
-	                if(v == mReturnButton){
-	                        Log.v("xinxin**", "mPlayButton");
-	                        audioRecorderResultListener.onReceiveAudio();
-	                        //getDialog().dismiss();
-	                }
-	          */     
-	        } 
-	        
-	            
-	           
-
-	        private void onRecord(boolean start) {
-	                if (start) {
-	                        startRecording();
-	                } else {
-	                        stopRecording();
-	                }
-	        }
-
-	        private void onPlay(boolean start) {
-	                if (start) {
-	                        startPlaying();
-	                } else {
-	                        stopPlaying();
-	                }
-	        }
-
 	        private void startPlaying() {
 	                mPlayer = new MediaPlayer();
 	                try {
 	                        mPlayer.setDataSource(mFileName);
 	                        mPlayer.prepare();
 	                        mPlayer.start();
-	                        Log.v("asd","asd");
 	                } catch (IOException e) {
 	                        Log.e(LOG_TAG, "prepare() failed when trying to play recorded audio");
 	                }
@@ -218,4 +166,6 @@ public class Record_tab2 extends Fragment {
 	        public static interface AudioRecorderResultListener {
 		        void onReceiveAudio();
 		    }
+	        
+	        
 	}
