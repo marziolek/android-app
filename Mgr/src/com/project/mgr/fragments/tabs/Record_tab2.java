@@ -12,13 +12,15 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.project.mgr.R;
 
-public class Record_tab2 extends Fragment implements View.OnClickListener {
+public class Record_tab2 extends Fragment {
 	
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
@@ -36,7 +38,17 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	        
 	        private AudioRecorderResultListener audioRecorderResultListener;
 	        
-	        
+	        /*
+	        public boolean onTouchEvent(MotionEvent me) {
+	        	switch (me.getAction()) {
+	            	case MotionEvent.ACTION_DOWN:
+	            		startRecording();
+	            	case MotionEvent.ACTION_UP:
+	            		stopRecording();
+	            }
+	            return true;
+	        }
+	        */
 	        
 	        public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                    Bundle savedInstanceState) {
@@ -44,25 +56,64 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	                View v= inflater.inflate(R.layout.record_tab2, container, false);
 	                
 	                	mRecordButton = (Button) v.findViewById(R.id.record_button);
-	                    mRecordButton.setOnClickListener(Record_tab2.this);
+	                    mRecordButton.setOnTouchListener(recordListener);
 	                        
 	                    mPlayButton = (Button) v.findViewById(R.id.play_button);
 	                    mPlayButton.setEnabled(false);
-	                    mPlayButton.setOnClickListener(Record_tab2.this);
+	                    mPlayButton.setOnTouchListener(playListener);
 	                    
 	                    mReturnButton = (Button) v.findViewById(R.id.return_button) ;
 	                    mReturnButton.setEnabled(false);
-	                    mReturnButton.setOnClickListener(Record_tab2.this);
-	                        
+	                    //mReturnButton.setOnClickListener(Record_tab2.this);	                    
+	                    
 	                return v;
 	        }
-	         
+	        
+	        private OnTouchListener recordListener = new OnTouchListener(){
+                public boolean onTouch(View v, MotionEvent event) {
+                	switch ( event.getAction() ) {
+                    	case MotionEvent.ACTION_DOWN: 
+                    		mStartRecording = !mStartRecording;
+	                        Log.v("xinxin**", "mRecord and mstartRecording=" + mStartRecording);
+	                        onRecord(mStartRecording);
+	                        if (mStartRecording) {
+	                                //mRecordButton.setImageResource(R.drawable.recorder_stop);
+	                                mPlayButton.setEnabled(false);
+	                                mReturnButton.setEnabled(false);
+	                                
+	                        }
+                    		return true;
+                    	case MotionEvent.ACTION_UP:
+                    		mStartRecording = !mStartRecording;
+                    		onRecord(mStartRecording);
+                    		mPlayButton.setEnabled(true);
+                    		Log.v("xinxin**", "mRecord and mstartRecording=ju¿ siê zrobi³o");
+    	            		return true;
+	                    }
+                   return false;
+                }
+            };
+	        
+            private OnTouchListener playListener = new OnTouchListener(){
+                public boolean onTouch(View v, MotionEvent event) {
+                	switch ( event.getAction() ) {
+                    	case MotionEvent.ACTION_DOWN: 
+                    		startPlaying();
+                    		return true;
+                    	case MotionEvent.ACTION_UP:
+                    		stopPlaying();
+                    		return true;
+	                    }
+                   return false;
+                }
+            };
+	        
 	        public void setAudioRecorderResultListener(AudioRecorderResultListener audioRecorderResultListener){
 	                this.audioRecorderResultListener = audioRecorderResultListener;
 	        }
 	        
 	        public void onClick(View v) {
-	                if (v == mRecordButton) {
+	                /*if (v == mRecordButton) {
 	                        
 	                        mStartRecording = !mStartRecording;
 	                        Log.v("xinxin**", "mRecord and mstartRecording=" + mStartRecording);
@@ -77,7 +128,7 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	                                mPlayButton.setEnabled(true);
 	                                mReturnButton.setEnabled(true);
 	                        }
-	                }
+	                }*/
 	                if(v == mPlayButton){
 	                        mStartPlaying = !mStartPlaying;
 	                        onPlay(mStartPlaying);
@@ -91,16 +142,17 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	                                mReturnButton.setEnabled(true);
 	                        }
 	                }
-	                
+	               /*
 	                if(v == mReturnButton){
 	                        Log.v("xinxin**", "mPlayButton");
 	                        audioRecorderResultListener.onReceiveAudio();
 	                        //getDialog().dismiss();
 	                }
-	                
-	        }
-
+	          */     
+	        } 
 	        
+	            
+	           
 
 	        private void onRecord(boolean start) {
 	                if (start) {
@@ -124,6 +176,7 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	                        mPlayer.setDataSource(mFileName);
 	                        mPlayer.prepare();
 	                        mPlayer.start();
+	                        Log.v("asd","asd");
 	                } catch (IOException e) {
 	                        Log.e(LOG_TAG, "prepare() failed when trying to play recorded audio");
 	                }
@@ -163,6 +216,6 @@ public class Record_tab2 extends Fragment implements View.OnClickListener {
 	        }
 	        
 	        public static interface AudioRecorderResultListener {
-	        void onReceiveAudio();
-	    }
+		        void onReceiveAudio();
+		    }
 	}
