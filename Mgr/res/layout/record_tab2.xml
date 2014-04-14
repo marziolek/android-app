@@ -8,14 +8,15 @@
 	    android:layout_height="fill_parent"
 	    android:orientation="vertical" >
 	    
-	    <LinearLayout
+	    <!--<LinearLayout
 	        android:id="@+id/recording_status"
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
 	        android:orientation="vertical"
 	        android:background="#33b5e5">	        
 	    </LinearLayout>
-	    <!-- <ImageView
+	    
+	     <ImageView
 	        android:id="@+id/draw_line"
 	        android:contentDescription="@string/rec_progress"
 	        android:layout_width="fill_parent"
@@ -23,6 +24,11 @@
 	        android:background="#000000"
 	        android:padding="0dp"
 	        android:adjustViewBounds="true" /> -->
+	        <ImageView android:id="@+id/imgLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/twitter"
+        android:layout_alignParentLeft="true"/>
 	</RelativeLayout>
 
 	<RelativeLayout
@@ -53,6 +59,15 @@
 	        android:format="@string/chronometer_initial_format"
 	        android:paddingBottom="30dip"
 	        android:paddingTop="30dip" />
+
+	    <TextView
+	        android:id="@+id/time"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentBottom="true"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginBottom="75dp"
+	         />
 
 	</RelativeLayout>
 

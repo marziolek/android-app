@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,15 +18,18 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.Chronometer.OnChronometerTickListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.project.mgr.R;
 
-public class Record_tab2 extends Fragment {
-	
+public class Record_tab2 extends Fragment implements AnimationListener {
+		
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
 	        private Button mRecordButton = null;
@@ -38,6 +42,10 @@ public class Record_tab2 extends Fragment {
 	        private boolean maxDuration = false;
 	        private LinearLayout mLayout = null;
 	        Chronometer mChronometer;
+	        private ImageView imgLogo;
+	        
+	        // Animation
+	    	Animation animMove;
 	        
 	        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -51,6 +59,14 @@ public class Record_tab2 extends Fragment {
 				
 				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
 				
+				imgLogo = (ImageView) v.findViewById(R.id.imgLogo);
+				// load the animation
+				animMove = AnimationUtils.loadAnimation(getActivity().getApplicationContext(),
+						R.anim.move);
+
+				// set animation listener
+				animMove.setAnimationListener(this);
+				
 				return v;
 	        }
 	        
@@ -62,31 +78,27 @@ public class Record_tab2 extends Fragment {
                 	switch ( event.getAction() ) {
                     	case MotionEvent.ACTION_DOWN: 
                     		if (!maxDuration) {
-                    			startRecording();
+                    			mChronometer.setBase(SystemClock.elapsedRealtime());
                     			mChronometer.start();
-		                    	
-		                    	mChronometer.setOnChronometerTickListener(new OnChronometerTickListener() {
-		                    	    public void onChronometerTick(Chronometer chronometer) {
-		                    	        String currentTime= mChronometer.getText().toString();
-			                    	    if(currentTime.equals("00:10")) {
-			                    	    	stopRecording();
-			                    	    	mChronometer.stop();
-			                    	    	maxDuration = true;
-			                    	    	mPlayButton.setEnabled(true);
-			                    	    	Log.d("chrono", "minelo 10 sek");
-			                    	    }
-		                    	    }
-		                    	});
-		                    	mPlayButton.setEnabled(false);
+                    			startRecording();
+                    			imgLogo.startAnimation(animMove);
+                    			mPlayButton.setEnabled(false);
+	                    		if (elapsedTime() >= 5.0) {
+                    				 stopRecording();
+                    				 mChronometer.stop();
+                    				 maxDuration = true;
+                    				 mPlayButton.setEnabled(true);
+                    				 Log.d("wiece", "niz 5 sekund kurdeee");
+                    			 }
                     		}
                     		return true;
                     	case MotionEvent.ACTION_UP:
                     		if (!maxDuration) {
                     			stopRecording();
                     			maxDuration = true;
-                    			mChronometer.stop();
                     			mPlayButton.setEnabled(true);
                     		}
+                    		mChronometer.stop();
 	                        return true;
 	                    }
                    return false;
@@ -179,5 +191,34 @@ public class Record_tab2 extends Fragment {
 	        /**
 	         * Drawing recording progress
 	         */
+	        private double elapsedTime() {
+	            long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
+	            double elapsedTime = elapsedMillis / 1000.0;
+	            
+	            return elapsedTime;
+	        }
 	        
+
+	    	@Override
+	    	public void onAnimationEnd(Animation animation) {
+	    		// Take any action after completing the animation
+
+	    		// check for zoom in animation
+	    		if (animation == animMove) {
+	    		}
+
+	    	}
+
+	    	@Override
+	    	public void onAnimationRepeat(Animation animation) {
+	    		// TODO Auto-generated method stub
+
+	    	}
+
+	    	@Override
+	    	public void onAnimationStart(Animation animation) {
+	    		// TODO Auto-generated method stub
+
+	    	}
+
 	}
