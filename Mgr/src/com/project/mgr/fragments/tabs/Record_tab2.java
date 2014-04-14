@@ -5,9 +5,6 @@ package com.project.mgr.fragments.tabs;
 
 import java.io.IOException;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -21,6 +18,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
+import android.widget.LinearLayout;
 
 import com.project.mgr.R;
 
@@ -36,21 +36,24 @@ public class Record_tab2 extends Fragment {
 	        private boolean mStartRecording = false;
 	        private AudioRecorderResultListener audioRecorderResultListener;
 	        private boolean maxDuration = false;
+	        private LinearLayout mLayout = null;
+	        Chronometer mChronometer;
 	        
-	        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                    Bundle savedInstanceState) {
+	        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-	                View v= inflater.inflate(R.layout.record_tab2, container, false);
-	                
-	                	mRecordButton = (Button) v.findViewById(R.id.record_button);
-	                    mRecordButton.setOnTouchListener(recordListener);
-	                        
-	                    mPlayButton = (Button) v.findViewById(R.id.play_button);
-	                    mPlayButton.setEnabled(false);
-	                    mPlayButton.setOnTouchListener(playListener);             
-	                    
-	                return v;
+	        	View v= inflater.inflate(R.layout.record_tab2, container, false);    
+				mRecordButton = (Button) v.findViewById(R.id.record_button);
+				mRecordButton.setOnTouchListener(recordListener);
+				
+				mPlayButton = (Button) v.findViewById(R.id.play_button);
+				mPlayButton.setEnabled(false);
+				mPlayButton.setOnTouchListener(playListener);             
+				
+				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
+				
+				return v;
 	        }
+	        
 	        
 	        final Timer timer = new Timer();
 	        
@@ -58,28 +61,32 @@ public class Record_tab2 extends Fragment {
                 public boolean onTouch(View v, MotionEvent event) {
                 	switch ( event.getAction() ) {
                     	case MotionEvent.ACTION_DOWN: 
-                    		timer.schedule(new TimerTask() {    	
-	                    		@Override
-	                    		public void run() {
-	                    			stopRecording();
-	                    			Log.v("xinxin**", "mRecord and mstartRecording=recording ended");
-	                    			if (!maxDuration) {
-	                    				maxDuration = true;
-	                    			}
-	                    		}
-                    		}, 10000);
-                    		startRecording();
-			                if (mStartRecording) {
-			                	mPlayButton.setEnabled(false);
-			                }
+                    		if (!maxDuration) {
+                    			startRecording();
+                    			mChronometer.start();
+		                    	
+		                    	mChronometer.setOnChronometerTickListener(new OnChronometerTickListener() {
+		                    	    public void onChronometerTick(Chronometer chronometer) {
+		                    	        String currentTime= mChronometer.getText().toString();
+			                    	    if(currentTime.equals("00:10")) {
+			                    	    	stopRecording();
+			                    	    	mChronometer.stop();
+			                    	    	maxDuration = true;
+			                    	    	mPlayButton.setEnabled(true);
+			                    	    	Log.d("chrono", "minelo 10 sek");
+			                    	    }
+		                    	    }
+		                    	});
+		                    	mPlayButton.setEnabled(false);
+                    		}
                     		return true;
                     	case MotionEvent.ACTION_UP:
                     		if (!maxDuration) {
                     			stopRecording();
                     			maxDuration = true;
-                    			Log.v("xinxin**", "mRecord and mstartRecording=recording ended");
+                    			mChronometer.stop();
+                    			mPlayButton.setEnabled(true);
                     		}
-	                        mPlayButton.setEnabled(true);
 	                        return true;
 	                    }
                    return false;
@@ -154,6 +161,7 @@ public class Record_tab2 extends Fragment {
 	                }
 
 	                mRecorder.start();
+	                Log.v("**rec**", "mRecord and mstartRecording=recording started");
 	        }
 
 	        private void stopRecording() {
@@ -161,11 +169,15 @@ public class Record_tab2 extends Fragment {
 	                mRecorder.reset();
 	                mRecorder.release();
 	                mRecorder = null;
+	                Log.v("**rec**", "mRecord and mstartRecording=recording ended");
 	        }
 	        
 	        public static interface AudioRecorderResultListener {
 		        void onReceiveAudio();
 		    }
 	        
+	        /**
+	         * Drawing recording progress
+	         */
 	        
 	}

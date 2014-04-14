@@ -1,19 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical" >
+	    
+	    <LinearLayout
+	        android:id="@+id/recording_status"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent"
+	        android:orientation="vertical"
+	        android:background="#33b5e5">	        
+	    </LinearLayout>
+	    <!-- <ImageView
+	        android:id="@+id/draw_line"
+	        android:contentDescription="@string/rec_progress"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:background="#000000"
+	        android:padding="0dp"
+	        android:adjustViewBounds="true" /> -->
+	</RelativeLayout>
 
-    <Button
-        android:id="@+id/record_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/record_button" />
-    
-    <Button
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/play_button" />
-    
-</LinearLayout>
+	<RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:orientation="vertical" >
+
+	    <Button
+	        android:id="@+id/record_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/record_button" />
+
+	    <Button
+	        android:id="@+id/play_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_alignParentTop="true"
+	        android:text="@string/play_button" />
+
+	    <Chronometer
+	        android:id="@+id/chronometer"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_centerHorizontal="true"
+	        android:layout_centerVertical="true"
+	        android:format="@string/chronometer_initial_format"
+	        android:paddingBottom="30dip"
+	        android:paddingTop="30dip" />
+
+	</RelativeLayout>
+
+</FrameLayout>
