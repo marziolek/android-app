@@ -11,6 +11,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -65,7 +66,7 @@ public class Record_tab2 extends Fragment {
 				mRecordButton.setOnTouchListener(new OnTouchListener() {
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
-						if (elapsedTime() >= 10.000) {
+						if (elapsedTime() >= 5.000) {
                    			stopRecording();
                    			mChronometer.stop();
                    			mMaxDuration = true;
@@ -74,6 +75,8 @@ public class Record_tab2 extends Fragment {
                     		mPlayButton.setEnabled(true);
                    			mRecordButton.setEnabled(false);
                    			Log.d("more than", "10 sec");
+                   			Intent intent = new Intent(getActivity(), TakePhotos.class);
+							startActivity(intent);
                    			return false;
                 		}
 						if (!mMaxDuration) {
@@ -94,9 +97,7 @@ public class Record_tab2 extends Fragment {
 		                    		animView.cancelAnimation(recordingStatusHeightActual);
 			                        break;
 		                	}
-		                } 
-						if (mMaxDuration) {
-							concatenateAudioFiles();
+							
 						}
 						return false;
 					}
@@ -204,13 +205,6 @@ public class Record_tab2 extends Fragment {
 		        void onReceiveAudio();
 		    }
 	        
-	        public void concatenateAudioFiles() {
-	        	mAllFiles = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
-	        	File dir = new File(mAllFiles);
-	        	for (final File fileEntry : dir.listFiles()) {
-	        		System.out.println(fileEntry.getName());
-	        	}
-	        }
 	        
 	        /**
 	         * Animating recording progress

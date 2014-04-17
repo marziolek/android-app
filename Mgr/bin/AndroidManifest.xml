@@ -39,9 +39,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <activity android:name="com.project.mgr.fragments.tabs.SwipeTabs" >
         </activity>
+        <activity 
+            android:name="com.project.mgr.fragments.tabs.TakePhotos"></activity>
 	</application>
 
 </manifest>
