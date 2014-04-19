@@ -1,5 +1,6 @@
 package com.project.mgr;
 
+import java.io.File;
 import java.io.InputStream;
 
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -100,7 +102,9 @@ ConnectionCallbacks, OnConnectionFailedListener {
     private ImageView imgProfilePic;
     private TextView txtName, txtEmail;
     private LinearLayout llProfileLayout;
-
+    
+    private String mFileName = null;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +147,18 @@ ConnectionCallbacks, OnConnectionFailedListener {
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this).addApi(Plus.API, null)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
+        
+        // Clean up recording folder
+        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
+        File dir = new File(mFileName);
+        if (dir.isDirectory()) {
+        	String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+            	new File(dir, children[i]).delete();
+            	String a = String.valueOf(i);
+            	Log.d("removed file: ", a);
+            }
+        }
     }
 
     protected void onStart() {

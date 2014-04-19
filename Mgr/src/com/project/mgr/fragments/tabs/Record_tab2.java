@@ -39,7 +39,6 @@ public class Record_tab2 extends Fragment {
 		
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
-	        private String mAllFiles = null;
 	        private Button mRecordButton = null;
 	        private MediaRecorder mRecorder = null;
 	        private Button mPlayButton = null;
@@ -142,7 +141,6 @@ public class Record_tab2 extends Fragment {
     		    int recordingStatusHeight = recording_status.getHeight();
     		    params.setMargins(0, recordingStatusHeight, 0, 0);
     	    	recording_status.setLayoutParams(params);
-    	    	Toast.makeText(getActivity(), "asd", Toast.LENGTH_SHORT).show();
 	        }
 	        
 	        /**
@@ -172,6 +170,7 @@ public class Record_tab2 extends Fragment {
 	                mRecorder = new MediaRecorder();
 	                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 	                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+	                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 	                
 	                String currentTime = String.valueOf(System.currentTimeMillis());
 	                mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
@@ -181,7 +180,6 @@ public class Record_tab2 extends Fragment {
 	                }	             
 	                mFileName += "/audiorecord" + currentTime + ".3gpp";
 	                mRecorder.setOutputFile(mFileName);
-	                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
 	                try {
 	                        mRecorder.prepare();
@@ -313,20 +311,4 @@ public class Record_tab2 extends Fragment {
 	                }
 	            }
 	    	}
-	    	
-	    	/* removing files after closing activity / should remove files after closing whole app
-	    	public void onDestroy() {
-	        	super.onDestroy();
-	        	
-	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
-	            File dir = new File(mFileName);
-	            if (dir.isDirectory()) {
-	            	String[] children = dir.list();
-	                for (int i = 0; i < children.length; i++) {
-	                	new File(dir, children[i]).delete();
-	                	String a = String.valueOf(i);
-	                	Log.d("removed file: ", a);
-	                }
-	            }
-	        }*/
 	    }	
