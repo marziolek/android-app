@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -31,8 +30,8 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.Toast;
 
+import com.project.mgr.AudioRecorder;
 import com.project.mgr.R;
 
 public class Record_tab2 extends Fragment {
@@ -40,17 +39,18 @@ public class Record_tab2 extends Fragment {
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
 	        private Button mRecordButton = null;
-	        private MediaRecorder mRecorder = null;
+	        //private MediaRecorder mRecorder = null;
 	        private Button mPlayButton = null;
 	        private MediaPlayer mPlayer = null;
 	        private boolean mStartPlaying = false;
-	        private boolean mStartRecording = false;
-	        private AudioRecorderResultListener audioRecorderResultListener;
+	        //private boolean mStartRecording = false;
+	        //private AudioRecorderResultListener audioRecorderResultListener;
 	        private boolean mMaxDuration = false;
 	        Chronometer mChronometer;
 	        private LinearLayout recording_status;
 	    	Animation animMove;
 	    	private long mChronometerPause = 0;
+	    	private AudioRecorder mAudioRecorder;
 	        
 	        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -61,11 +61,12 @@ public class Record_tab2 extends Fragment {
 				mPlayButton.setEnabled(false);             
 				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
 				recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
+				mAudioRecorder = AudioRecorder.build(getActivity(), getNextFileName());
 				mRecordButton = (Button) v.findViewById(R.id.record_button);
 				mRecordButton.setOnTouchListener(new OnTouchListener() {
 					@Override
 					public boolean onTouch(View v, MotionEvent event) {
-						if (elapsedTime() >= 5.000) {
+						if (elapsedTime() >= 10.000) {
                    			stopRecording();
                    			mChronometer.stop();
                    			mMaxDuration = true;
@@ -83,7 +84,7 @@ public class Record_tab2 extends Fragment {
 		                    	case MotionEvent.ACTION_DOWN:
 		                    		mChronometer.setBase(SystemClock.elapsedRealtime() + mChronometerPause);
 			                    	mChronometer.start();
-			                    	startRecording();
+			                    	startRecording();			                    	
 			                    	int recordingStatusHeight = recording_status.getHeight();
 			                    	animView.startAnimation(recordingStatusHeight);
 		                    		break;
@@ -145,10 +146,10 @@ public class Record_tab2 extends Fragment {
 	        
 	        /**
 	         * recording and playing
-	         */
+	         
 	        public void setAudioRecorderResultListener(AudioRecorderResultListener audioRecorderResultListener){
 	                this.audioRecorderResultListener = audioRecorderResultListener;
-	        }
+	        }*/
 	        
 	        private void startPlaying() {
 	                mPlayer = new MediaPlayer();
@@ -165,13 +166,26 @@ public class Record_tab2 extends Fragment {
 	                mPlayer.release();
 	                mPlayer = null;
 	        }
+	        
+	        private String getNextFileName() {
+	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
+                File dir = new File(mFileName);
+                if (!dir.exists()) {
+                	dir.mkdir();
+                }
+                String currentTime = String.valueOf(System.currentTimeMillis());
+                mFileName += "/audiorecord" + currentTime + ".mp4";
+                
+                return mFileName;
+	        }
 
 	        private void startRecording() {
+	                /*
 	                mRecorder = new MediaRecorder();
+	                 
 	                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 	                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-	                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-	                
+	                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
 	                String currentTime = String.valueOf(System.currentTimeMillis());
 	                mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
 	                File dir = new File(mFileName);
@@ -180,6 +194,7 @@ public class Record_tab2 extends Fragment {
 	                }	             
 	                mFileName += "/audiorecord" + currentTime + ".3gpp";
 	                mRecorder.setOutputFile(mFileName);
+	                
 
 	                try {
 	                        mRecorder.prepare();
@@ -189,14 +204,43 @@ public class Record_tab2 extends Fragment {
 
 	                mRecorder.start();
 	                Log.v("**rec**", "mRecord and mstartRecording=recording started");
+	                */
+	        	mAudioRecorder.start(new AudioRecorder.OnStartListener() {
+	        	    @Override
+	        	    public void onStarted() {
+	        	        // started
+	        	    	Log.v("**rec**", "new recorder started");
+	        	    }
+
+	        	    @Override
+	        	    public void onException(Exception e) {
+	        	        // error
+	        	    	Log.v("**rec**", "error!!!!!!!!!!!!");
+	        	    }
+	        	});
 	        }
 
 	        private void stopRecording() {
-	                mRecorder.stop();
+	                /*
+	                mRecorder.stop(); 
 	                mRecorder.reset();
 	                mRecorder.release();
 	                mRecorder = null;
 	                Log.v("**rec**", "mRecord and mstartRecording=recording ended");
+	                */
+	        	mAudioRecorder.pause(new AudioRecorder.OnPauseListener() {
+	        	    @Override
+	        	    public void onPaused(String activeRecordFileName) {
+	        	        // paused
+	        	    	Log.v("**rec**", "new recorder paused");
+	        	    }
+
+	        	    @Override
+	        	    public void onException(Exception e) {
+	        	        // error
+	        	    	Log.v("**rec**", "PUASE ERROR!!!!!");
+	        	    }
+	        	});
 	        }
 	        
 	        public static interface AudioRecorderResultListener {

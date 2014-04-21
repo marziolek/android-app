@@ -2,9 +2,15 @@ package com.project.mgr;
 
 import java.io.File;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -15,6 +21,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -108,7 +115,22 @@ ConnectionCallbacks, OnConnectionFailedListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
 
+        	   PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+
+        	   for (Signature signature : info.signatures) 
+        	   {
+        	    MessageDigest md = MessageDigest.getInstance("SHA");
+        	    md.update(signature.toByteArray());
+        	    Log.e("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+        	   }
+
+        	  } catch (NameNotFoundException e) {
+        	   Log.e("name not found", e.toString());
+        	  } catch (NoSuchAlgorithmException e) {
+        	   Log.e("no such an algorithm", e.toString());
+        	  }
         if (savedInstanceState != null) {
             userSkippedLogin = savedInstanceState.getBoolean(USER_SKIPPED_LOGIN_KEY);
         }

@@ -438,8 +438,8 @@ containing a value of this type.
         public static final int yammer=0x7f02004f;
     }
     public static final class id {
-        public static final int action_forgot_password=0x7f050074;
-        public static final int action_settings=0x7f050075;
+        public static final int action_forgot_password=0x7f050075;
+        public static final int action_settings=0x7f050076;
         public static final int albumTitle=0x7f050045;
         public static final int albumname=0x7f050013;
         public static final int btnCareer=0x7f050042;
@@ -514,6 +514,7 @@ containing a value of this type.
         public static final int login_form=0x7f050009;
         public static final int login_status=0x7f050007;
         public static final int login_status_message=0x7f050008;
+        public static final int merge=0x7f050073;
         public static final int name=0x7f050056;
         public static final int none=0x7f050000;
         public static final int normal=0x7f050001;
@@ -525,7 +526,7 @@ containing a value of this type.
         public static final int picker_subtitle=0x7f050028;
         public static final int picture=0x7f050048;
         public static final int pictureTitle=0x7f050049;
-        public static final int play=0x7f050073;
+        public static final int play=0x7f050074;
         public static final int play_button=0x7f050064;
         public static final int profile=0x7f050055;
         public static final int profile_name=0x7f05006f;
@@ -545,7 +546,7 @@ containing a value of this type.
         public static final int small=0x7f050005;
         public static final int splashFragment=0x7f05004e;
         public static final int splash_icon=0x7f05006e;
-        public static final int tabviewpager=0x7f050076;
+        public static final int tabviewpager=0x7f050077;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f050011;
         public static final int textview=0x7f05004b;
