@@ -438,8 +438,8 @@ containing a value of this type.
         public static final int yammer=0x7f02004f;
     }
     public static final class id {
-        public static final int action_forgot_password=0x7f050075;
-        public static final int action_settings=0x7f050076;
+        public static final int action_forgot_password=0x7f050077;
+        public static final int action_settings=0x7f050078;
         public static final int albumTitle=0x7f050045;
         public static final int albumname=0x7f050013;
         public static final int btnCareer=0x7f050042;
@@ -449,9 +449,11 @@ containing a value of this type.
         public static final int btn_sign_in=0x7f050072;
         public static final int btn_sign_out=0x7f05006c;
         public static final int btn_sign_out_google_facebook=0x7f050067;
+        public static final int button_capture=0x7f050075;
         public static final int cEmail=0x7f050033;
         public static final int cImage=0x7f050032;
         public static final int cName=0x7f050031;
+        public static final int camera_preview=0x7f050074;
         public static final int career=0x7f050015;
         public static final int careerLayout=0x7f050018;
         public static final int chronometer=0x7f050065;
@@ -526,7 +528,7 @@ containing a value of this type.
         public static final int picker_subtitle=0x7f050028;
         public static final int picture=0x7f050048;
         public static final int pictureTitle=0x7f050049;
-        public static final int play=0x7f050074;
+        public static final int play=0x7f050076;
         public static final int play_button=0x7f050064;
         public static final int profile=0x7f050055;
         public static final int profile_name=0x7f05006f;
@@ -546,7 +548,7 @@ containing a value of this type.
         public static final int small=0x7f050005;
         public static final int splashFragment=0x7f05004e;
         public static final int splash_icon=0x7f05006e;
-        public static final int tabviewpager=0x7f050077;
+        public static final int tabviewpager=0x7f050079;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f050011;
         public static final int textview=0x7f05004b;

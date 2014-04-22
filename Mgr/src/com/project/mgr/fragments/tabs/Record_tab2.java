@@ -69,15 +69,15 @@ public class Record_tab2 extends Fragment {
 						if (elapsedTime() >= 10.000) {
                    			stopRecording();
                    			mChronometer.stop();
+                   			mRecordButton.setEnabled(false);
                    			mMaxDuration = true;
                    			int recordingStatusHeightActual = recording_status.getHeight();
                     		animView.cancelAnimation(recordingStatusHeightActual);
                     		mPlayButton.setEnabled(true);
-                   			mRecordButton.setEnabled(false);
                    			Log.d("more than", "10 sec");
                    			Intent intent = new Intent(getActivity(), TakePhotos.class);
 							startActivity(intent);
-                   			return false;
+                   			return true;
                 		}
 						if (!mMaxDuration) {
 		                	switch ( event.getAction() ) {
@@ -209,13 +209,13 @@ public class Record_tab2 extends Fragment {
 	        	    @Override
 	        	    public void onStarted() {
 	        	        // started
-	        	    	Log.v("**rec**", "new recorder started");
+	        	    	//Log.v("**rec**", "new recorder started");
 	        	    }
 
 	        	    @Override
 	        	    public void onException(Exception e) {
 	        	        // error
-	        	    	Log.v("**rec**", "error!!!!!!!!!!!!");
+	        	    	//Log.v("**rec**", "error!!!!!!!!!!!!");
 	        	    }
 	        	});
 	        }
@@ -232,13 +232,13 @@ public class Record_tab2 extends Fragment {
 	        	    @Override
 	        	    public void onPaused(String activeRecordFileName) {
 	        	        // paused
-	        	    	Log.v("**rec**", "new recorder paused");
+	        	    	//Log.v("**rec**", "new recorder paused");
 	        	    }
 
 	        	    @Override
 	        	    public void onException(Exception e) {
 	        	        // error
-	        	    	Log.v("**rec**", "PUASE ERROR!!!!!");
+	        	    	//Log.v("**rec**", "PUASE ERROR!!!!!");
 	        	    }
 	        	});
 	        }
