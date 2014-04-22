@@ -39,12 +39,7 @@ public class Record_tab2 extends Fragment {
 	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
 	        private Button mRecordButton = null;
-	        //private MediaRecorder mRecorder = null;
-	        private Button mPlayButton = null;
 	        private MediaPlayer mPlayer = null;
-	        private boolean mStartPlaying = false;
-	        //private boolean mStartRecording = false;
-	        //private AudioRecorderResultListener audioRecorderResultListener;
 	        private boolean mMaxDuration = false;
 	        Chronometer mChronometer;
 	        private LinearLayout recording_status;
@@ -57,8 +52,6 @@ public class Record_tab2 extends Fragment {
 	        	View v= inflater.inflate(R.layout.record_tab2, container, false);
 	        	
 	        	final MyAnimationView animView = new MyAnimationView(getActivity());
-	        	mPlayButton = (Button) v.findViewById(R.id.play_button);
-				mPlayButton.setEnabled(false);             
 				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
 				recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
 				mAudioRecorder = AudioRecorder.build(getActivity(), getNextFileName());
@@ -73,9 +66,8 @@ public class Record_tab2 extends Fragment {
                    			mMaxDuration = true;
                    			int recordingStatusHeightActual = recording_status.getHeight();
                     		animView.cancelAnimation(recordingStatusHeightActual);
-                    		mPlayButton.setEnabled(true);
-                   			Log.d("more than", "10 sec");
-                   			Intent intent = new Intent(getActivity(), TakePhotos.class);
+                    		Log.d("more than", "10 sec");
+                   			Intent intent = new Intent(getActivity(), PreviewAudio.class);
 							startActivity(intent);
                    			return true;
                 		}
@@ -92,7 +84,6 @@ public class Record_tab2 extends Fragment {
 	                    			mChronometerPause = mChronometer.getBase() - SystemClock.elapsedRealtime();
 	                    			mChronometer.stop();
 	                    			stopRecording();
-	                    			mPlayButton.setEnabled(true);
 	                    			int recordingStatusHeightActual = recording_status.getHeight();
 		                    		animView.cancelAnimation(recordingStatusHeightActual);
 			                        break;
@@ -102,32 +93,7 @@ public class Record_tab2 extends Fragment {
 						return false;
 					}
 				});
-				mPlayButton.setOnTouchListener(new OnTouchListener() {
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						switch ( event.getAction() ) {
-		                	case MotionEvent.ACTION_DOWN: 
-		                		mStartPlaying = !mStartPlaying;
-		                        startPlaying();
-		                        if (mStartPlaying) {
-		                        	mRecordButton.setEnabled(false);
-		                        } else {
-		                        	mRecordButton.setEnabled(true);
-		                        }
-		                    	return true;
-		                    case MotionEvent.ACTION_UP:
-		                    	mStartPlaying = !mStartPlaying;
-		                    	stopPlaying();
-		                        if (mStartPlaying) {
-		                        	mRecordButton.setEnabled(false);
-		                        } else {
-		                        	mRecordButton.setEnabled(true);
-		                        }
-		                    	return true;
-						}
-		                return false;
-					}
-				});
+				
 				
 				return v;
 	        }
@@ -146,26 +112,7 @@ public class Record_tab2 extends Fragment {
 	        
 	        /**
 	         * recording and playing
-	         
-	        public void setAudioRecorderResultListener(AudioRecorderResultListener audioRecorderResultListener){
-	                this.audioRecorderResultListener = audioRecorderResultListener;
-	        }*/
-	        
-	        private void startPlaying() {
-	                mPlayer = new MediaPlayer();
-	                try {
-	                        mPlayer.setDataSource(mFileName);
-	                        mPlayer.prepare();
-	                        mPlayer.start();
-	                } catch (IOException e) {
-	                        Log.e(LOG_TAG, "prepare() failed when trying to play recorded audio");
-	                }
-	        }
-
-	        private void stopPlaying() {
-	                mPlayer.release();
-	                mPlayer = null;
-	        }
+	         */
 	        
 	        private String getNextFileName() {
 	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";

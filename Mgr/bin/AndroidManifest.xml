@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="13"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -46,6 +46,7 @@
         <activity 
             android:name="com.project.mgr.fragments.tabs.TakePhotos"
             android:screenOrientation="landscape"></activity>
+        <activity android:name="com.project.mgr.fragments.tabs.PreviewAudio"></activity>
 	</application>
 
 </manifest>

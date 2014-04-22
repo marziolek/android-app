@@ -36,10 +36,11 @@
     <string name="btn_logout_from_google">Logout from Google</string>
     <string name="btn_revoke_access">Revoke Access</string>
     <string name="record_button">Record</string>
-    <string name="play_button">Play</string>
+    <string name="play_audio">Play recorded sounds</string>
     <string name="rec_progress">Recording progress</string>
     <string name="chronometer_initial_format">Initial format:<xliff:g id="initial-format">%</xliff:g></string>
-    <string name="title_activity_take_photos">TakePhotos</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="title_activity_take_photos">Take Photos</string>
+    <string name="take_photos">Take photos</string>
+    <string name="skip_photos">Skip photos</string>
+    
 </resources>
