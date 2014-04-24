@@ -452,7 +452,7 @@ containing a value of this type.
         public static final int cEmail=0x7f050033;
         public static final int cImage=0x7f050032;
         public static final int cName=0x7f050031;
-        public static final int camera_preview=0x7f050076;
+        public static final int camera=0x7f050079;
         public static final int career=0x7f050015;
         public static final int careerLayout=0x7f050018;
         public static final int chronometer=0x7f050067;
@@ -528,6 +528,7 @@ containing a value of this type.
         public static final int picture=0x7f050048;
         public static final int pictureTitle=0x7f050049;
         public static final int play=0x7f050054;
+        public static final int preview=0x7f050076;
         public static final int profile=0x7f050058;
         public static final int profile_name=0x7f050071;
         public static final int provider=0x7f05005f;
@@ -547,7 +548,7 @@ containing a value of this type.
         public static final int small=0x7f050005;
         public static final int splashFragment=0x7f05004e;
         public static final int splash_icon=0x7f050070;
-        public static final int tabviewpager=0x7f050079;
+        public static final int tabviewpager=0x7f05007a;
         public static final int take_photo=0x7f050055;
         public static final int terrain=0x7f050003;
         public static final int textView1=0x7f050011;
@@ -612,7 +613,8 @@ containing a value of this type.
     public static final class menu {
         public static final int login=0x7f0a0000;
         public static final int main=0x7f0a0001;
-        public static final int tabs_viewpager_layout=0x7f0a0002;
+        public static final int options=0x7f0a0002;
+        public static final int tabs_viewpager_layout=0x7f0a0003;
     }
     public static final class string {
         public static final int action_forgot_password=0x7f060060;

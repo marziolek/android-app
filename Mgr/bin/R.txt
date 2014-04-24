@@ -162,7 +162,7 @@ int id btn_sign_out_google_facebook 0x7f050069
 int id cEmail 0x7f050033
 int id cImage 0x7f050032
 int id cName 0x7f050031
-int id camera_preview 0x7f050076
+int id camera 0x7f050079
 int id career 0x7f050015
 int id careerLayout 0x7f050018
 int id chronometer 0x7f050067
@@ -238,6 +238,7 @@ int id picker_subtitle 0x7f050028
 int id picture 0x7f050048
 int id pictureTitle 0x7f050049
 int id play 0x7f050054
+int id preview 0x7f050076
 int id profile 0x7f050058
 int id profile_name 0x7f050071
 int id provider 0x7f05005f
@@ -257,7 +258,7 @@ int id skip_photo 0x7f050056
 int id small 0x7f050005
 int id splashFragment 0x7f05004e
 int id splash_icon 0x7f050070
-int id tabviewpager 0x7f050079
+int id tabviewpager 0x7f05007a
 int id take_photo 0x7f050055
 int id terrain 0x7f050003
 int id textView1 0x7f050011
@@ -316,7 +317,8 @@ int layout stream_tab1 0x7f030029
 int layout take_photos 0x7f03002a
 int menu login 0x7f0a0000
 int menu main 0x7f0a0001
-int menu tabs_viewpager_layout 0x7f0a0002
+int menu options 0x7f0a0002
+int menu tabs_viewpager_layout 0x7f0a0003
 int string action_forgot_password 0x7f060060
 int string action_settings 0x7f060035
 int string action_sign_in_register 0x7f06005e
