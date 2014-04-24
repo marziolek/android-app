@@ -452,7 +452,6 @@ containing a value of this type.
         public static final int cEmail=0x7f050033;
         public static final int cImage=0x7f050032;
         public static final int cName=0x7f050031;
-        public static final int camera=0x7f050079;
         public static final int career=0x7f050015;
         public static final int careerLayout=0x7f050018;
         public static final int chronometer=0x7f050067;
@@ -540,6 +539,7 @@ containing a value of this type.
         public static final int recording_status=0x7f050065;
         public static final int satellite=0x7f050002;
         public static final int section_label=0x7f050040;
+        public static final int see_pictures=0x7f050079;
         public static final int selectionFragment=0x7f05004d;
         public static final int sign_in_button=0x7f05000d;
         public static final int signstatus=0x7f050061;

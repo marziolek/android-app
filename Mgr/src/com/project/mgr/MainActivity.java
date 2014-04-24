@@ -111,6 +111,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     private LinearLayout llProfileLayout;
     
     private String mFileName = null;
+    private String mFileNamePics = null;
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,12 +172,22 @@ ConnectionCallbacks, OnConnectionFailedListener {
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
         
         // Clean up recording folder
-        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
+        mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
         File dir = new File(mFileName);
         if (dir.isDirectory()) {
         	String[] children = dir.list();
             for (int i = 0; i < children.length; i++) {
             	new File(dir, children[i]).delete();
+            	String a = String.valueOf(i);
+            	Log.d("removed file: ", a);
+            }
+        }
+        mFileNamePics = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures";
+        File dirPics = new File(mFileNamePics);
+        if (dirPics.isDirectory()) {
+        	String[] children = dirPics.list();
+            for (int i = 0; i < children.length; i++) {
+            	new File(dirPics, children[i]).delete();
             	String a = String.valueOf(i);
             	Log.d("removed file: ", a);
             }

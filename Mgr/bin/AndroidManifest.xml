@@ -48,6 +48,7 @@
             android:name="com.project.mgr.fragments.tabs.TakePhotos"
             android:screenOrientation="landscape"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.PreviewAudio"></activity>
+        <activity android:name="com.project.mgr.fragments.tabs.PreviewPictures"></activity>
 	</application>
 
 </manifest>

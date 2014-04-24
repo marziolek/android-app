@@ -4,7 +4,6 @@
 package com.project.mgr.fragments.tabs;
 
 import java.io.File;
-import java.io.IOException;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -13,7 +12,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -36,10 +34,8 @@ import com.project.mgr.R;
 
 public class Record_tab2 extends Fragment {
 		
-	        private static final String LOG_TAG = "Record_tab2";
 	        private String mFileName = null;
 	        private Button mRecordButton = null;
-	        private MediaPlayer mPlayer = null;
 	        private boolean mMaxDuration = false;
 	        Chronometer mChronometer;
 	        private LinearLayout recording_status;
@@ -115,7 +111,7 @@ public class Record_tab2 extends Fragment {
 	         */
 	        
 	        private String getNextFileName() {
-	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
+	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
                 File dir = new File(mFileName);
                 if (!dir.exists()) {
                 	dir.mkdir();

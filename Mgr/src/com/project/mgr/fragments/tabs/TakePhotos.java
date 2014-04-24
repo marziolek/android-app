@@ -3,6 +3,7 @@ package com.project.mgr.fragments.tabs;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import android.content.Intent;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.project.mgr.R;
@@ -40,6 +42,15 @@ public class TakePhotos extends FragmentActivity {
 	    previewHolder=preview.getHolder();
 	    previewHolder.addCallback(surfaceCallback);
 	    previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+	    
+	    preview.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	if (inPreview) {
+        	        camera.takePicture(null, null, photoCallback);
+        	        inPreview=false;
+            	}
+            }
+        });
 	  }
 
 	  @Override
@@ -87,11 +98,9 @@ public class TakePhotos extends FragmentActivity {
 
 	  @Override
 	  public boolean onOptionsItemSelected(MenuItem item) {
-	    if (item.getItemId() == R.id.camera) {
-	      if (inPreview) {
-	        camera.takePicture(null, null, photoCallback);
-	        inPreview=false;
-	      }
+	    if (item.getItemId() == R.id.see_pictures) {
+	    	Intent intent = new Intent(getBaseContext(), PreviewPictures.class);
+            startActivity(intent);
 	    }
 
 	    return(super.onOptionsItemSelected(item));
@@ -203,25 +212,28 @@ public class TakePhotos extends FragmentActivity {
 	  class SavePhotoTask extends AsyncTask<byte[], String, String> {
 	    @Override
 	    protected String doInBackground(byte[]... jpeg) {
-	      File photo=
-	          new File(Environment.getExternalStorageDirectory()+"/MgrApp/",
-	                   "photo"+System.currentTimeMillis()+".jpg");
-
-	      if (photo.exists()) {
-	        photo.delete();
-	      }
-
-	      try {
-	        FileOutputStream fos=new FileOutputStream(photo.getPath());
-
-	        fos.write(jpeg[0]);
-	        fos.close();
-	      }
-	      catch (java.io.IOException e) {
-	        Log.e("PictureDemo", "Exception in photoCallback", e);
-	      }
-
-	      return(null);
+	    	File dir = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures");
+	    	if (!dir.exists()) {
+	    		dir.mkdir();
+	    	}
+	    	File photo = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures",
+		                 "photo"+System.currentTimeMillis()+".jpg");
+	          
+		    if (photo.exists()) {
+		        photo.delete();
+		    }
+	
+		    try {
+		    	FileOutputStream fos=new FileOutputStream(photo.getPath());
+	
+		        fos.write(jpeg[0]);
+		        fos.close();
+		    }
+		    catch (java.io.IOException e) {
+		        Log.e("PictureDemo", "Exception in photoCallback", e);
+		    }
+	
+		    return(null);
 	    }
 	  }   
 }

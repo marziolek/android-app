@@ -58,7 +58,7 @@ public class PreviewAudio extends FragmentActivity {
     private void startPlaying() {
         mPlayer = new MediaPlayer();
         try {
-        	mAllFiles = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp";
+        	mAllFiles = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
         	File dir = new File(mAllFiles);
         	File[] files = dir.listFiles();
                 mPlayer.setDataSource(files[files.length - 1].toString());

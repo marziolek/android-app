@@ -162,7 +162,6 @@ int id btn_sign_out_google_facebook 0x7f050069
 int id cEmail 0x7f050033
 int id cImage 0x7f050032
 int id cName 0x7f050031
-int id camera 0x7f050079
 int id career 0x7f050015
 int id careerLayout 0x7f050018
 int id chronometer 0x7f050067
@@ -250,6 +249,7 @@ int id record_button 0x7f050066
 int id recording_status 0x7f050065
 int id satellite 0x7f050002
 int id section_label 0x7f050040
+int id see_pictures 0x7f050079
 int id selectionFragment 0x7f05004d
 int id sign_in_button 0x7f05000d
 int id signstatus 0x7f050061
