@@ -2,6 +2,8 @@ package com.project.mgr.fragments.tabs;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import android.content.Intent;
 import android.graphics.ImageFormat;
@@ -26,12 +28,14 @@ import com.project.mgr.R;
 
 public class TakePhotos extends FragmentActivity {
 	
-	
+	NumberFormat fileCountFormatter = new DecimalFormat("00");
+	String formattedFileCount;
+	int fileCount = 0;
 	private SurfaceView preview=null;
-	  private SurfaceHolder previewHolder=null;
-	  private Camera camera=null;
-	  private boolean inPreview=false;
-	  private boolean cameraConfigured=false;
+	private SurfaceHolder previewHolder=null;
+	private Camera camera=null;
+	private boolean inPreview=false;
+	private boolean cameraConfigured=false;
 
 	  @Override
 	  public void onCreate(Bundle savedInstanceState) {
@@ -99,7 +103,7 @@ public class TakePhotos extends FragmentActivity {
 	  @Override
 	  public boolean onOptionsItemSelected(MenuItem item) {
 	    if (item.getItemId() == R.id.see_pictures) {
-	    	Intent intent = new Intent(getBaseContext(), PreviewPictures.class);
+	    	Intent intent = new Intent(getBaseContext(), PreviewGif.class);
             startActivity(intent);
 	    }
 
@@ -216,9 +220,10 @@ public class TakePhotos extends FragmentActivity {
 	    	if (!dir.exists()) {
 	    		dir.mkdir();
 	    	}
+	    	formattedFileCount = fileCountFormatter.format(fileCount);  
 	    	File photo = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures",
-		                 "photo"+System.currentTimeMillis()+".jpg");
-	          
+		                 "photo_"+formattedFileCount+".jpg");
+	    	fileCount++;
 		    if (photo.exists()) {
 		        photo.delete();
 		    }

@@ -1,15 +1,11 @@
 package com.project.mgr.fragments.tabs;
 
-import java.io.File;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 
 import com.project.mgr.R;
 
