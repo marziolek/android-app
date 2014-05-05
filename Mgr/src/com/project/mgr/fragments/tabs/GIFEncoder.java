@@ -16,7 +16,7 @@ public class GIFEncoder {
 	  protected int y = 0;
 	  protected int transparent = -1; // transparent color if given
 	  protected int transIndex; // transparent index in color table
-	  protected int repeat = -1; // no repeat
+	  protected int repeat = 0; // infinit repeat
 	  protected int delay = 0; // frame delay (hundredths)
 	  protected boolean started = false; // ready to output frames
 	  protected OutputStream out;

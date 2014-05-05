@@ -42,5 +42,5 @@
     <string name="title_activity_take_photos">Take Photos</string>
     <string name="take_photos">Take photos</string>
     <string name="skip_photos">Skip photos</string>
-    
+    <string name="GIFpreview">GIF preview</string>
 </resources>

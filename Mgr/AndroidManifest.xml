@@ -49,6 +49,7 @@
             android:screenOrientation="landscape"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.PreviewAudio"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGif"></activity>
+        <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
 	</application>
 

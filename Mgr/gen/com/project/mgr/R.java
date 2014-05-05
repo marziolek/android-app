@@ -429,6 +429,14 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int fetch_user_info=0x7f01008c;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int gif=0x7f010091;
+        /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+         */
+        public static final int gifMoviewViewStyle=0x7f010093;
         /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
 Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
 in (inches), mm (millimeters).
@@ -665,6 +673,14 @@ theme attribute (in the form
 containing a value of this type.
          */
         public static final int panelMenuListWidth=0x7f01004a;
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int paused=0x7f010092;
         /**  Default PopupMenu style. 
          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
 or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
@@ -1425,7 +1441,7 @@ containing a value of this type.
         public static final int com_facebook_list_section_header_background=0x7f020065;
         public static final int com_facebook_loginbutton_silver=0x7f020066;
         public static final int com_facebook_logo=0x7f020067;
-        public static final int com_facebook_picker_default_separator_color=0x7f0200a8;
+        public static final int com_facebook_picker_default_separator_color=0x7f02009f;
         public static final int com_facebook_picker_item_background=0x7f020068;
         public static final int com_facebook_picker_list_focused=0x7f020069;
         public static final int com_facebook_picker_list_longpressed=0x7f02006a;
@@ -1468,28 +1484,19 @@ containing a value of this type.
         public static final int common_signin_btn_text_pressed_light=0x7f02008f;
         public static final int email=0x7f020090;
         public static final int facebook=0x7f020091;
-        public static final int flickr=0x7f020092;
-        public static final int foursquare=0x7f020093;
-        public static final int google=0x7f020094;
-        public static final int googleplus=0x7f020095;
-        public static final int ic_launcher=0x7f020096;
-        public static final int ic_plusone_medium_off_client=0x7f020097;
-        public static final int ic_plusone_small_off_client=0x7f020098;
-        public static final int ic_plusone_standard_off_client=0x7f020099;
-        public static final int ic_plusone_tall_off_client=0x7f02009a;
-        public static final int icon=0x7f02009b;
-        public static final int instagram=0x7f02009c;
-        public static final int linkedin=0x7f02009d;
-        public static final int logo=0x7f02009e;
-        public static final int mms=0x7f02009f;
-        public static final int myspace=0x7f0200a0;
-        public static final int runkeeper=0x7f0200a1;
-        public static final int salesforce=0x7f0200a2;
-        public static final int splash=0x7f0200a3;
-        public static final int splash_screen=0x7f0200a4;
-        public static final int twitter=0x7f0200a5;
-        public static final int yahoo=0x7f0200a6;
-        public static final int yammer=0x7f0200a7;
+        public static final int gif_heart=0x7f020092;
+        public static final int google=0x7f020093;
+        public static final int googleplus=0x7f020094;
+        public static final int ic_launcher=0x7f020095;
+        public static final int ic_plusone_medium_off_client=0x7f020096;
+        public static final int ic_plusone_small_off_client=0x7f020097;
+        public static final int ic_plusone_standard_off_client=0x7f020098;
+        public static final int ic_plusone_tall_off_client=0x7f020099;
+        public static final int icon=0x7f02009a;
+        public static final int logo=0x7f02009b;
+        public static final int splash=0x7f02009c;
+        public static final int splash_screen=0x7f02009d;
+        public static final int twitter=0x7f02009e;
     }
     public static final class id {
         public static final int action_bar=0x7f050021;
@@ -1500,11 +1507,11 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f050028;
         public static final int action_bar_title=0x7f050027;
         public static final int action_context_bar=0x7f050022;
-        public static final int action_forgot_password=0x7f0500b0;
+        public static final int action_forgot_password=0x7f0500b1;
         public static final int action_menu_divider=0x7f050016;
         public static final int action_menu_presenter=0x7f050017;
         public static final int action_mode_close_button=0x7f050029;
-        public static final int action_settings=0x7f0500b1;
+        public static final int action_settings=0x7f0500b2;
         public static final int activity_chooser_view_content=0x7f05002a;
         public static final int albumTitle=0x7f05007f;
         public static final int albumname=0x7f05004d;
@@ -1513,17 +1520,17 @@ containing a value of this type.
         public static final int btnCareer=0x7f05007c;
         public static final int btnEducation=0x7f05007e;
         public static final int btnRecommendation=0x7f05007d;
-        public static final int btn_revoke_access=0x7f0500a8;
-        public static final int btn_sign_in=0x7f0500ad;
-        public static final int btn_sign_out=0x7f0500a7;
-        public static final int btn_sign_out_google_facebook=0x7f0500a2;
+        public static final int btn_revoke_access=0x7f0500a9;
+        public static final int btn_sign_in=0x7f0500ae;
+        public static final int btn_sign_out=0x7f0500a8;
+        public static final int btn_sign_out_google_facebook=0x7f0500a3;
         public static final int cEmail=0x7f05006d;
         public static final int cImage=0x7f05006c;
         public static final int cName=0x7f05006b;
         public static final int career=0x7f05004f;
         public static final int careerLayout=0x7f050052;
         public static final int checkbox=0x7f050032;
-        public static final int chronometer=0x7f0500a0;
+        public static final int chronometer=0x7f0500a1;
         public static final int collapseActionView=0x7f05000d;
         public static final int com_facebook_login_activity_progress_bar=0x7f050055;
         public static final int com_facebook_picker_activity_circle=0x7f050054;
@@ -1548,14 +1555,14 @@ containing a value of this type.
         public static final int companyName=0x7f05008b;
         public static final int contact=0x7f050068;
         public static final int contactList=0x7f05006a;
-        public static final int country=0x7f050097;
+        public static final int country=0x7f050098;
         public static final int coveralbum=0x7f05004c;
         public static final int dataSection=0x7f050080;
         public static final int default_activity_button=0x7f05002d;
         public static final int dialog=0x7f05000e;
         public static final int dialogTitle=0x7f05006e;
         public static final int disableHome=0x7f050008;
-        public static final int displayName=0x7f050093;
+        public static final int displayName=0x7f050094;
         public static final int dropdown=0x7f05000f;
         public static final int editTxt=0x7f05006f;
         public static final int edit_message=0x7f05007b;
@@ -1573,7 +1580,8 @@ containing a value of this type.
         public static final int feedList=0x7f050076;
         public static final int feedTitle=0x7f050075;
         public static final int frame=0x7f050081;
-        public static final int gender=0x7f050095;
+        public static final int gender=0x7f050096;
+        public static final int gif1=0x7f050090;
         public static final int header=0x7f050051;
         public static final int headline=0x7f050050;
         public static final int home=0x7f050014;
@@ -1583,25 +1591,25 @@ containing a value of this type.
         public static final int ifRoom=0x7f05000a;
         public static final int image=0x7f05002c;
         public static final int imgLogo=0x7f05004a;
-        public static final int imgProfilePic=0x7f0500a4;
-        public static final int imgView=0x7f050090;
+        public static final int imgProfilePic=0x7f0500a5;
+        public static final int imgView=0x7f050091;
         public static final int industry=0x7f05008c;
-        public static final int language=0x7f050096;
+        public static final int language=0x7f050097;
         public static final int large=0x7f05001e;
         public static final int listMode=0x7f050001;
         public static final int list_item=0x7f05002e;
         public static final int listview=0x7f050086;
-        public static final int llProfile=0x7f0500a3;
+        public static final int llProfile=0x7f0500a4;
         public static final int loadImage=0x7f050071;
-        public static final int location=0x7f050094;
+        public static final int location=0x7f050095;
         public static final int login=0x7f050046;
-        public static final int login_button=0x7f0500ac;
+        public static final int login_button=0x7f0500ad;
         public static final int login_form=0x7f050043;
         public static final int login_status=0x7f050041;
         public static final int login_status_message=0x7f050042;
-        public static final int merge=0x7f0500ae;
+        public static final int merge=0x7f0500af;
         public static final int middle=0x7f050012;
-        public static final int name=0x7f050092;
+        public static final int name=0x7f050093;
         public static final int never=0x7f050009;
         public static final int none=0x7f050010;
         public static final int normal=0x7f050000;
@@ -1614,19 +1622,19 @@ containing a value of this type.
         public static final int picture=0x7f050082;
         public static final int pictureTitle=0x7f050083;
         public static final int play=0x7f05008d;
-        public static final int preview=0x7f0500af;
-        public static final int profile=0x7f050091;
-        public static final int profile_name=0x7f0500aa;
+        public static final int preview=0x7f0500b0;
+        public static final int profile=0x7f050092;
+        public static final int profile_name=0x7f0500ab;
         public static final int progress_circular=0x7f050018;
         public static final int progress_horizontal=0x7f050019;
-        public static final int provider=0x7f050098;
-        public static final int providerText=0x7f050099;
+        public static final int provider=0x7f050099;
+        public static final int providerText=0x7f05009a;
         public static final int radio=0x7f050034;
-        public static final int recommender=0x7f05009b;
-        public static final int recommenderText=0x7f05009d;
-        public static final int recommenderType=0x7f05009c;
-        public static final int record_button=0x7f05009f;
-        public static final int recording_status=0x7f05009e;
+        public static final int recommender=0x7f05009c;
+        public static final int recommenderText=0x7f05009e;
+        public static final int recommenderType=0x7f05009d;
+        public static final int record_button=0x7f0500a0;
+        public static final int recording_status=0x7f05009f;
         public static final int satellite=0x7f05001a;
         public static final int search_badge=0x7f050037;
         public static final int search_bar=0x7f050036;
@@ -1639,33 +1647,33 @@ containing a value of this type.
         public static final int search_src_text=0x7f05003c;
         public static final int search_voice_btn=0x7f050040;
         public static final int section_label=0x7f05007a;
-        public static final int see_pictures=0x7f0500b2;
+        public static final int see_pictures=0x7f0500b3;
         public static final int selectionFragment=0x7f050087;
         public static final int shortcut=0x7f050033;
         public static final int showCustom=0x7f050007;
         public static final int showHome=0x7f050004;
         public static final int showTitle=0x7f050006;
         public static final int sign_in_button=0x7f050047;
-        public static final int signstatus=0x7f05009a;
-        public static final int skip_login_button=0x7f0500ab;
+        public static final int signstatus=0x7f05009b;
+        public static final int skip_login_button=0x7f0500ac;
         public static final int skip_photo=0x7f05008f;
         public static final int small=0x7f05001d;
         public static final int splashFragment=0x7f050088;
-        public static final int splash_icon=0x7f0500a9;
+        public static final int splash_icon=0x7f0500aa;
         public static final int split_action_bar=0x7f050023;
         public static final int submit_area=0x7f05003e;
         public static final int tabMode=0x7f050002;
-        public static final int tabviewpager=0x7f0500b3;
+        public static final int tabviewpager=0x7f0500b4;
         public static final int take_photo=0x7f05008e;
         public static final int terrain=0x7f05001b;
         public static final int textView1=0x7f05004b;
         public static final int textview=0x7f050085;
-        public static final int time=0x7f0500a1;
+        public static final int time=0x7f0500a2;
         public static final int title=0x7f050030;
         public static final int top_action_bar=0x7f050025;
         public static final int topbar=0x7f050084;
-        public static final int txtEmail=0x7f0500a6;
-        public static final int txtName=0x7f0500a5;
+        public static final int txtEmail=0x7f0500a7;
+        public static final int txtName=0x7f0500a6;
         public static final int up=0x7f050026;
         public static final int update=0x7f050070;
         public static final int useLogo=0x7f050003;
@@ -1778,6 +1786,7 @@ containing a value of this type.
         public static final int tabs_viewpager_layout=0x7f0c0003;
     }
     public static final class string {
+        public static final int GIFpreview=0x7f0a0068;
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
          */
         public static final int abc_action_bar_home_description=0x7f0a0001;
@@ -1818,10 +1827,10 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f0a000b;
-        public static final int action_forgot_password=0x7f0a006d;
+        public static final int action_forgot_password=0x7f0a006e;
         public static final int action_settings=0x7f0a0042;
-        public static final int action_sign_in_register=0x7f0a006b;
-        public static final int action_sign_in_short=0x7f0a006c;
+        public static final int action_sign_in_register=0x7f0a006c;
+        public static final int action_sign_in_short=0x7f0a006d;
         public static final int app_id=0x7f0a004d;
         public static final int app_name=0x7f0a0041;
         /**   Title for notification shown when GooglePlayServices needs to be
@@ -1952,22 +1961,22 @@ containing a value of this type.
         public static final int common_signin_button_text_long=0x7f0a0020;
         public static final int created_by=0x7f0a004a;
         public static final int edit_message=0x7f0a0047;
-        public static final int error_field_required=0x7f0a0072;
-        public static final int error_incorrect_password=0x7f0a0071;
-        public static final int error_invalid_email=0x7f0a006f;
-        public static final int error_invalid_password=0x7f0a0070;
+        public static final int error_field_required=0x7f0a0073;
+        public static final int error_incorrect_password=0x7f0a0072;
+        public static final int error_invalid_email=0x7f0a0070;
+        public static final int error_invalid_password=0x7f0a0071;
         public static final int get_started=0x7f0a004b;
         /**  Location client code resources (prefix with location_client) 
          */
         public static final int location_client_powered_by_google=0x7f0a0027;
-        public static final int login_progress_signing_in=0x7f0a006e;
+        public static final int login_progress_signing_in=0x7f0a006f;
         public static final int play_audio=0x7f0a0062;
         public static final int play_services_error=0x7f0a005c;
         public static final int profile_picture=0x7f0a005e;
         /**  Strings related to login 
          */
-        public static final int prompt_email=0x7f0a0069;
-        public static final int prompt_password=0x7f0a006a;
+        public static final int prompt_email=0x7f0a006a;
+        public static final int prompt_password=0x7f0a006b;
         public static final int rec_progress=0x7f0a0063;
         public static final int record_button=0x7f0a0061;
         public static final int revoke_access_button_name=0x7f0a0052;
@@ -1984,7 +1993,7 @@ containing a value of this type.
         public static final int status_signed_out=0x7f0a0057;
         public static final int status_signing_in=0x7f0a0056;
         public static final int take_photos=0x7f0a0066;
-        public static final int title_activity_login=0x7f0a0068;
+        public static final int title_activity_login=0x7f0a0069;
         public static final int title_activity_take_photos=0x7f0a0065;
         public static final int title_section1=0x7f0a0043;
         public static final int title_section2=0x7f0a0044;
@@ -2227,6 +2236,7 @@ containing a value of this type.
         public static final int Widget_AppCompat_ProgressBar=0x7f0b000a;
         public static final int Widget_AppCompat_ProgressBar_Horizontal=0x7f0b0009;
         public static final int Widget_AppCompat_Spinner_DropDown_ActionBar=0x7f0b0022;
+        public static final int Widget_PreviewGif=0x7f0b0090;
         public static final int com_facebook_loginview_default_style=0x7f0b008b;
         public static final int com_facebook_loginview_silver_style=0x7f0b008c;
     }
@@ -3019,6 +3029,29 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
           @attr name com.project.mgr:textAllCaps
         */
         public static final int CompatTextView_textAllCaps = 0;
+        /** Attributes that can be used with a CustomTheme.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #CustomTheme_gifMoviewViewStyle com.project.mgr:gifMoviewViewStyle}</code></td><td></td></tr>
+           </table>
+           @see #CustomTheme_gifMoviewViewStyle
+         */
+        public static final int[] CustomTheme = {
+            0x7f010093
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.project.mgr.R.attr#gifMoviewViewStyle}
+          attribute's value can be found in the {@link #CustomTheme} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.project.mgr:gifMoviewViewStyle
+        */
+        public static final int CustomTheme_gifMoviewViewStyle = 0;
         /** Attributes that can be used with a LinearLayoutICS.
            <p>Includes the following attributes:</p>
            <table>
@@ -3769,6 +3802,45 @@ containing a value of this type.
           @attr name android:windowAnimationStyle
         */
         public static final int MenuView_android_windowAnimationStyle = 0;
+        /** Attributes that can be used with a PreviewGif.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #PreviewGif_gif com.project.mgr:gif}</code></td><td></td></tr>
+           <tr><td><code>{@link #PreviewGif_paused com.project.mgr:paused}</code></td><td></td></tr>
+           </table>
+           @see #PreviewGif_gif
+           @see #PreviewGif_paused
+         */
+        public static final int[] PreviewGif = {
+            0x7f010091, 0x7f010092
+        };
+        /**
+          <p>This symbol is the offset where the {@link com.project.mgr.R.attr#gif}
+          attribute's value can be found in the {@link #PreviewGif} array.
+
+
+          <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
+or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>".
+          @attr name com.project.mgr:gif
+        */
+        public static final int PreviewGif_gif = 0;
+        /**
+          <p>This symbol is the offset where the {@link com.project.mgr.R.attr#paused}
+          attribute's value can be found in the {@link #PreviewGif} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.project.mgr:paused
+        */
+        public static final int PreviewGif_paused = 1;
         /** Attributes that can be used with a SearchView.
            <p>Includes the following attributes:</p>
            <table>
