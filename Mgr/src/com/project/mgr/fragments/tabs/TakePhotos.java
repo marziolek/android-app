@@ -1,99 +1,60 @@
 package com.project.mgr.fragments.tabs;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.util.List;
 
 import android.content.Intent;
-import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.Camera;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Spinner;
 
 import com.project.mgr.R;
 
+public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSelectedListener {
+    private ResizableCameraPreview mPreview;
+    private ArrayAdapter<String> mAdapter;
+    private RelativeLayout mLayout;
+    private int mCameraId = 0;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-public class TakePhotos extends FragmentActivity {
-	
-	NumberFormat fileCountFormatter = new DecimalFormat("00");
-	String formattedFileCount;
-	int fileCount = 0;
-	private SurfaceView preview=null;
-	private SurfaceHolder previewHolder=null;
-	private Camera camera=null;
-	private boolean inPreview=false;
-	private boolean cameraConfigured=false;
+        // Hide status-bar
+        // getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-	  @Override
-	  public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.take_photos);
+        // Hide title-bar, must be before setContentView
+        // requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-	    preview=(SurfaceView) findViewById(R.id.preview);
-	    previewHolder=preview.getHolder();
-	    previewHolder.addCallback(surfaceCallback);
-	    previewHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-	    
-	    preview.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-            	if (inPreview) {
-        	        camera.takePicture(null, null, photoCallback);
-        	        inPreview=false;
-            	}
-            }
-        });
-	  }
+        setContentView(R.layout.take_photos);
+        
+        // Spinner for preview sizes
+        Spinner spinnerSize = (Spinner) findViewById(R.id.spinner_size);
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSize.setAdapter(mAdapter);
+        spinnerSize.setOnItemSelectedListener(this);
+        
+        mLayout = (RelativeLayout) findViewById(R.id.layout);		
+		mLayout.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+		    	//Camera.takePicture(null, null, photoCallback);
+		    	mPreview.takePictureFromPreview();
+		    }
+		});
+    }
 
-	  @Override
-	  public void onResume() {
-	    super.onResume();
-
-	    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-	      Camera.CameraInfo info=new Camera.CameraInfo();
-
-	      for (int i=0; i < Camera.getNumberOfCameras(); i++) {
-	        Camera.getCameraInfo(i, info);
-
-	        if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-	          camera=Camera.open(i);
-	        }
-	      }
-	    }
-
-	    if (camera == null) {
-	      camera=Camera.open();
-	    }
-
-	    startPreview();
-	  }
-
-	  @Override
-	  public void onPause() {
-	    if (inPreview) {
-	      camera.stopPreview();
-	    }
-
-	    camera.release();
-	    camera=null;
-	    inPreview=false;
-
-	    super.onPause();
-	  }
-
-	  @Override
+    @Override
 	  public boolean onCreateOptionsMenu(Menu menu) {
 	    new MenuInflater(this).inflate(R.menu.options, menu);
 
@@ -104,141 +65,63 @@ public class TakePhotos extends FragmentActivity {
 	  public boolean onOptionsItemSelected(MenuItem item) {
 	    if (item.getItemId() == R.id.see_pictures) {
 	    	Intent intent = new Intent(getBaseContext(), PreviewGif.class);
-            startActivity(intent);
+          startActivity(intent);
 	    }
 
 	    return(super.onOptionsItemSelected(item));
 	  }
 
-	  private Camera.Size getBestPreviewSize(int width, int height,
-	                                         Camera.Parameters parameters) {
-	    Camera.Size result=null;
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Log.w("CameraPreviewTestActivity", "onItemSelected invoked");
+        Log.w("CameraPreviewTestActivity", "position: " + position);
+        Log.w("CameraPreviewTestActivity", "parent.getId(): " + parent.getId());
+        switch (parent.getId()) {
+            case R.id.spinner_size:
+            Rect rect = new Rect();
+            mLayout.getDrawingRect(rect);
 
-	    for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
-	      if (size.width <= width && size.height <= height) {
-	        if (result == null) {
-	          result=size;
-	        }
-	        else {
-	          int resultArea=result.width * result.height;
-	          int newArea=size.width * size.height;
+            if (0 == position) { // "Auto" selected
+                mPreview.surfaceChanged(null, 0, rect.width(), rect.height());
+            } else {
+                mPreview.setPreviewSize(position - 1, rect.width(), rect.height());
+            }
+            break;
+        }
+    }
 
-	          if (newArea > resultArea) {
-	            result=size;
-	          }
-	        }
-	      }
-	    }
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // do nothing
+    }
 
-	    return(result);
-	  }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        createCameraPreview();
+    }
 
-	  private Camera.Size getSmallestPictureSize(Camera.Parameters parameters) {
-	    Camera.Size result=null;
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPreview.stop();
+        mLayout.removeView(mPreview);
+        mPreview = null;
+    }
+    
+    private void createCameraPreview() {
+        // Set the second argument by your choice.
+        // Usually, 0 for back-facing camera, 1 for front-facing camera.
+        // If the OS is pre-gingerbreak, this does not have any effect.
+        mPreview = new ResizableCameraPreview(this, mCameraId, CameraPreview.LayoutMode.FitToParent, false);
+        LayoutParams previewLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        mLayout.addView(mPreview, 0, previewLayoutParams);
 
-	    for (Camera.Size size : parameters.getSupportedPictureSizes()) {
-	      if (result == null) {
-	        result=size;
-	      }
-	      else {
-	        int resultArea=result.width * result.height;
-	        int newArea=size.width * size.height;
-
-	        if (newArea < resultArea) {
-	          result=size;
-	        }
-	      }
-	    }
-
-	    return(result);
-	  }
-
-	  private void initPreview(int width, int height) {
-	    if (camera != null && previewHolder.getSurface() != null) {
-	      try {
-	        camera.setPreviewDisplay(previewHolder);
-	      }
-	      catch (Throwable t) {
-	        Log.e("PreviewDemo-surfaceCallback",
-	              "Exception in setPreviewDisplay()", t);
-	        Toast.makeText(TakePhotos.this, t.getMessage(),
-	                       Toast.LENGTH_LONG).show();
-	      }
-
-	      if (!cameraConfigured) {
-	        Camera.Parameters parameters=camera.getParameters();
-	        Camera.Size size=getBestPreviewSize(width, height, parameters);
-	        Camera.Size pictureSize=getSmallestPictureSize(parameters);
-
-	        if (size != null && pictureSize != null) {
-	          parameters.setPreviewSize(size.width, size.height);
-	          parameters.setPictureSize(pictureSize.width,
-	                                    pictureSize.height);
-	          parameters.setPictureFormat(ImageFormat.JPEG);
-	          camera.setParameters(parameters);
-	          cameraConfigured=true;
-	        }
-	      }
-	    }
-	  }
-
-	  private void startPreview() {
-	    if (cameraConfigured && camera != null) {
-	      camera.startPreview();
-	      inPreview=true;
-	    }
-	  }
-
-	  SurfaceHolder.Callback surfaceCallback=new SurfaceHolder.Callback() {
-	    public void surfaceCreated(SurfaceHolder holder) {
-	      // no-op -- wait until surfaceChanged()
-	    }
-
-	    public void surfaceChanged(SurfaceHolder holder, int format,
-	                               int width, int height) {
-	      initPreview(width, height);
-	      startPreview();
-	    }
-
-	    public void surfaceDestroyed(SurfaceHolder holder) {
-	      // no-op
-	    }
-	  };
-
-	  Camera.PictureCallback photoCallback=new Camera.PictureCallback() {
-	    public void onPictureTaken(byte[] data, Camera camera) {
-	      new SavePhotoTask().execute(data);
-	      camera.startPreview();
-	      inPreview=true;
-	    }
-	  };
-
-	  class SavePhotoTask extends AsyncTask<byte[], String, String> {
-	    @Override
-	    protected String doInBackground(byte[]... jpeg) {
-	    	File dir = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures");
-	    	if (!dir.exists()) {
-	    		dir.mkdir();
-	    	}
-	    	formattedFileCount = fileCountFormatter.format(fileCount);  
-	    	File photo = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures",
-		                 "photo_"+formattedFileCount+".jpg");
-	    	fileCount++;
-		    if (photo.exists()) {
-		        photo.delete();
-		    }
-	
-		    try {
-		    	FileOutputStream fos=new FileOutputStream(photo.getPath());
-	
-		        fos.write(jpeg[0]);
-		        fos.close();
-		    }
-		    catch (java.io.IOException e) {
-		        Log.e("PictureDemo", "Exception in photoCallback", e);
-		    }
-	
-		    return(null);
-	    }
-	  }   
+        mAdapter.clear();
+        mAdapter.add("Auto");
+        List<Camera.Size> sizes = mPreview.getSupportedPreivewSizes();
+        for (Camera.Size size : sizes) {
+            mAdapter.add(size.width + " x " + size.height);
+        }
+    }
 }

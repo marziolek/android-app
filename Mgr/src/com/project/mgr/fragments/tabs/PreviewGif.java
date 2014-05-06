@@ -13,7 +13,6 @@ import android.graphics.Movie;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.project.mgr.R;
@@ -43,10 +42,7 @@ public class PreviewGif extends FragmentActivity {
 	        gif1.setMovie(movie);
 	    }
         catch(Exception e) {
-        	Log.d("Asd", e.toString());
-        }
-       
-        
+        }        
 	}
 		
 	 private static byte[] streamToBytes(InputStream is) {

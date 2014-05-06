@@ -1,41 +1,53 @@
 package com.project.mgr.fragments.tabs;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.hardware.Camera;
+import android.hardware.Camera.PreviewCallback;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-
-/** A basic Camera preview class */
+/**
+ * This class assumes the parent layout is RelativeLayout.LayoutParams.
+ */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private String TAG = "***preview camera***";
-    protected List<Camera.Size> mPreviewSizeList;
-    protected List<Camera.Size> mPictureSizeList;
-    
     private static boolean DEBUGGING = true;
-    private static final String LOG_TAG = "Cam preview";
-    private LayoutMode mLayoutMode;
-    private int mCenterPosX = -1;
-    private int mCenterPosY;
-    protected Camera.Size mPreviewSize;
-    protected Camera.Size mPictureSize;
-    protected Activity mActivity;
-    private int mSurfaceChangedCallDepth = 0;
+    private static final String LOG_TAG = "CameraPreviewSample";
     private static final String CAMERA_PARAM_ORIENTATION = "orientation";
     private static final String CAMERA_PARAM_LANDSCAPE = "landscape";
     private static final String CAMERA_PARAM_PORTRAIT = "portrait";
+    protected Activity mActivity;
+    private SurfaceHolder mHolder;
+    protected Camera mCamera;
+    protected List<Camera.Size> mPreviewSizeList;
+    protected List<Camera.Size> mPictureSizeList;
+    protected Camera.Size mPreviewSize;
+    protected Camera.Size mPictureSize;
+    private int mSurfaceChangedCallDepth = 0;
+    private int mCameraId;
+    private LayoutMode mLayoutMode;
+    private int mCenterPosX = -1;
+    private int mCenterPosY;
+    
+    NumberFormat fileCountFormatter = new DecimalFormat("00");
+	String formattedFileCount;
+	int fileCount = 0;
+    
     PreviewReadyCallback mPreviewReadyCallback = null;
     
     public static enum LayoutMode {
@@ -46,116 +58,58 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public interface PreviewReadyCallback {
         public void onPreviewReady();
     }
-    
+ 
+    /**
+     * State flag: true when surface's layout size is set and surfaceChanged()
+     * process has not been completed.
+     */
     protected boolean mSurfaceConfiguring = false;
-    
-    public CameraPreview(Activity context, Camera camera) {
-        super(context);
-        mCamera = camera;
-        mActivity = context;
-        // Install a SurfaceHolder.Callback so we get notified when the
-        // underlying surface is created and destroyed.
+
+    public CameraPreview(Activity activity, int cameraId, LayoutMode mode) {
+        super(activity); // Always necessary
+        mActivity = activity;
+        mLayoutMode = mode;
         mHolder = getHolder();
         mHolder.addCallback(this);
-        // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        
+
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            if (Camera.getNumberOfCameras() > cameraId) {
+                mCameraId = cameraId;
+            } else {
+                mCameraId = 0;
+            }
+        } else {*/
+            mCameraId = 0;
+        //}
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            mCamera = Camera.open(mCameraId);
+        } else {*/
+            mCamera = Camera.open();
+        //}
         Camera.Parameters cameraParams = mCamera.getParameters();
         mPreviewSizeList = cameraParams.getSupportedPreviewSizes();
         mPictureSizeList = cameraParams.getSupportedPictureSizes();
     }
 
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera where to draw the preview.
-        try {
-            mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
-        } catch (IOException e) {
-            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
-        }
-    }
-
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        // empty. Take care of releasing the Camera preview in your activity.
-    }
-
-    public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-        // If your preview can change or rotate, take care of those events here.
-        // Make sure to stop the preview before resizing or reformatting it.
-/*
-        if (mHolder.getSurface() == null){
-          // preview surface does not exist
-          return;
-        }
-
-        // stop preview before making changes
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e){
-          // ignore: tried to stop a non-existent preview
-        }
-
-        // set preview size and make any resize, rotate or
-        // reformatting changes here
-
-        // start preview with new settings
         try {
             mCamera.setPreviewDisplay(mHolder);
-            mCamera.startPreview();
-
-        } catch (Exception e){
-            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
-        }*/
-    	mSurfaceChangedCallDepth++;
-        doSurfaceChanged(w, h);
+        } catch (IOException e) {
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+    
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        mSurfaceChangedCallDepth++;
+        doSurfaceChanged(width, height);
         mSurfaceChangedCallDepth--;
     }
-    
-    public boolean isPortrait() {
-        return (mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
-    }
-    
-    protected void configureCameraParameters(Camera.Parameters cameraParams, boolean portrait) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) { // for 2.1 and before
-            if (portrait) {
-                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
-            } else {
-                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
-            }
-        } else { // for 2.2 and later
-            int angle;
-            Display display = mActivity.getWindowManager().getDefaultDisplay();
-            switch (display.getRotation()) {
-                case Surface.ROTATION_0: // This is display orientation
-                    angle = 90; // This is camera orientation
-                    break;
-                case Surface.ROTATION_90:
-                    angle = 0;
-                    break;
-                case Surface.ROTATION_180:
-                    angle = 270;
-                    break;
-                case Surface.ROTATION_270:
-                    angle = 180;
-                    break;
-                default:
-                    angle = 90;
-                    break;
-            }
-            Log.v(LOG_TAG, "angle: " + angle);
-            mCamera.setDisplayOrientation(angle);
-        }
 
-        cameraParams.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-        cameraParams.setPictureSize(mPictureSize.width, mPictureSize.height);
-        if (DEBUGGING) {
-            Log.v(LOG_TAG, "Preview Actual Size - w: " + mPreviewSize.width + ", h: " + mPreviewSize.height);
-            Log.v(LOG_TAG, "Picture Actual Size - w: " + mPictureSize.width + ", h: " + mPictureSize.height);
-        }
-
-        mCamera.setParameters(cameraParams);
-    }
-    
     private void doSurfaceChanged(int width, int height) {
         mCamera.stopPreview();
         
@@ -312,7 +266,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             }
         }
 
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams)this.getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams)this.getLayoutParams();
 
         int layoutHeight = (int) (tmpLayoutHeight * fact);
         int layoutWidth = (int) (tmpLayoutWidth * fact);
@@ -337,5 +291,138 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         return layoutChanged;
     }
- 
+
+    /**
+     * @param x X coordinate of center position on the screen. Set to negative value to unset.
+     * @param y Y coordinate of center position on the screen.
+     */
+    public void setCenterPosition(int x, int y) {
+        mCenterPosX = x;
+        mCenterPosY = y;
+    }
+    
+    protected void configureCameraParameters(Camera.Parameters cameraParams, boolean portrait) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO) { // for 2.1 and before
+            if (portrait) {
+                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
+            } else {
+                cameraParams.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
+            }
+        } else { // for 2.2 and later
+            int angle;
+            Display display = mActivity.getWindowManager().getDefaultDisplay();
+            switch (display.getRotation()) {
+                case Surface.ROTATION_0: // This is display orientation
+                    angle = 90; // This is camera orientation
+                    break;
+                case Surface.ROTATION_90:
+                    angle = 0;
+                    break;
+                case Surface.ROTATION_180:
+                    angle = 270;
+                    break;
+                case Surface.ROTATION_270:
+                    angle = 180;
+                    break;
+                default:
+                    angle = 90;
+                    break;
+            }
+            Log.v(LOG_TAG, "angle: " + angle);
+            mCamera.setDisplayOrientation(angle);
+        }
+
+        cameraParams.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+        cameraParams.setPictureSize(mPictureSize.width, mPictureSize.height);
+        if (DEBUGGING) {
+            Log.v(LOG_TAG, "Preview Actual Size - w: " + mPreviewSize.width + ", h: " + mPreviewSize.height);
+            Log.v(LOG_TAG, "Picture Actual Size - w: " + mPictureSize.width + ", h: " + mPictureSize.height);
+        }
+
+        mCamera.setParameters(cameraParams);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        stop();
+    }
+    
+    public void stop() {
+        if (null == mCamera) {
+            return;
+        }
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
+    }
+
+    public boolean isPortrait() {
+        return (mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
+    }
+    
+    public void setOneShotPreviewCallback(PreviewCallback callback) {
+        if (null == mCamera) {
+            return;
+        }
+        mCamera.setOneShotPreviewCallback(callback);
+    }
+    
+    public void setPreviewCallback(PreviewCallback callback) {
+        if (null == mCamera) {
+            return;
+        }
+        mCamera.setPreviewCallback(callback);
+    }
+    
+    public Camera.Size getPreviewSize() {
+        return mPreviewSize;
+    }
+    
+    public void setOnPreviewReady(PreviewReadyCallback cb) {
+        mPreviewReadyCallback = cb;
+    }
+    public List<Camera.Size> getSupportedPreivewSizes() {
+        return mPreviewSizeList;
+    }
+    
+    public void takePictureFromPreview() {
+    	mCamera.takePicture(null,null,photoCallback);
+    }
+    
+    Camera.PictureCallback photoCallback=new Camera.PictureCallback() {
+	    public void onPictureTaken(byte[] data, Camera camera) {
+	      new SavePhotoTask().execute(data);
+	      camera.startPreview();
+	      //inPreview=true;
+	    }
+	  };
+	  
+	  class SavePhotoTask extends AsyncTask<byte[], String, String> {
+	    @Override
+	    protected String doInBackground(byte[]... jpeg) {
+	    	File dir = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures");
+	    	if (!dir.exists()) {
+	    		dir.mkdir();
+	    	}
+	    	formattedFileCount = fileCountFormatter.format(fileCount);  
+	    	File photo = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures",
+		                 "photo_"+formattedFileCount+".jpg");
+	    	fileCount++;
+		    if (photo.exists()) {
+		        photo.delete();
+		    }
+	
+		    try {
+		    	FileOutputStream fos=new FileOutputStream(photo.getPath());
+	
+		        fos.write(jpeg[0]);
+		        fos.close();
+		    }
+		    catch (java.io.IOException e) {
+		        Log.e("PictureDemo", "Exception in photoCallback", e);
+		    }
+	
+		    return(null);
+	    }
+	  }   
 }
