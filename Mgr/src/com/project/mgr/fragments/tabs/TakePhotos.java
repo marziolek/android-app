@@ -1,11 +1,22 @@
 package com.project.mgr.fragments.tabs;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.hardware.Camera;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -17,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.project.mgr.R;
 
@@ -64,8 +76,9 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 	  @Override
 	  public boolean onOptionsItemSelected(MenuItem item) {
 	    if (item.getItemId() == R.id.see_pictures) {
-	    	Intent intent = new Intent(getBaseContext(), PreviewGif.class);
-          startActivity(intent);
+	    	new GIF(this).execute();
+	    	//Intent intent = new Intent(getBaseContext(), PreviewGif.class);
+	    	//startActivity(intent);
 	    }
 
 	    return(super.onOptionsItemSelected(item));
@@ -124,4 +137,88 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
             mAdapter.add(size.width + " x " + size.height);
         }
     }
+    
+    /**
+     * Async GIF creation before previewing
+     */
+    
+	
+	
+	public byte[] generateGIF() {
+		ArrayList<Bitmap> bitmaps = new ArrayList<Bitmap>();
+		File picturesDir = new File(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/pictures");
+		File pictures[] = picturesDir.listFiles();
+		for (int i=0; i < pictures.length; i++) {
+			Bitmap myBitmap = BitmapFactory.decodeFile(pictures[i].getAbsolutePath());
+			bitmaps.add(myBitmap);
+		}
+	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	    GIFEncoder encoder = new GIFEncoder();
+	    encoder.start(bos);
+	    for (Bitmap bitmap : bitmaps) {
+	        encoder.addFrame(bitmap);
+	    }
+	    encoder.finish();
+	    return bos.toByteArray();
+	}
+	
+    
+    public static final int PLEASE_WAIT_DIALOG = 1;
+	
+	@Override
+    public Dialog onCreateDialog(int dialogId) {
+        switch (dialogId) {
+        case PLEASE_WAIT_DIALOG:
+            ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setTitle("Creating GIF");
+            dialog.setMessage("Please wait...");
+            dialog.setCancelable(true);
+            return dialog;
+        default:
+            break;
+        }
+        return null;
+    }
+
+	class GIF extends AsyncTask<Void, Void, Void> {
+		Activity startingActivity;
+
+		public GIF(Activity startingActivity) {
+			this.startingActivity = startingActivity;
+		}
+		 
+		@Override
+		protected void onPreExecute() {
+			startingActivity.showDialog(TakePhotos.PLEASE_WAIT_DIALOG);
+		}
+				 
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			FileOutputStream outStream = null;
+	        try{
+	            outStream = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIFfromPictures.gif");
+	            outStream.write(generateGIF());
+	            outStream.close();
+	        }catch(Exception e){
+	            e.printStackTrace();
+	        }
+			/*
+			try {
+				Thread.sleep(5000);
+	        } catch (InterruptedException e) {
+	            e.printStackTrace();
+	        }*/
+	        return null;
+	    }
+		 
+		    @Override
+		    protected void onPostExecute(Void result) {
+		    	startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
+		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
+		        Intent intent = new Intent(getBaseContext(), PreviewGif.class);
+		    	startActivity(intent);
+		    }
+	}
+
+
 }
