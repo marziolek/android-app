@@ -37,6 +37,7 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
     private ArrayAdapter<String> mAdapter;
     private RelativeLayout mLayout;
     private int mCameraId = 0;
+    Boolean makingGif = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,9 +118,11 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
     @Override
     protected void onPause() {
         super.onPause();
-        mPreview.stop();
-        mLayout.removeView(mPreview);
-        mPreview = null;
+        if (!makingGif) {
+        	mPreview.stop();
+            mLayout.removeView(mPreview);
+            mPreview = null;	
+        }
     }
     
     private void createCameraPreview() {
@@ -190,6 +193,10 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		@Override
 		protected void onPreExecute() {
 			startingActivity.showDialog(TakePhotos.PLEASE_WAIT_DIALOG);
+			mPreview.stop();
+	        mLayout.removeView(mPreview);
+	        mPreview = null;
+			makingGif = true;
 		}
 				 
 		@Override
@@ -200,7 +207,7 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 	            outStream.write(generateGIF());
 	            outStream.close();
 	        }catch(Exception e){
-	            e.printStackTrace();
+	            //e.printStackTrace();
 	        }
 			/*
 			try {
@@ -217,6 +224,14 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
 		        Intent intent = new Intent(getBaseContext(), PreviewGif.class);
 		    	startActivity(intent);
+		    }
+		    
+		    @Override
+		    protected void onCancelled() {
+		    	//TODO some activity restart needed 
+		    	//Intent intent = new Intent(getBaseContext(), TakePhotos.class);
+		    	//startActivity(intent);
+		    	createCameraPreview();
 		    }
 	}
 

@@ -51,6 +51,7 @@
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGif"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
+		<activity android:name="com.project.mgr.fragments.tabs.FilesUploader"></activity>
 	</application>
 
 </manifest>
