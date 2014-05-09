@@ -1,13 +1,27 @@
 package com.project.mgr.fragments.tabs;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,26 +56,28 @@ public class FilesUploader extends Activity {
 		new Upload().execute();
 		
 		final Session session = Session.getActiveSession();
-	    if (session != null && session.isOpened()) {
-	        // If the session is open, make an API call to get user data
-	        // and define a new callback to handle the response
-	        Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
-	            @Override
-	            public void onCompleted(GraphUser user, Response response) {
-	                // If the response is successful
-	                if (session == Session.getActiveSession()) {
-	                    if (user != null) {
-	                       String user_ID = user.getId();//user id
-	                       String profileName = user.getName();//user's profile name
-	                       // userNameView.setText(user.getName());
-	                       Log.d("id", user_ID);
-	                       Log.d("prof", profileName);
-	                    }   
-	                }   
-	            }   
-	        }); 
-	        Request.executeBatchAsync(request);
-	    } 
+    	if (session != null && session.isOpened()) {
+    		// If the session is open, make an API call to get user data
+    	    // and define a new callback to handle the response
+    	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+	    	    @Override
+	    	    public void onCompleted(GraphUser user, Response response) {
+	    	               // If the response is successful
+		    	    if (session == Session.getActiveSession()) {
+		    	    	if (user != null) {
+		    	    		String user_id = user.getId();//user id
+		    	            String profileName = user.getName();//user's profile name
+		    	            // userNameView.setText(user.getName());
+		    	            Log.d("id", user_id);
+		    	            Log.d("prof", profileName);
+		    	            new task().execute(user_id);
+		    	    	}   
+		    	    }   
+	    	    }   
+    	    }); 
+    	    Request.executeBatchAsync(request);
+    	}  
+    	
     }
     
     class Upload extends AsyncTask<Void, Void, Void> {
@@ -136,5 +152,89 @@ public class FilesUploader extends Activity {
     		Log.d("upload error", ex.toString());
     	}
     }
-   
+	
+	class task extends AsyncTask<String, String, Void> {
+		private ProgressDialog progressDialog = new ProgressDialog(FilesUploader.this);
+	    InputStream is = null ;
+	    String result = "";
+	    protected void onPreExecute() {
+	       progressDialog.setMessage("Fetching data...");
+	       progressDialog.show();
+	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
+			 @Override
+			  public void onCancel(DialogInterface arg0) {
+			  task.this.cancel(true);
+			    }
+			 });*/
+	       
+	     }
+	    
+	    @Override
+	    protected Void doInBackground(String... params) {
+	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/insert.php";
+
+	      	HttpClient httpClient = new DefaultHttpClient();
+	      	HttpPost httpPost = new HttpPost(url_select);
+	      	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
+	      	param.add(new BasicNameValuePair("user_id", params[0]));
+		    
+	        try {
+			     httpPost.setEntity(new UrlEncodedFormEntity(param));
+		
+			     HttpResponse httpResponse = httpClient.execute(httpPost);
+			     HttpEntity httpEntity = httpResponse.getEntity();
+		
+			     //read content
+			     is =  httpEntity.getContent();     
+
+	        } catch (Exception e) {
+	        	Log.e("log_tag", "Error in http connection "+e.toString());
+	        }
+	    try {
+	        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		     StringBuilder sb = new StringBuilder();
+		     String line = "";
+		     while((line=br.readLine())!=null)
+		     {
+		        sb.append(line+"\n");
+		     }
+		      is.close();
+		      result=sb.toString();    
+
+	       } catch (Exception e) {
+	        // TODO: handle exception
+	        Log.e("log_tag", "Error converting result "+e.toString());
+	       }
+
+	      return null;
+
+	     }
+	    protected void onPostExecute(Void v) {
+/*
+	  // ambil data dari Json database
+	  try {
+	   JSONArray Jarray = new JSONArray(result);
+	   for(int i=0;i<Jarray.length();i++)
+	   {
+	   JSONObject Jasonobject = null;
+	  
+	   Jasonobject = Jarray.getJSONObject(i);
+
+	   //get an output on the screen
+	   String user_id = Jasonobject.getString("user_id");
+	   String created_at = Jasonobject.getString("created_at");
+	   String post_id = Jasonobject.getString("id");
+	   
+	   Log.d("DB:", user_id+"__"+created_at+"__"+post_id);
+	   }
+	   this.progressDialog.dismiss();
+
+	  } catch (Exception e) {
+	   // TODO: handle exception
+	   Log.e("log_tag", "Error parsing data "+e.toString());
+	  }
+	  */
+	}
+	}
+
 }
