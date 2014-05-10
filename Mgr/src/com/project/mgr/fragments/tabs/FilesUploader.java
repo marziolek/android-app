@@ -22,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -39,7 +40,6 @@ public class FilesUploader extends Activity {
 	HttpURLConnection connection = null;
     DataOutputStream outputStream = null;
     DataInputStream inputStream = null;
-    String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIFfromPictures.gif";
     String urlServer = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/upload.php";
     String lineEnd = "\r\n";
     String twoHyphens = "--";
@@ -54,7 +54,7 @@ public class FilesUploader extends Activity {
 		super.onCreate(savedInstanceState);
     	
 		new Upload().execute();
-		
+		System.out.println(fileNameAudio());
 		final Session session = Session.getActiveSession();
     	if (session != null && session.isOpened()) {
     		// If the session is open, make an API call to get user data
@@ -66,11 +66,14 @@ public class FilesUploader extends Activity {
 		    	    if (session == Session.getActiveSession()) {
 		    	    	if (user != null) {
 		    	    		String user_id = user.getId();//user id
-		    	            String profileName = user.getName();//user's profile name
+		    	            //String profileName = user.getName();//user's profile name
 		    	            // userNameView.setText(user.getName());
-		    	            Log.d("id", user_id);
-		    	            Log.d("prof", profileName);
-		    	            new task().execute(user_id);
+		    	            //Log.d("id", user_id);
+		    	            //Log.d("prof", profileName);
+		    	            String gifName = fileName();
+		    	            String audioName = fileNameAudio();
+		    	            String[] params = {user_id,gifName,audioName};
+		    	            new task().execute(params);
 		    	    	}   
 		    	    }   
 	    	    }   
@@ -96,6 +99,7 @@ public class FilesUploader extends Activity {
     public void UploadFile(){
     	try
     	{
+    		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName();
     	    FileInputStream fileInputStream = new FileInputStream(new File(gifPath) );
     	 
     	    URL url = new URL(urlServer);
@@ -177,7 +181,10 @@ public class FilesUploader extends Activity {
 	      	HttpPost httpPost = new HttpPost(url_select);
 	      	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
 	      	param.add(new BasicNameValuePair("user_id", params[0]));
-		    
+	      	param.add(new BasicNameValuePair("gif", params[1]));
+	      	param.add(new BasicNameValuePair("audio", params[2]));
+	      	System.out.println(params[1]);
+	      	
 	        try {
 			     httpPost.setEntity(new UrlEncodedFormEntity(param));
 		
@@ -227,14 +234,32 @@ public class FilesUploader extends Activity {
 	   
 	   Log.d("DB:", user_id+"__"+created_at+"__"+post_id);
 	   }
-	   this.progressDialog.dismiss();
 
 	  } catch (Exception e) {
 	   // TODO: handle exception
 	   Log.e("log_tag", "Error parsing data "+e.toString());
 	  }
 	  */
+	    	//this.progressDialog.dismiss();
 	}
 	}
 
+	public String fileName() {
+		Intent extras = this.getIntent();
+    	if (extras != null) {
+    	    String fileName = extras.getStringExtra("fileName");
+    	    return fileName;
+    	} else {
+    		return null;
+    	}
+	}
+	public String fileNameAudio() {
+		File audio = new File(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/audio");
+		if (audio.isDirectory()) {
+			File[] audioFile = audio.listFiles();
+			return audioFile[0].getName();
+		} else {
+			return null;
+		}
+	}
 }

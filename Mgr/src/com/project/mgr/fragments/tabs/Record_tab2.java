@@ -298,4 +298,5 @@ public class Record_tab2 extends Fragment {
 	                }
 	            }
 	    	}
+
 	    }	

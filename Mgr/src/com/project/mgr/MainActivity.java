@@ -171,6 +171,19 @@ ConnectionCallbacks, OnConnectionFailedListener {
                 .addOnConnectionFailedListener(this).addApi(Plus.API, null)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).build();
         
+        File mMainDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp");
+        File mMainDirAudio = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio");
+        File mMainDirPictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
+        if (!mMainDir.isDirectory()) {
+        	mMainDir.mkdir();	
+        }
+        if (!mMainDirAudio.isDirectory()) {
+        	mMainDirAudio.mkdir();	
+        }
+        if (!mMainDirPictures.isDirectory()) {
+        	mMainDirPictures.mkdir();	
+        }
+        
         // Clean up recording folder
         mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
         File dir = new File(mFileName);
@@ -545,3 +558,16 @@ ConnectionCallbacks, OnConnectionFailedListener {
     }
     
 }
+/*
+ * DB 
+ drop table if exists posts;
+ create table posts 
+ 	(id int not null auto_increment,
+ 	 user_id varchar(15) not null,
+ 	 created_at timestamp not null, 
+ 	 gif varchar(27) not null, 
+ 	 audio varchar(35) not null, 
+ 	 geo varchar(20) null, 
+ 	 primary key (id));
+ 	 
+*/

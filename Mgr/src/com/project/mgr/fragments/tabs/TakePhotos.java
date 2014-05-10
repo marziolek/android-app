@@ -3,7 +3,9 @@ package com.project.mgr.fragments.tabs;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
@@ -37,8 +39,9 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
     private ArrayAdapter<String> mAdapter;
     private RelativeLayout mLayout;
     private int mCameraId = 0;
-    Boolean makingGif = false;
-
+    private Boolean makingGif = false;
+    private String fileName = generateFileName();
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,7 +206,7 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		protected Void doInBackground(Void... arg0) {
 			FileOutputStream outStream = null;
 	        try{
-	            outStream = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIFfromPictures.gif");
+	            outStream = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName);
 	            outStream.write(generateGIF());
 	            outStream.close();
 	        }catch(Exception e){
@@ -222,7 +225,8 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		    protected void onPostExecute(Void result) {
 		    	startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
 		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
-		        Intent intent = new Intent(getBaseContext(), PreviewGif.class);
+		        Intent intent = new Intent(TakePhotos.this, PreviewGif.class);
+		        intent.putExtra("fileName", fileName);
 		    	startActivity(intent);
 		    }
 		    
@@ -235,5 +239,11 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		    }
 	}
 
+	public String generateFileName() {
+		Date now = new Date();
+	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+	    String fileName = "GIF_"+formatter.format(now) + ".gif";
+	    return fileName;
+	}
 
 }

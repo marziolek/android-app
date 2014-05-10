@@ -9,6 +9,7 @@ import android.graphics.Movie;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -25,19 +26,22 @@ public class PreviewGif extends FragmentActivity {
 		setContentView(R.layout.preview_gif);
 
         final PreviewGifPlayer gif1 = (PreviewGifPlayer) findViewById(R.id.gif1);
-        
         try {
-        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIFfromPictures.gif");
+        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName());
             byte[] array = streamToBytes(is);
-	        Movie movie = Movie.decodeByteArray(array, 0, array.length);
-	        gif1.setMovie(movie);
+            Log.d("filename", fileName());
+    	    Movie movie = Movie.decodeByteArray(array, 0, array.length);
+    	    gif1.setMovie(movie);
 	    }
         catch(Exception e) {
         }
         uploadGif = (Button) findViewById(R.id.uploadGif);
         uploadGif.setOnClickListener(new View.OnClickListener() {
            public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), FilesUploader.class);
+                Intent intent = new Intent(PreviewGif.this, FilesUploader.class);
+                Bundle b = new Bundle();
+                b.putString("fileName", fileName());
+                intent.putExtras(b);
                 startActivity(intent);
             }
         });	    
@@ -62,4 +66,13 @@ public class PreviewGif extends FragmentActivity {
 		gif.setPaused(!gif.isPaused());
 	}
 	
+	public String fileName() {
+		Intent extras = this.getIntent();
+    	if (extras != null) {
+    	    String fileName = extras.getStringExtra("fileName");
+    	    return fileName;
+    	} else {
+    		return null;
+    	}
+	}
 }
