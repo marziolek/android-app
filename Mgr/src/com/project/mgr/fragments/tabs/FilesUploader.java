@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -53,7 +54,7 @@ public class FilesUploader extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
     	
-		new Upload().execute();
+		
 		System.out.println(fileNameAudio());
 		final Session session = Session.getActiveSession();
     	if (session != null && session.isOpened()) {
@@ -73,6 +74,7 @@ public class FilesUploader extends Activity {
 		    	            String gifName = fileName();
 		    	            String audioName = fileNameAudio();
 		    	            String[] params = {user_id,gifName,audioName};
+		    	            new Upload().execute(params);
 		    	            new task().execute(params);
 		    	    	}   
 		    	    }   
@@ -83,11 +85,12 @@ public class FilesUploader extends Activity {
     	
     }
     
-    class Upload extends AsyncTask<Void, Void, Void> {
+    class Upload extends AsyncTask<String, String, Void> {
 		@Override
-		protected Void doInBackground(Void... arg0) {
+		protected Void doInBackground(String... user_id) {
 			try {
-				UploadFile();
+				UploadFile(user_id[0]);
+				UploadAudioFile(user_id[0]);
 			}
 			catch(Exception e) {
 				Log.d("err", e.toString());
@@ -95,8 +98,7 @@ public class FilesUploader extends Activity {
 			return null;
 		}
     }
-    
-    public void UploadFile(){
+    public void UploadFile(String user_id){
     	try
     	{
     		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName();
@@ -115,12 +117,13 @@ public class FilesUploader extends Activity {
     	 
     	    connection.setRequestProperty("Connection", "Keep-Alive");
     	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+    	    connection.setRequestProperty("UserId", user_id);
     	 
     	    outputStream = new DataOutputStream( connection.getOutputStream() );
     	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
     	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + gifPath +"\"" + lineEnd);
     	    outputStream.writeBytes(lineEnd);
-    	 
+    	    
     	    bytesAvailable = fileInputStream.available();
     	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
     	    buffer = new byte[bufferSize];
@@ -156,7 +159,69 @@ public class FilesUploader extends Activity {
     		Log.d("upload error", ex.toString());
     	}
     }
-	
+    
+    public void UploadAudioFile(String user_id){
+    	try
+    	{
+    		String audioPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/audio/"+fileNameAudio();
+    	    FileInputStream fileInputStreamAudio = new FileInputStream(new File(audioPath) );
+    	 
+    	    URL url = new URL(urlServer);
+    	    connection = (HttpURLConnection) url.openConnection();
+    	 
+    	    // Allow Inputs &amp; Outputs.
+    	    connection.setDoInput(true);
+    	    connection.setDoOutput(true);
+    	    connection.setUseCaches(false);
+    	 
+    	    // Set HTTP method to POST.
+    	    connection.setRequestMethod("POST");
+    	 
+    	    connection.setRequestProperty("Connection", "Keep-Alive");
+    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+    	    connection.setRequestProperty("UserId", user_id);
+    	    
+    	    outputStream = new DataOutputStream( connection.getOutputStream() );
+    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + audioPath +"\"" + lineEnd);
+    	    outputStream.writeBytes(lineEnd);
+    	 
+    	    bytesAvailable = fileInputStreamAudio.available();
+    	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+    	    buffer = new byte[bufferSize];
+    	 
+    	    // Read file
+    	    bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
+    	 
+    	    while (bytesRead > 0)
+    	    {
+    	        outputStream.write(buffer, 0, bufferSize);
+    	        bytesAvailable = fileInputStreamAudio.available();
+    	        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+    	        bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
+    	    }
+    	 
+    	    outputStream.writeBytes(lineEnd);
+    	    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+    	 
+    	    // Responses from the server (code and message)
+    	    Integer serverResponseCode = connection.getResponseCode();
+    	    String serverResponseMessage = connection.getResponseMessage();
+    	 
+    	    Log.d("response code", serverResponseCode.toString());
+    	    Log.d("response msg", serverResponseMessage.toString());
+    	    
+    	    fileInputStreamAudio.close();
+    	    outputStream.flush();
+    	    outputStream.close();
+    	}
+    	catch (Exception ex)
+    	{
+    	    //Exception handling
+    		Log.d("upload error", ex.toString());
+    	}
+    }
+    
 	class task extends AsyncTask<String, String, Void> {
 		private ProgressDialog progressDialog = new ProgressDialog(FilesUploader.this);
 	    InputStream is = null ;
@@ -183,7 +248,6 @@ public class FilesUploader extends Activity {
 	      	param.add(new BasicNameValuePair("user_id", params[0]));
 	      	param.add(new BasicNameValuePair("gif", params[1]));
 	      	param.add(new BasicNameValuePair("audio", params[2]));
-	      	System.out.println(params[1]);
 	      	
 	        try {
 			     httpPost.setEntity(new UrlEncodedFormEntity(param));
