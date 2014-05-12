@@ -56,8 +56,6 @@ public class FilesUploader extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
     	
-		
-		System.out.println(fileNameAudio());
 		final Session session = Session.getActiveSession();
     	if (session != null && session.isOpened()) {
     		// If the session is open, make an API call to get user data
