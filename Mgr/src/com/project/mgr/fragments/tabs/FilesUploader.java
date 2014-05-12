@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,17 +21,20 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+import com.project.mgr.MainActivity;
 
 
 
@@ -67,37 +69,19 @@ public class FilesUploader extends Activity {
 		    	    if (session == Session.getActiveSession()) {
 		    	    	if (user != null) {
 		    	    		String user_id = user.getId();//user id
-		    	            //String profileName = user.getName();//user's profile name
-		    	            // userNameView.setText(user.getName());
-		    	            //Log.d("id", user_id);
-		    	            //Log.d("prof", profileName);
 		    	            String gifName = fileName();
 		    	            String audioName = fileNameAudio();
 		    	            String[] params = {user_id,gifName,audioName};
-		    	            new Upload().execute(params);
-		    	            new task().execute(params);
+		    	            
+		    	            new Task(FilesUploader.this).execute(params);
 		    	    	}   
 		    	    }   
 	    	    }   
     	    }); 
     	    Request.executeBatchAsync(request);
     	}  
-    	
     }
     
-    class Upload extends AsyncTask<String, String, Void> {
-		@Override
-		protected Void doInBackground(String... user_id) {
-			try {
-				UploadFile(user_id[0]);
-				UploadAudioFile(user_id[0]);
-			}
-			catch(Exception e) {
-				Log.d("err", e.toString());
-			}
-			return null;
-		}
-    }
     public void UploadFile(String user_id){
     	try
     	{
@@ -222,24 +206,43 @@ public class FilesUploader extends Activity {
     	}
     }
     
-	class task extends AsyncTask<String, String, Void> {
-		private ProgressDialog progressDialog = new ProgressDialog(FilesUploader.this);
-	    InputStream is = null ;
+    public static final int PLEASE_WAIT_DIALOG = 1;
+
+    @Override
+    public Dialog onCreateDialog(int dialogId) {
+        switch (dialogId) {
+        case PLEASE_WAIT_DIALOG:
+            ProgressDialog dialog = new ProgressDialog(this);
+            dialog.setTitle("Uploading files");
+            dialog.setMessage("Please wait...");
+            dialog.setCancelable(true);
+            return dialog;
+        default:
+            break;
+        }
+        return null;
+    }
+    
+	class Task extends AsyncTask<String, String, Void> {
+		InputStream is = null ;
 	    String result = "";
-	    protected void onPreExecute() {
-	       progressDialog.setMessage("Fetching data...");
-	       progressDialog.show();
-	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
-			 @Override
-			  public void onCancel(DialogInterface arg0) {
-			  task.this.cancel(true);
-			    }
-			 });*/
-	       
-	     }
+	    
+	    Activity startingActivity;
+
+		public Task(Activity startingActivity) {
+			this.startingActivity = startingActivity;
+		}
+		 
+		@Override
+		protected void onPreExecute() {
+			startingActivity.showDialog(FilesUploader.PLEASE_WAIT_DIALOG);
+		}
+				
 	    
 	    @Override
 	    protected Void doInBackground(String... params) {
+	    	UploadFile(params[0]);
+			UploadAudioFile(params[0]);
 	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/insert.php";
 
 	      	HttpClient httpClient = new DefaultHttpClient();
@@ -276,36 +279,15 @@ public class FilesUploader extends Activity {
 	        // TODO: handle exception
 	        Log.e("log_tag", "Error converting result "+e.toString());
 	       }
-
 	      return null;
-
 	     }
+	    
 	    protected void onPostExecute(Void v) {
-/*
-	  // ambil data dari Json database
-	  try {
-	   JSONArray Jarray = new JSONArray(result);
-	   for(int i=0;i<Jarray.length();i++)
-	   {
-	   JSONObject Jasonobject = null;
-	  
-	   Jasonobject = Jarray.getJSONObject(i);
-
-	   //get an output on the screen
-	   String user_id = Jasonobject.getString("user_id");
-	   String created_at = Jasonobject.getString("created_at");
-	   String post_id = Jasonobject.getString("id");
-	   
-	   Log.d("DB:", user_id+"__"+created_at+"__"+post_id);
-	   }
-
-	  } catch (Exception e) {
-	   // TODO: handle exception
-	   Log.e("log_tag", "Error parsing data "+e.toString());
-	  }
-	  */
-	    	//this.progressDialog.dismiss();
-	}
+	    	startingActivity.removeDialog(FilesUploader.PLEASE_WAIT_DIALOG);
+	    	Toast.makeText(getApplicationContext(), "Your post is now online!", 2000).show();
+	    	Intent stream = new Intent(FilesUploader.this, SwipeTabs.class);
+	    	startActivity(stream);
+	    }
 	}
 
 	public String fileName() {
