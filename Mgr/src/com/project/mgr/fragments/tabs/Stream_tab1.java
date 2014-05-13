@@ -4,8 +4,14 @@
 package com.project.mgr.fragments.tabs;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.apache.http.HttpEntity;
@@ -22,12 +28,13 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.Request;
@@ -37,8 +44,6 @@ import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
 public class Stream_tab1 extends Fragment {
-    
-	private Button button;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
@@ -65,8 +70,10 @@ public class Stream_tab1 extends Fragment {
         	    }); 
         	    Request.executeBatchAsync(request);
         	}
-    		
-    		return rootView;
+        	
+        	
+        	
+        	return rootView;
     }
 	
 	TextView txt1,txt2,txt3,txt4;
@@ -124,26 +131,37 @@ public class Stream_tab1 extends Fragment {
 	  // ambil data dari Json database
 	  try {
 	   JSONArray Jarray = new JSONArray(result);
-	   for(int i=0;i<Jarray.length();i++)
-	   {
-	   JSONObject Jasonobject = null;
-	   txt1 = (TextView) getActivity().findViewById(R.id.txt1);
-	   txt2 = (TextView) getActivity().findViewById(R.id.txt2);
-	   txt3 = (TextView) getActivity().findViewById(R.id.txt3);
-	   txt4 = (TextView) getActivity().findViewById(R.id.txt4);
+	   LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	   String[] fields = {"user_id","created_at","gif","audio"};
+	   for(int i=0;i<Jarray.length();i++) {
+		   JSONObject Jasonobject = null;
+		   Jasonobject = Jarray.getJSONObject(i);
+		   
+		   for(int j=0;j<fields.length;j++) {
+		   
+		   TextView post = new TextView(getActivity());
+		   post.setText(Jasonobject.getString(fields[j]));
+		   post.setId(i);
+		   posts.addView(post);
+		   
+		   /*txt1 = (TextView) getActivity().findViewById(R.id.txt1);
+		   txt2 = (TextView) getActivity().findViewById(R.id.txt2);
+		   txt3 = (TextView) getActivity().findViewById(R.id.txt3);
+		   txt4 = (TextView) getActivity().findViewById(R.id.txt4);
+	
+		   Jasonobject = Jarray.getJSONObject(i);
+	
+		   //get an output on the screen
+		   String user_id = Jasonobject.getString("user_id");
+		   String created_at = Jasonobject.getString("created_at");
+		   String gif_name = Jasonobject.getString("gif");
+		   String audio_name = Jasonobject.getString("audio");
 
-	   Jasonobject = Jarray.getJSONObject(i);
-
-	   //get an output on the screen
-	   String user_id = Jasonobject.getString("user_id");
-	   String created_at = Jasonobject.getString("created_at");
-	   String gif_name = Jasonobject.getString("gif");
-	   String audio_name = Jasonobject.getString("audio");
-
-	      txt1.setText(user_id);
-	      txt2.setText(created_at);
-	      txt3.setText(gif_name);
-	      txt3.setText(audio_name);
+		   txt1.setText(user_id);
+		   txt2.setText(created_at);
+		   txt3.setText(gif_name);
+           txt4.setText(audio_name);*/
+		   }
 	   }
 	   this.progressDialog.dismiss();
 
@@ -152,5 +170,65 @@ public class Stream_tab1 extends Fragment {
 	   Log.e("log_tag", "Error parsing data "+e.toString());
 	  }
 	}
+	}
+	
+	public void downloadPosts() {
+		try {
+	        //set the download URL, a url that points to a file on the internet
+	        //this is the file to be downloaded
+	        URL url = new URL("http://somewhere.com/some/webhosted/file");
+
+	        //create the new connection
+	        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+	        //set up some things on the connection
+	        urlConnection.setRequestMethod("GET");
+	        urlConnection.setDoOutput(true);
+
+	        //and connect!
+	        urlConnection.connect();
+
+	        //set the path where we want to save the file
+	        //in this case, going to save it on the root directory of the
+	        //sd card.
+	        File SDCardRoot = Environment.getExternalStorageDirectory();
+	        //create a new file, specifying the path, and the filename
+	        //which we want to save the file as.
+	        File file = new File(SDCardRoot,"somefile.ext");
+
+	        //this will be used to write the downloaded data into the file we created
+	        FileOutputStream fileOutput = new FileOutputStream(file);
+
+	        //this will be used in reading the data from the internet
+	        InputStream inputStream = urlConnection.getInputStream();
+
+	        //this is the total size of the file
+	        int totalSize = urlConnection.getContentLength();
+	        //variable to store total downloaded bytes
+	        int downloadedSize = 0;
+
+	        //create a buffer...
+	        byte[] buffer = new byte[1024];
+	        int bufferLength = 0; //used to store a temporary size of the buffer
+
+	        //now, read through the input buffer and write the contents to the file
+	        while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
+	                //add the data in the buffer to the file in the file output stream (the file on the sd card
+	                fileOutput.write(buffer, 0, bufferLength);
+	                //add up the size so we know how much is downloaded
+	                downloadedSize += bufferLength;
+	                //this is where you would do something to report the prgress, like this maybe
+	                //updateProgress(downloadedSize, totalSize);
+
+	        }
+	        //close the output stream when done
+	        fileOutput.close();
+
+		//catch some possible errors...
+		} catch (MalformedURLException e) {
+		        e.printStackTrace();
+		} catch (IOException e) {
+		        e.printStackTrace();
+		}
 	}
 }

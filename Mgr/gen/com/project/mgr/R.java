@@ -1608,7 +1608,6 @@ containing a value of this type.
         public static final int login_form=0x7f050043;
         public static final int login_status=0x7f050041;
         public static final int login_status_message=0x7f050042;
-        public static final int merge=0x7f0500b3;
         public static final int middle=0x7f050012;
         public static final int name=0x7f050097;
         public static final int never=0x7f050009;
@@ -1623,6 +1622,7 @@ containing a value of this type.
         public static final int picture=0x7f050082;
         public static final int pictureTitle=0x7f050083;
         public static final int play=0x7f05008d;
+        public static final int posts=0x7f0500b3;
         public static final int profile=0x7f050096;
         public static final int profile_name=0x7f0500af;
         public static final int progress_circular=0x7f050018;
