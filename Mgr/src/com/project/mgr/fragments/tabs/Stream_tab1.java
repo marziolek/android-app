@@ -14,7 +14,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -28,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.graphics.Movie;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -35,10 +38,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -50,9 +57,13 @@ public class Stream_tab1 extends Fragment {
 	
 	private MediaPlayer mPlayer;
 	private boolean mPlaying = false;
-	private MediaPlayer player;
 	
 	private PreviewGifPlayer lastPlayed = null;
+	private String calculatedDays = null;
+	private Integer calculatedDaysNo = null;
+	private String calculatedMins = null;
+	private String calculatedSecs = null;
+	private String calculatedTime = null;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
@@ -84,7 +95,7 @@ public class Stream_tab1 extends Fragment {
         	return rootView;
     }
 	
-	class downloadFiles extends AsyncTask<String, String, Void> {
+	class displayPosts extends AsyncTask<String, String, Void> {
 		
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
@@ -106,6 +117,14 @@ public class Stream_tab1 extends Fragment {
 			downloadPosts(params[0],params[3]);
 			if (downloadPosts(params[0],params[2]) && downloadPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
+				   final LinearLayout postGifLay = new LinearLayout(getActivity());
+				   final TextView creationDate = new TextView(getActivity());
+				   postGifLay.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1f));
+				   creationDate.setText(calculateDate(params[1]));
+				   creationDate.setGravity(Gravity.BOTTOM);
+				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
+				   creationDate.setTextColor(Color.WHITE);
+				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/stream/"+params[2]);
 			            byte[] array = streamToBytes(is);
@@ -161,8 +180,14 @@ public class Stream_tab1 extends Fragment {
 			    	    getActivity().runOnUiThread(new Runnable() {
 			    	        @Override
 			    	        public void run() {
-			    	        	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
-			    	        	posts.addView(postGif);
+			    	        	RelativeLayout post = new RelativeLayout(getActivity());
+			    	        	post.setPadding(0, 40, 0, 0);
+			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
+			    	        	postGifLay.addView(postGif);
+			    	        	postGifLay.setGravity(Gravity.CENTER);
+			    	        	post.addView(postGifLay);
+			    	        	post.addView(creationDate);
+			    	        	posts.addView(post);
 			    	        }
 			    	   });
 				   } catch(Exception e) {
@@ -242,7 +267,7 @@ public class Stream_tab1 extends Fragment {
 			   
 			   String[] fields = {user_id,created_at,gif,audio};
 			   
-			   new downloadFiles().execute(fields);
+			   new displayPosts().execute(fields);
 			   
 			   /*for(int j=0;j<fields.length;j++) {
 			   
@@ -370,12 +395,55 @@ public class Stream_tab1 extends Fragment {
         //return mPlayer;
     }
 	
-	private void startPlaying(MediaPlayer mPlayer) {
-		mPlayer.start();
-	}
-	
 	private void stopPlaying() {
 		mPlayer.release();
 	    mPlayer = null;
+	}
+	
+	private String calculateDate(String created_at) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		try {
+			Date date = format.parse(created_at);
+			Long asd = new Date(System.currentTimeMillis()).getTime();// - date.getTime();// - date.getTime();
+			Long dsa = date.getTime();
+			Long qwe = (asd-dsa)/1000;
+			int difference = Integer.parseInt(qwe.toString());
+			
+			int secs = difference;
+			int mins = secs / 60;
+			int hours = mins / 60;
+			int days = hours / 24;
+			
+			System.out.println(difference);
+			System.out.println(secs);
+			System.out.println(mins);
+			System.out.println(hours);
+			System.out.println(days);
+			
+			
+			if (!(secs > 30)) {
+				calculatedTime = "Just now";
+			} else {
+				calculatedTime = Integer.toString(secs)+" seconds ago";
+			}
+			if (mins == 1) {
+				calculatedTime = "1 minute ago";
+			} else if (mins != 1 && mins != 0){
+				calculatedTime = Integer.toString(mins)+" minutes ago";
+			}
+			if (hours == 1) {
+				calculatedTime = "1 hour ago";
+			} else if (hours != 1 && hours != 0) {
+				calculatedTime = Integer.toString(hours)+" hours ago";
+			}
+			if (days == 1) {
+				calculatedTime = "1 day ago";
+			} else if (days != 0 && days != 1) {
+				calculatedTime = Integer.toString(days)+" days ago";
+			}
+		} catch(Exception e) {
+			
+		}
+		return calculatedTime;
 	}
 }
