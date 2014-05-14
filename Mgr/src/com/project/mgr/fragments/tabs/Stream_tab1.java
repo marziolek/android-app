@@ -52,6 +52,8 @@ public class Stream_tab1 extends Fragment {
 	private boolean mPlaying = false;
 	private MediaPlayer player;
 	
+	private PreviewGifPlayer lastPlayed = null;
+	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
 
@@ -114,15 +116,41 @@ public class Stream_tab1 extends Fragment {
 			    	    postGif.setOnClickListener(new View.OnClickListener() {
 			    	    	@Override
 			    	        public void onClick(View v) {
-			    	    		postGif.setPaused(!postGif.isPaused());
-			    	    		if (!mPlaying) {
-			    	    			preparePlaying(params[3]);
-			    	    			//startPlaying(player);
-			    	    			mPlaying = !mPlaying;
+			    	    		PreviewGifPlayer temp = (PreviewGifPlayer) v;
+			    	    		if (lastPlayed != null) {
+			    	    			if (lastPlayed == temp) {
+			    	    				lastPlayed.setPaused(!lastPlayed.isPaused());
+			    	    				if (!mPlaying) {
+					    	    			preparePlaying(params[3]);
+					    	    			mPlaying = !mPlaying;
+					    	    		} else {
+					    	    			stopPlaying();
+					    	    			mPlaying = !mPlaying;
+					    	    		}
+			    	    			} else {
+				    	    			lastPlayed.setPaused(true);
+				    	    			temp.setPaused(false);
+					    	    		lastPlayed = temp;
+				    	    			if (!mPlaying) {
+					    	    			preparePlaying(params[3]);
+					    	    			mPlaying = !mPlaying;
+					    	    		} else {
+					    	    			stopPlaying();
+					    	    			mPlaying = !mPlaying;
+					    	    		}
+			    	    			}
 			    	    		} else {
-			    	    			stopPlaying();
-			    	    			mPlaying = !mPlaying;
+			    	    			temp.setPaused(!temp.isPaused());
+			    	    			lastPlayed = temp;
+			    	    			if (!mPlaying) {
+				    	    			preparePlaying(params[3]);
+				    	    			mPlaying = !mPlaying;
+				    	    		} else {
+				    	    			stopPlaying();
+				    	    			mPlaying = !mPlaying;
+				    	    		}
 			    	    		}
+			    	    		
 			    	        }
 			        	});
 			        	
