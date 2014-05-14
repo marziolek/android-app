@@ -131,7 +131,11 @@ public class Stream_tab1 extends Fragment {
 				    	    			lastPlayed.setPaused(true);
 				    	    			temp.setPaused(false);
 					    	    		lastPlayed = temp;
-				    	    			if (!mPlaying) {
+					    	    		if (mPlaying) {
+						    	    		stopPlaying();
+						    	    		mPlaying = !mPlaying;
+					    	    		}
+					    	    		if (!mPlaying) {
 					    	    			preparePlaying(params[3]);
 					    	    			mPlaying = !mPlaying;
 					    	    		} else {
