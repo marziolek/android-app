@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.graphics.Movie;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -46,6 +47,10 @@ import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
 public class Stream_tab1 extends Fragment {
+	
+	private MediaPlayer mPlayer;
+	private boolean mPlaying = false;
+	private MediaPlayer player;
 	
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
@@ -74,7 +79,6 @@ public class Stream_tab1 extends Fragment {
         	}
         	
         	
-        	
         	return rootView;
     }
 	
@@ -95,7 +99,7 @@ public class Stream_tab1 extends Fragment {
 	     }
 
 		@Override
-	    protected Void doInBackground(String... params) {
+	    protected Void doInBackground(final String... params) {
 			downloadPosts(params[0],params[2]);
 			downloadPosts(params[0],params[3]);
 			if (downloadPosts(params[0],params[2]) && downloadPosts(params[0],params[3])) {
@@ -105,6 +109,23 @@ public class Stream_tab1 extends Fragment {
 			            byte[] array = streamToBytes(is);
 			    	    Movie movie = Movie.decodeByteArray(array, 0, array.length);
 			    	    postGif.setMovie(movie);
+			    	    postGif.setTag(params[0]+"/"+params[2]);
+			    	    postGif.setPaused(true);
+			    	    postGif.setOnClickListener(new View.OnClickListener() {
+			    	    	@Override
+			    	        public void onClick(View v) {
+			    	    		postGif.setPaused(!postGif.isPaused());
+			    	    		if (!mPlaying) {
+			    	    			preparePlaying(params[3]);
+			    	    			//startPlaying(player);
+			    	    			mPlaying = !mPlaying;
+			    	    		} else {
+			    	    			stopPlaying();
+			    	    			mPlaying = !mPlaying;
+			    	    		}
+			    	        }
+			        	});
+			        	
 			    	    getActivity().runOnUiThread(new Runnable() {
 			    	        @Override
 			    	        public void run() {
@@ -243,34 +264,36 @@ public class Stream_tab1 extends Fragment {
 	        //create a new file, specifying the path, and the filename
 	        //which we want to save the file as.
 	        File file = new File(SDCardRoot,fileName);
-
-	        //this will be used to write the downloaded data into the file we created
-	        FileOutputStream fileOutput = new FileOutputStream(file);
-
-	        //this will be used in reading the data from the internet
-	        InputStream inputStream = urlConnection.getInputStream();
-
-	        //this is the total size of the file
-	        int totalSize = urlConnection.getContentLength();
-	        //variable to store total downloaded bytes
-	        int downloadedSize = 0;
-
-	        //create a buffer...
-	        byte[] buffer = new byte[1024];
-	        int bufferLength = 0; //used to store a temporary size of the buffer
-
-	        //now, read through the input buffer and write the contents to the file
-	        while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
-	                //add the data in the buffer to the file in the file output stream (the file on the sd card
-	                fileOutput.write(buffer, 0, bufferLength);
-	                //add up the size so we know how much is downloaded
-	                downloadedSize += bufferLength;
-	                //this is where you would do something to report the prgress, like this maybe
-	                //updateProgress(downloadedSize, totalSize);
-
+	        if (!file.exists()) {
+		        //this will be used to write the downloaded data into the file we created
+		        FileOutputStream fileOutput = new FileOutputStream(file);
+	
+		        //this will be used in reading the data from the internet
+		        InputStream inputStream = urlConnection.getInputStream();
+	
+		        //this is the total size of the file
+		        int totalSize = urlConnection.getContentLength();
+		        //variable to store total downloaded bytes
+		        int downloadedSize = 0;
+	
+		        //create a buffer...
+		        byte[] buffer = new byte[1024];
+		        int bufferLength = 0; //used to store a temporary size of the buffer
+	
+		        //now, read through the input buffer and write the contents to the file
+		        
+		        while ( (bufferLength = inputStream.read(buffer)) > 0 ) {
+		                //add the data in the buffer to the file in the file output stream (the file on the sd card
+		                fileOutput.write(buffer, 0, bufferLength);
+		                //add up the size so we know how much is downloaded
+		                downloadedSize += bufferLength;
+		                //this is where you would do something to report the prgress, like this maybe
+		                //updateProgress(downloadedSize, totalSize);
+	
+		        }
+		        //close the output stream when done
+		        fileOutput.close();
 	        }
-	        //close the output stream when done
-	        fileOutput.close();
 	        return true;
 		//catch some possible errors...
 		} catch (MalformedURLException e) {
@@ -300,4 +323,27 @@ public class Stream_tab1 extends Fragment {
 		gif.setPaused(!gif.isPaused());
 	}
 	
+	private void preparePlaying(String audio) {
+        mPlayer = new MediaPlayer();
+        try {
+        	String audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/stream/"+audio;
+        	//File dir = new File(mAllFiles);
+        	//File[] files = dir.listFiles();
+        	mPlayer.setDataSource(audioFile);
+            mPlayer.prepare();
+            mPlayer.start();
+        } catch (IOException e) {
+                Log.d("asdasd", "prepare() failed when trying to play recorded audio");
+        }
+        //return mPlayer;
+    }
+	
+	private void startPlaying(MediaPlayer mPlayer) {
+		mPlayer.start();
+	}
+	
+	private void stopPlaying() {
+		mPlayer.release();
+	    mPlayer = null;
+	}
 }

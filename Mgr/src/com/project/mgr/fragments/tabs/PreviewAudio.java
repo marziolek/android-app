@@ -20,7 +20,7 @@ public class PreviewAudio extends FragmentActivity {
 	private String mAllFiles;
 	private MediaPlayer mPlayer = null;
 	private Button mPlay;
-	private boolean mStartPlaying = false;
+	private boolean mStartPlaying = true;
 	private Button mTakePhoto;
 
 	@Override
