@@ -15,11 +15,13 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
  
         switch (index) {
         case 0:
-            return new Stream_tab1();
+            return new StreamTab1();
         case 1:
-            return new Record_tab2();
+        	return new UserStreamTab2();
         case 2:
-            return new Settings_tab3();
+            return new RecordTab3();
+        case 3:
+            return new SettingsTab4();
 	    }
  
         return null;
@@ -28,7 +30,7 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         // get item count - equal to number of tabs
-        return 3;
+        return 4;
     }
  
 }

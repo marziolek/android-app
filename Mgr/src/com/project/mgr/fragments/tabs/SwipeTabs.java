@@ -14,7 +14,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabs = { "Stream", "Record", "Settings" };
+    private String[] tabs = { "Stream", "My stream", "Record", "Settings" };
         
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +32,18 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
  
         // Adding Tabs
         for (String tab_name : tabs) {
-            actionBar.addTab(actionBar.newTab().setText(tab_name)
-                    .setTabListener(this));
+            if (tab_name == "Stream") {
+            	actionBar.addTab(actionBar.newTab().setTabListener(this).setIcon(R.drawable.users));
+            }
+            if (tab_name == "My stream") {
+            	actionBar.addTab(actionBar.newTab().setTabListener(this).setIcon(R.drawable.user));
+            }
+            if (tab_name == "Record") {
+            	actionBar.addTab(actionBar.newTab().setTabListener(this).setIcon(R.drawable.mic));
+            }
+            if (tab_name == "Settings") {
+            	actionBar.addTab(actionBar.newTab().setTabListener(this).setIcon(R.drawable.settings));
+            }
         }
  
         /**
@@ -72,4 +82,5 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
+    
 }
