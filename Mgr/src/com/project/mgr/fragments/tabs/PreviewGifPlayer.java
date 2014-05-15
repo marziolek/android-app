@@ -144,15 +144,13 @@ public class PreviewGifPlayer extends View {
 
 			if (measureModeWidth != MeasureSpec.UNSPECIFIED) {
 				int maximumWidth = MeasureSpec.getSize(widthMeasureSpec);
-				if (movieWidth > maximumWidth) {
-					scaleH = (float) movieWidth / (float) maximumWidth;
-				}
+				scaleH = (float) movieWidth / (float) maximumWidth;
 			}
 
 			/*
 			 * calculate vertical scaling
 			 */
-			float scaleW = 1f;
+			float scaleW = 0f;
 			int measureModeHeight = MeasureSpec.getMode(heightMeasureSpec);
 
 			if (measureModeHeight != MeasureSpec.UNSPECIFIED) {

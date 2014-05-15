@@ -37,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -113,13 +114,14 @@ public class Stream_tab1 extends Fragment {
 
 		@Override
 	    protected Void doInBackground(final String... params) {
-			downloadPosts(params[0],params[2]);
-			downloadPosts(params[0],params[3]);
+			//downloadPosts(params[0],params[2]);
+			//downloadPosts(params[0],params[3]);
 			if (downloadPosts(params[0],params[2]) && downloadPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
-				   postGifLay.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, 1f));
+				   int[] displayMetrics = getDisplayMetrics();
+				   postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
 				   creationDate.setText(calculateDate(params[1]));
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
@@ -413,6 +415,8 @@ public class Stream_tab1 extends Fragment {
 			int mins = secs / 60;
 			int hours = mins / 60;
 			int days = hours / 24;
+			int months = days / 30;
+			int years = months / 12;
 			
 			System.out.println(difference);
 			System.out.println(secs);
@@ -441,9 +445,31 @@ public class Stream_tab1 extends Fragment {
 			} else if (days != 0 && days != 1) {
 				calculatedTime = Integer.toString(days)+" days ago";
 			}
+			if (months == 1) {
+				calculatedTime = "1 month ago";
+			} else if (months != 0 && months != 1) {
+				calculatedTime = Integer.toString(months)+" months ago";
+			}
+			if (years == 1) {
+				calculatedTime = "1 year ago";
+			} else if (years != 0 && years != 1) {
+				calculatedTime = Integer.toString(years)+" years ago";
+			}
 		} catch(Exception e) {
 			
 		}
 		return calculatedTime;
+	}
+	
+	private int[] getDisplayMetrics() {
+		DisplayMetrics displaymetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int h = displaymetrics.heightPixels;
+        int w = displaymetrics.widthPixels;
+        System.out.println(h);
+        System.out.println(w);
+        
+        int[] displayMetrics = {w,h};
+        return displayMetrics;
 	}
 }
