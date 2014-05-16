@@ -128,9 +128,9 @@ public class UserStreamTab2 extends Fragment {
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
-				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
 				   try {
-			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/stream/"+params[2]);
+			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/myStream/"+params[2]);
 			            byte[] array = streamToBytes(is);
 			    	    Movie movie = Movie.decodeByteArray(array, 0, array.length);
 			    	    postGif.setMovie(movie);
@@ -317,7 +317,7 @@ public class UserStreamTab2 extends Fragment {
 	        //set the path where we want to save the file
 	        //in this case, going to save it on the root directory of the
 	        //sd card.
-	        String postsDir = Environment.getExternalStorageDirectory()+"/MgrApp/stream/";
+	        String postsDir = Environment.getExternalStorageDirectory()+"/MgrApp/myStream/";
 	        File SDCardRoot = new File(postsDir);
 	        if (!SDCardRoot.exists()) {
 	        	SDCardRoot.mkdirs();
@@ -387,7 +387,7 @@ public class UserStreamTab2 extends Fragment {
 	private void preparePlaying(String audio) {
         mPlayer = new MediaPlayer();
         try {
-        	String audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/stream/"+audio;
+        	String audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/myStream/"+audio;
         	//File dir = new File(mAllFiles);
         	//File[] files = dir.listFiles();
         	mPlayer.setDataSource(audioFile);

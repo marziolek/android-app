@@ -15,13 +15,17 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -44,7 +48,12 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.project.mgr.R;
+import com.project.mgr.fragments.tabs.UserStreamTab2.RetrivePosts;
 
 public class StreamTab1 extends Fragment {
 	
@@ -63,12 +72,31 @@ public class StreamTab1 extends Fragment {
     		Bundle savedInstanceState) {
 
     		View rootView = inflater.inflate(R.layout.stream_tab1, container, false);
-    		new RetriveAllPosts().execute();
+    		final Session session = Session.getActiveSession();
+        	if (session != null && session.isOpened()) {
+        		// If the session is open, make an API call to get user data
+        	    // and define a new callback to handle the response
+        	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+    	    	    @Override
+    	    	    public void onCompleted(GraphUser user, Response response) {
+    	    	               // If the response is successful
+    		    	    if (session == Session.getActiveSession()) {
+    		    	    	if (user != null) {
+    		    	    		String user_id = user.getId();//user id
+    		    	            String[] params = {user_id};
+    		    	            
+    		    	            new RetriveAllPosts().execute(params);
+    		    	    	}   
+    		    	    }   
+    	    	    }   
+        	    }); 
+        	    Request.executeBatchAsync(request);
+        	}
     		
         	return rootView;
     }
 	
-	class displayPosts extends AsyncTask<String, String, Void> {
+	class displayAllPosts extends AsyncTask<String, String, Void> {
 		
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
@@ -88,7 +116,7 @@ public class StreamTab1 extends Fragment {
 	    protected Void doInBackground(final String... params) {
 			//downloadPosts(params[0],params[2]);
 			//downloadPosts(params[0],params[3]);
-			if (downloadPosts(params[0],params[2]) && downloadPosts(params[0],params[3])) {
+			if (downloadAllPosts(params[0],params[2]) && downloadAllPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
@@ -176,7 +204,7 @@ public class StreamTab1 extends Fragment {
 		}
 	}
 	
-	class RetriveAllPosts extends AsyncTask<Void, Void, Void> {
+	class RetriveAllPosts extends AsyncTask<String, String, Void> {
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
 	    String result = "";
@@ -192,19 +220,22 @@ public class StreamTab1 extends Fragment {
 	     }
 
 	    @Override
-	    protected Void doInBackground(Void... params) {
+	    protected Void doInBackground(String... params) {
 	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/selectAll.php";
 
 	    	HttpClient httpClient = new DefaultHttpClient();
 	    	HttpPost httpPost = new HttpPost(url_select);
+	    	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
+	    	param.add(new BasicNameValuePair("user_id",params[0]));
 	        try {
-			     HttpResponse httpResponse = httpClient.execute(httpPost);
-			     HttpEntity httpEntity = httpResponse.getEntity();
-			     //read content
-			     is =  httpEntity.getContent();     
-		     } catch (Exception e) {
-		    	 Log.e("log_tag", "Error in http connection "+e.toString());
-		     }
+	        	httpPost.setEntity(new UrlEncodedFormEntity(param));
+			    HttpResponse httpResponse = httpClient.execute(httpPost);
+			    HttpEntity httpEntity = httpResponse.getEntity();
+			    //read content
+			    is =  httpEntity.getContent();     
+		    } catch (Exception e) {
+		    	Log.e("log_tag", "Error in http connection "+e.toString());
+		    }
 		    try {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			    StringBuilder sb = new StringBuilder();
@@ -238,7 +269,7 @@ public class StreamTab1 extends Fragment {
 			   
 			   String[] fields = {user_id,created_at,gif,audio};
 			   
-			   new displayPosts().execute(fields);
+			   new displayAllPosts().execute(fields);
 		   }
 		   this.progressDialog.dismiss();
 	
@@ -249,7 +280,7 @@ public class StreamTab1 extends Fragment {
 		}
 	}
 	
-	public boolean downloadPosts(String user_id, String fileName) {
+	public boolean downloadAllPosts(String user_id, String fileName) {
 		try {
 	        //set the download URL, a url that points to a file on the internet
 	        //this is the file to be downloaded
