@@ -37,23 +37,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.project.mgr.R;
-import com.project.mgr.fragments.tabs.UserStreamTab2.RetrivePosts;
 
 public class StreamTab1 extends Fragment {
 	
@@ -83,7 +83,7 @@ public class StreamTab1 extends Fragment {
     		    	    if (session == Session.getActiveSession()) {
     		    	    	if (user != null) {
     		    	    		String user_id = user.getId();//user id
-    		    	            String[] params = {user_id};
+    		    	            final String[] params = {user_id};
     		    	            
     		    	            new RetriveAllPosts().execute(params);
     		    	    	}   
@@ -120,12 +120,51 @@ public class StreamTab1 extends Fragment {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
-				   int[] displayMetrics = getDisplayMetrics();
-				   postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
+				   final LinearLayout likesLL = new LinearLayout(getActivity());
+				   final TextView likes = new TextView(getActivity());
+				   final ImageView heart = new ImageView(getActivity());
+				   final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+				   LinearLayout.LayoutParams heartSize = new LinearLayout.LayoutParams(50,50);
+				    
+				   //int[] displayMetrics = getDisplayMetrics();
+				   //postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
 				   creationDate.setText(calculateDate(params[1]));
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
+				   
+				   likes.setText(params[4]);
+				   likesLL.addView(likes);
+				   heart.setImageResource(R.drawable.heart);
+				   heart.setLayoutParams(heartSize);
+				   likesLL.addView(heart);
+				   likesLL.setOnClickListener(new View.OnClickListener() {
+		    	    	@Override
+		    	        public void onClick(View v) {
+		    	    		final Session session = Session.getActiveSession();
+		    	        	if (session != null && session.isOpened()) {
+		    	        		// If the session is open, make an API call to get user data
+		    	        	    // and define a new callback to handle the response
+		    	        	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+		    	    	    	    @Override
+		    	    	    	    public void onCompleted(GraphUser user, Response response) {
+		    	    	    	               // If the response is successful
+		    	    		    	    if (session == Session.getActiveSession()) {
+		    	    		    	    	if (user != null) {
+		    	    		    	    		String user_id = user.getId();//user id
+		    	    		    	            String[] likeParams = {params[5],user_id};
+		    	    		    	    		new AddLike().execute(likeParams);
+		    	    		    	    	}   
+		    	    		    	    }   
+		    	    	    	    }   
+		    	        	    }); 
+		    	        	    Request.executeBatchAsync(request);
+		    	        	}
+		    	    	}
+				   });
+				   
 				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/stream/"+params[2]);
@@ -187,8 +226,10 @@ public class StreamTab1 extends Fragment {
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
+			    	        	postGifLay.setPadding(0, 0, 0, 40);
 			    	        	post.addView(postGifLay);
 			    	        	post.addView(creationDate);
+			    	        	post.addView(likesLL, lp);
 			    	        	posts.addView(post);
 			    	        }
 			    	   });
@@ -262,12 +303,14 @@ public class StreamTab1 extends Fragment {
 			   JSONObject Jasonobject = null;
 			   Jasonobject = Jarray.getJSONObject(i);
 			   
+			   String id = Jasonobject.getString("id");
 			   String user_id = Jasonobject.getString("user_id");
 			   String created_at = Jasonobject.getString("created_at");
 			   String gif = Jasonobject.getString("gif");
 			   String audio = Jasonobject.getString("audio");
+			   String likes = Jasonobject.getString("likes");
 			   
-			   String[] fields = {user_id,created_at,gif,audio};
+			   String[] fields = {user_id,created_at,gif,audio,likes,id};
 			   
 			   new displayAllPosts().execute(fields);
 		   }
@@ -446,15 +489,54 @@ public class StreamTab1 extends Fragment {
 		return calculatedTime;
 	}
 	
-	private int[] getDisplayMetrics() {
-		DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int h = displaymetrics.heightPixels;
-        int w = displaymetrics.widthPixels;
-        System.out.println(h);
-        System.out.println(w);
-        
-        int[] displayMetrics = {w,h};
-        return displayMetrics;
+	class AddLike extends AsyncTask<String, String, Void> {
+		InputStream is = null;
+		String result = "";
+		
+	    @Override
+	    protected Void doInBackground(String... params) {
+	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/addLike.php";
+
+	      	HttpClient httpClient = new DefaultHttpClient();
+	      	HttpPost httpPost = new HttpPost(url_select);
+	      	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
+	      	param.add(new BasicNameValuePair("post_id", params[0]));
+	      	param.add(new BasicNameValuePair("user_id", params[1]));
+	      	System.out.println(params[0]);
+	      	System.out.println(params[1]);
+	        try {
+			     httpPost.setEntity(new UrlEncodedFormEntity(param));
+			     HttpResponse httpResponse = httpClient.execute(httpPost);
+			     HttpEntity httpEntity = httpResponse.getEntity();
+		
+			     //read content
+			     is =  httpEntity.getContent();     
+
+	        } catch (Exception e) {
+	        	Log.e("log_tag", "Error in http connection "+e.toString());
+	        }
+	        try {
+		        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+			     StringBuilder sb = new StringBuilder();
+			     String line = "";
+			     while((line=br.readLine())!=null)
+			     {
+			        sb.append(line+"\n");
+			     }
+			      is.close();
+			      result=sb.toString();    
+
+		       } catch (Exception e) {
+		        // TODO: handle exception
+		        Log.e("log_tag", "Error converting result "+e.toString());
+		       }
+	        return null;
+	    }
+	    
+	    protected void onPostExecute(Void v) {
+	    	Toast.makeText(getActivity(), "Thanks for like", 1500).show();
+	    }
 	}
+
 }
+

@@ -567,7 +567,15 @@ ConnectionCallbacks, OnConnectionFailedListener {
  	 created_at timestamp not null, 
  	 gif varchar(27) not null, 
  	 audio varchar(35) not null, 
- 	 geo varchar(20) null, 
+ 	 geo varchar(20) null,
+ 	 likes int null, 
+ 	 primary key (id));
+ 	 
+ drop table if exists likes;
+ create table likes
+ 	(id int not null auto_increment,
+ 	 post_id int not null,
+ 	 user_id varchar(15) not null,
  	 primary key (id));
  	 
 */
