@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -117,13 +119,13 @@ public class StreamTab1 extends Fragment {
 
 		@Override
 	    protected Void doInBackground(final String... params) {
-			//downloadPosts(params[0],params[2]);
-			//downloadPosts(params[0],params[3]);
 			if (downloadAllPosts(params[0],params[2]) && downloadAllPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
 				   final LinearLayout profileLL = new LinearLayout(getActivity());
+				   final LinearLayout dateLL = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
+				   final TextView fullName = new TextView(getActivity());
 				   final LinearLayout likesLL = new LinearLayout(getActivity());
 				   final TextView likes = new TextView(getActivity());
 				   final ImageView heart = new ImageView(getActivity());
@@ -132,13 +134,15 @@ public class StreamTab1 extends Fragment {
 				   lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 				   LinearLayout.LayoutParams heartSize = new LinearLayout.LayoutParams(50,50);
 				    
-				   //int[] displayMetrics = getDisplayMetrics();
-				   //postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
 				   profileLL.addView(displayUserPicture(params[0]));
+				   fullName.setText(getUserFBname(params[0]));
+				   profileLL.addView(fullName);
+				   
 				   creationDate.setText(calculateDate(params[1]));
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
+				   dateLL.addView(creationDate);
 				   
 				   likes.setText(params[4]);
 				   likesLL.addView(likes);
@@ -234,7 +238,7 @@ public class StreamTab1 extends Fragment {
 			    	        	postGifLay.setPadding(0, 50, 0, 60);
 			    	        	post.addView(profileLL);
 			    	        	post.addView(postGifLay);
-			    	        	post.addView(creationDate);
+			    	        	post.addView(dateLL);
 			    	        	post.addView(likesLL, lp);
 			    	        	posts.addView(post);
 			    	        }
@@ -556,7 +560,30 @@ public class StreamTab1 extends Fragment {
 			System.out.print(e);
 		}
 		return null;
-		
-		
+	}
+	
+	private String getUserFBname(String user_id) {
+		try {
+		URI url = new URI("https://graph.facebook.com/"+user_id);
+		HttpClient client = new DefaultHttpClient();
+		HttpGet request = new HttpGet();
+		request.setURI(url);
+		HttpResponse response = client.execute(request);
+		BufferedReader in = new BufferedReader(new InputStreamReader(response
+		        .getEntity().getContent()));
+		String line = "";
+
+		while ((line = in.readLine()) != null) {
+
+		    JSONObject jObject = new JSONObject(line);
+
+		    if (jObject.has("name")) {
+		        String fullName = jObject.getString("name");
+		        return fullName;
+		    }
+
+		}
+		} catch (Exception w) {}
+		return null;
 	}
 }

@@ -3,6 +3,7 @@
  */
 package com.project.mgr.fragments.tabs;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,16 +14,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -117,25 +121,53 @@ public class UserStreamTab2 extends Fragment {
 
 		@Override
 	    protected Void doInBackground(final String... params) {
-			//downloadPosts(params[0],params[2]);
-			//downloadPosts(params[0],params[3]);
 			if (downloadPosts(params[0],params[2]) && downloadPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
+				   final RelativeLayout profileLL = new RelativeLayout(getActivity());
+				   final LinearLayout dateLL = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
+				   final TextView fullName = new TextView(getActivity());
 				   final LinearLayout likesLL = new LinearLayout(getActivity());
 				   final TextView likes = new TextView(getActivity());
+				   final ImageView heart = new ImageView(getActivity());
+				   final ImageView profilePicture = displayUserPicture(params[0]);
 				   final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
 				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				   lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+				   final RelativeLayout.LayoutParams prof = new RelativeLayout.LayoutParams
+				            (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				   prof.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+				   final RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   
+				   final RelativeLayout.LayoutParams rlpDate = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   final RelativeLayout.LayoutParams matchParent = new RelativeLayout.LayoutParams
+				            (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				   
+				   fullName.setId(generateViewId());
+				   profilePicture.setId(generateViewId());
+				   rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+				   rlp.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
+				   rlpDate.addRule(RelativeLayout.BELOW, fullName.getId());
+				   rlpDate.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
+				   LinearLayout.LayoutParams heartSize = new LinearLayout.LayoutParams(50,50);
+				   	
+				   profileLL.addView(profilePicture);
+				   fullName.setText(getUserFBname(params[0]));
+				   profileLL.addView(fullName, rlp);
 				   
 				   creationDate.setText(calculateDate(params[1]));
-				   creationDate.setGravity(Gravity.BOTTOM);
-				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
+				   profileLL.addView(creationDate, rlpDate);
 				   
 				   likes.setText(params[4]);
 				   likesLL.addView(likes);
+				   heart.setImageResource(R.drawable.heart);
+				   heart.setLayoutParams(heartSize);
+				   likesLL.addView(heart);
+				   
 				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/myStream/"+params[2]);
@@ -197,11 +229,12 @@ public class UserStreamTab2 extends Fragment {
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
-			    	        	postGifLay.setPadding(0, 50, 0, 60);
+			    	        	postGifLay.setPadding(0, 200, 0, 60);
+			    	        	post.addView(profileLL, prof);
 			    	        	post.addView(postGifLay);
-			    	        	post.addView(creationDate);
+			    	        	//post.addView(dateLL);
 			    	        	post.addView(likesLL, lp);
-			    	        	posts.addView(post);
+			    	        	posts.addView(post, matchParent);
 			    	        }
 			    	   });
 				   } catch(Exception e) {
@@ -279,8 +312,9 @@ public class UserStreamTab2 extends Fragment {
 			   String gif = Jasonobject.getString("gif");
 			   String audio = Jasonobject.getString("audio");
 			   String likes = Jasonobject.getString("likes");
+			   String post_id = Jasonobject.getString("id");
 			   
-			   String[] fields = {user_id,created_at,gif,audio,likes};
+			   String[] fields = {user_id,created_at,gif,audio,likes,post_id};
 			   
 			   new displayPosts().execute(fields);
 			   
@@ -471,13 +505,52 @@ public class UserStreamTab2 extends Fragment {
 		final ImageView userPicture = new ImageView(getActivity());
 		URL img = null;
 		try {
-			img = new URL("http://graph.facebook.com/"+user_id+"/picture?type=large");
-			Bitmap mIcon1 = BitmapFactory.decodeStream(img.openConnection().getInputStream());
-			userPicture.setImageBitmap(mIcon1);
+			img = new URL("https://graph.facebook.com/"+user_id+"/picture?type=large&height=200&width=200");
+			HttpURLConnection connection = (HttpURLConnection) img.openConnection();
+			
+			InputStream is = connection.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			Bitmap bm = BitmapFactory.decodeStream(bis);
+			bis.close();
+			is.close();
+			connection.disconnect();
+			userPicture.setImageBitmap(bm);
 			return userPicture;
 		} catch (Exception e) {
-			
+			System.out.print(e);
 		}
 		return null;
+	}
+	
+	private String getUserFBname(String user_id) {
+		try {
+		URI url = new URI("https://graph.facebook.com/"+user_id);
+		HttpClient client = new DefaultHttpClient();
+		HttpGet request = new HttpGet();
+		request.setURI(url);
+		HttpResponse response = client.execute(request);
+		BufferedReader in = new BufferedReader(new InputStreamReader(response
+		        .getEntity().getContent()));
+		String line = "";
+
+		while ((line = in.readLine()) != null) {
+
+		    JSONObject jObject = new JSONObject(line);
+
+		    if (jObject.has("name")) {
+		        String fullName = jObject.getString("name");
+		        return fullName;
+		    }
+
+		}
+		} catch (Exception w) {}
+		return null;
+	}
+	
+	private int generateViewId() {
+		String viewId = null;
+		Random rand = new Random(); 
+		
+		return rand.nextInt(999999999);
 	}
 }
