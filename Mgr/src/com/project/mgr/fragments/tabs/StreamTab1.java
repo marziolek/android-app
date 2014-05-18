@@ -3,6 +3,7 @@
  */
 package com.project.mgr.fragments.tabs;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,6 +31,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Movie;
 import android.media.MediaPlayer;
@@ -83,7 +86,7 @@ public class StreamTab1 extends Fragment {
     		    	    if (session == Session.getActiveSession()) {
     		    	    	if (user != null) {
     		    	    		String user_id = user.getId();//user id
-    		    	            final String[] params = {user_id};
+    		    	    		final String[] params = {user_id};
     		    	            
     		    	            new RetriveAllPosts().execute(params);
     		    	    	}   
@@ -119,6 +122,7 @@ public class StreamTab1 extends Fragment {
 			if (downloadAllPosts(params[0],params[2]) && downloadAllPosts(params[0],params[3])) {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
+				   final LinearLayout profileLL = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
 				   final LinearLayout likesLL = new LinearLayout(getActivity());
 				   final TextView likes = new TextView(getActivity());
@@ -130,6 +134,7 @@ public class StreamTab1 extends Fragment {
 				    
 				   //int[] displayMetrics = getDisplayMetrics();
 				   //postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
+				   profileLL.addView(displayUserPicture(params[0]));
 				   creationDate.setText(calculateDate(params[1]));
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
@@ -222,11 +227,12 @@ public class StreamTab1 extends Fragment {
 			    	        @Override
 			    	        public void run() {
 			    	        	RelativeLayout post = new RelativeLayout(getActivity());
-			    	        	post.setPadding(0, 40, 0, 0);
+			    	        	//post.setPadding(0, 0, 0, 0);
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
-			    	        	postGifLay.setPadding(0, 0, 0, 40);
+			    	        	postGifLay.setPadding(0, 50, 0, 60);
+			    	        	post.addView(profileLL);
 			    	        	post.addView(postGifLay);
 			    	        	post.addView(creationDate);
 			    	        	post.addView(likesLL, lp);
@@ -446,13 +452,6 @@ public class StreamTab1 extends Fragment {
 			int months = days / 30;
 			int years = months / 12;
 			
-			System.out.println(difference);
-			System.out.println(secs);
-			System.out.println(mins);
-			System.out.println(hours);
-			System.out.println(days);
-			
-			
 			if (!(secs > 30)) {
 				calculatedTime = "Just now";
 			} else {
@@ -538,5 +537,26 @@ public class StreamTab1 extends Fragment {
 	    }
 	}
 
+	private ImageView displayUserPicture(String user_id) {
+		final ImageView userPicture = new ImageView(getActivity());
+		URL img = null;
+		try {
+			img = new URL("https://graph.facebook.com/"+user_id+"/picture?type=large&height=200&width=200");
+			HttpURLConnection connection = (HttpURLConnection) img.openConnection();
+			
+			InputStream is = connection.getInputStream();
+			BufferedInputStream bis = new BufferedInputStream(is);
+			Bitmap bm = BitmapFactory.decodeStream(bis);
+			bis.close();
+			is.close();
+			connection.disconnect();
+			userPicture.setImageBitmap(bm);
+			return userPicture;
+		} catch (Exception e) {
+			System.out.print(e);
+		}
+		return null;
+		
+		
+	}
 }
-

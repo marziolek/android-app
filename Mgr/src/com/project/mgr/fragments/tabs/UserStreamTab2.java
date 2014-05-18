@@ -29,8 +29,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Movie;
 import android.media.MediaPlayer;
@@ -38,12 +39,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -122,12 +123,19 @@ public class UserStreamTab2 extends Fragment {
 				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
-				   int[] displayMetrics = getDisplayMetrics();
-				   postGifLay.setLayoutParams(new LinearLayout.LayoutParams(displayMetrics[0], LayoutParams.WRAP_CONTENT, 1f));
+				   final LinearLayout likesLL = new LinearLayout(getActivity());
+				   final TextView likes = new TextView(getActivity());
+				   final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+				   
 				   creationDate.setText(calculateDate(params[1]));
 				   creationDate.setGravity(Gravity.BOTTOM);
 				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
+				   
+				   likes.setText(params[4]);
+				   likesLL.addView(likes);
 				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/myStream/"+params[2]);
@@ -183,14 +191,16 @@ public class UserStreamTab2 extends Fragment {
 			        	
 			    	    getActivity().runOnUiThread(new Runnable() {
 			    	        @Override
-			    	        public void run() {
+			    	        public void run() {			    	        	
 			    	        	RelativeLayout post = new RelativeLayout(getActivity());
-			    	        	post.setPadding(0, 40, 0, 0);
+			    	        	//post.setPadding(0, 0, 0, 0);
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
+			    	        	postGifLay.setPadding(0, 50, 0, 60);
 			    	        	post.addView(postGifLay);
 			    	        	post.addView(creationDate);
+			    	        	post.addView(likesLL, lp);
 			    	        	posts.addView(post);
 			    	        }
 			    	   });
@@ -268,8 +278,9 @@ public class UserStreamTab2 extends Fragment {
 			   String created_at = Jasonobject.getString("created_at");
 			   String gif = Jasonobject.getString("gif");
 			   String audio = Jasonobject.getString("audio");
+			   String likes = Jasonobject.getString("likes");
 			   
-			   String[] fields = {user_id,created_at,gif,audio};
+			   String[] fields = {user_id,created_at,gif,audio,likes};
 			   
 			   new displayPosts().execute(fields);
 			   
@@ -419,14 +430,7 @@ public class UserStreamTab2 extends Fragment {
 			int days = hours / 24;
 			int months = days / 30;
 			int years = months / 12;
-			
-			System.out.println(difference);
-			System.out.println(secs);
-			System.out.println(mins);
-			System.out.println(hours);
-			System.out.println(days);
-			
-			
+						
 			if (!(secs > 30)) {
 				calculatedTime = "Just now";
 			} else {
@@ -463,15 +467,17 @@ public class UserStreamTab2 extends Fragment {
 		return calculatedTime;
 	}
 	
-	private int[] getDisplayMetrics() {
-		DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int h = displaymetrics.heightPixels;
-        int w = displaymetrics.widthPixels;
-        System.out.println(h);
-        System.out.println(w);
-        
-        int[] displayMetrics = {w,h};
-        return displayMetrics;
+	private ImageView displayUserPicture(String user_id) {
+		final ImageView userPicture = new ImageView(getActivity());
+		URL img = null;
+		try {
+			img = new URL("http://graph.facebook.com/"+user_id+"/picture?type=large");
+			Bitmap mIcon1 = BitmapFactory.decodeStream(img.openConnection().getInputStream());
+			userPicture.setImageBitmap(mIcon1);
+			return userPicture;
+		} catch (Exception e) {
+			
+		}
+		return null;
 	}
 }
