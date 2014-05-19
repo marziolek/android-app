@@ -34,7 +34,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -49,7 +48,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -61,8 +59,8 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
-import com.project.mgr.MainActivity;
 import com.project.mgr.R;
+import com.project.mgr.fragments.tabs.DetectScrollView.OnScrollViewListener;
 
 public class StreamTab1 extends Fragment {
 	
@@ -82,6 +80,13 @@ public class StreamTab1 extends Fragment {
 
     		View rootView = inflater.inflate(R.layout.stream_tab1, container, false);
     		    		
+    		DetectScrollView detectScrollView = (DetectScrollView) rootView.findViewById(R.id.postsScroll);
+    		detectScrollView.setOnScrollViewListener( new OnScrollViewListener() {
+    		    public void onScrollChanged( DetectScrollView v, int l, int t, int oldl, int oldt ) {
+    		    	
+    		    }
+    		});
+    		
     		final Session session = Session.getActiveSession();
         	if (session != null && session.isOpened()) {
         		// If the session is open, make an API call to get user data
@@ -105,7 +110,7 @@ public class StreamTab1 extends Fragment {
     		
         	return rootView;
     }
-	
+        	
 	class displayAllPosts extends AsyncTask<String, String, Void> {
 		
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());

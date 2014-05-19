@@ -393,11 +393,11 @@ int id action_bar_root 0x7f05001f
 int id action_bar_subtitle 0x7f050028
 int id action_bar_title 0x7f050027
 int id action_context_bar 0x7f050022
-int id action_forgot_password 0x7f0500b5
+int id action_forgot_password 0x7f0500b6
 int id action_menu_divider 0x7f050016
 int id action_menu_presenter 0x7f050017
 int id action_mode_close_button 0x7f050029
-int id action_settings 0x7f0500b6
+int id action_settings 0x7f0500b7
 int id activity_chooser_view_content 0x7f05002a
 int id albumTitle 0x7f05007f
 int id albumname 0x7f05004d
@@ -481,7 +481,7 @@ int id imgView 0x7f050092
 int id industry 0x7f05008c
 int id language 0x7f050098
 int id large 0x7f05001e
-int id layout 0x7f0500b2
+int id layout 0x7f0500b3
 int id listMode 0x7f050001
 int id list_item 0x7f05002e
 int id listview 0x7f050086
@@ -494,7 +494,7 @@ int id login_form 0x7f050043
 int id login_status 0x7f050041
 int id login_status_message 0x7f050042
 int id middle 0x7f050012
-int id myPosts 0x7f0500b4
+int id myPosts 0x7f0500b5
 int id name 0x7f050094
 int id never 0x7f050009
 int id none 0x7f050010
@@ -508,7 +508,8 @@ int id picker_subtitle 0x7f050062
 int id picture 0x7f050082
 int id pictureTitle 0x7f050083
 int id play 0x7f05008d
-int id posts 0x7f0500b1
+int id posts 0x7f0500b2
+int id postsScroll 0x7f0500b1
 int id profile 0x7f050093
 int id profile_name 0x7f0500ad
 int id progress_circular 0x7f050018
@@ -533,7 +534,7 @@ int id search_plate 0x7f05003b
 int id search_src_text 0x7f05003c
 int id search_voice_btn 0x7f050040
 int id section_label 0x7f05007a
-int id see_pictures 0x7f0500b7
+int id see_pictures 0x7f0500b8
 int id selectionFragment 0x7f050087
 int id settings 0x7f0500a4
 int id shortcut 0x7f050033
@@ -546,13 +547,13 @@ int id signstatus 0x7f05009c
 int id skip_login_button 0x7f0500ae
 int id skip_photo 0x7f05008f
 int id small 0x7f05001d
-int id spinner_size 0x7f0500b3
+int id spinner_size 0x7f0500b4
 int id splashFragment 0x7f050088
 int id splash_icon 0x7f0500ac
 int id split_action_bar 0x7f050023
 int id submit_area 0x7f05003e
 int id tabMode 0x7f050002
-int id tabviewpager 0x7f0500b8
+int id tabviewpager 0x7f0500b9
 int id take_photo 0x7f05008e
 int id terrain 0x7f05001b
 int id textView1 0x7f05004b
