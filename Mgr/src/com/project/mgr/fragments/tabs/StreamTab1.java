@@ -19,6 +19,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -33,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -47,6 +49,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -58,6 +61,7 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+import com.project.mgr.MainActivity;
 import com.project.mgr.R;
 
 public class StreamTab1 extends Fragment {
@@ -77,6 +81,7 @@ public class StreamTab1 extends Fragment {
     		Bundle savedInstanceState) {
 
     		View rootView = inflater.inflate(R.layout.stream_tab1, container, false);
+    		    		
     		final Session session = Session.getActiveSession();
         	if (session != null && session.isOpened()) {
         		// If the session is open, make an API call to get user data
@@ -106,10 +111,16 @@ public class StreamTab1 extends Fragment {
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
 	    String result = "";
+	    
+	    final PreviewGifPlayer loader = new PreviewGifPlayer(getActivity());
+	    final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	    
 	    protected void onPreExecute() {
-	       progressDialog.setMessage("Downloading files...");
-	       progressDialog.show();
-	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
+	    	loader.setMovieResource(R.drawable.loading);	    	
+	    	posts.addView(loader);
+	    	//progressDialog.setMessage("Downloading files...");
+	    	//progressDialog.show();
+	    	/*progressDialog.setOnCancelListener(new OnCancelListener() {
 			 @Override
 			  public void onCancel(DialogInterface arg0) {
 			  task.this.cancel(true);
@@ -120,35 +131,52 @@ public class StreamTab1 extends Fragment {
 		@Override
 	    protected Void doInBackground(final String... params) {
 			if (downloadAllPosts(params[0],params[2]) && downloadAllPosts(params[0],params[3])) {
-				   final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
+				final PreviewGifPlayer postGif = new PreviewGifPlayer(getActivity());
 				   final LinearLayout postGifLay = new LinearLayout(getActivity());
-				   final LinearLayout profileLL = new LinearLayout(getActivity());
+				   final RelativeLayout profileLL = new RelativeLayout(getActivity());
 				   final LinearLayout dateLL = new LinearLayout(getActivity());
 				   final TextView creationDate = new TextView(getActivity());
 				   final TextView fullName = new TextView(getActivity());
 				   final LinearLayout likesLL = new LinearLayout(getActivity());
 				   final TextView likes = new TextView(getActivity());
 				   final ImageView heart = new ImageView(getActivity());
+				   final ImageView profilePicture = displayUserPicture(params[0]);
 				   final RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams
 				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				   lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+				   final RelativeLayout.LayoutParams prof = new RelativeLayout.LayoutParams
+				            (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				   prof.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+				   final RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   
+				   final RelativeLayout.LayoutParams rlpDate = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				   final RelativeLayout.LayoutParams matchParent = new RelativeLayout.LayoutParams
+				            (LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+				   
+				   fullName.setId(generateViewId());
+				   profilePicture.setId(generateViewId());
+				   rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+				   rlp.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
+				   rlpDate.addRule(RelativeLayout.BELOW, fullName.getId());
+				   rlpDate.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
 				   LinearLayout.LayoutParams heartSize = new LinearLayout.LayoutParams(50,50);
-				    
-				   profileLL.addView(displayUserPicture(params[0]));
+				   	
+				   profileLL.addView(profilePicture);
 				   fullName.setText(getUserFBname(params[0]));
-				   profileLL.addView(fullName);
+				   profileLL.addView(fullName, rlp);
 				   
 				   creationDate.setText(calculateDate(params[1]));
-				   creationDate.setGravity(Gravity.BOTTOM);
-				   creationDate.setBackgroundColor(Color.rgb(51,181,229));
 				   creationDate.setTextColor(Color.WHITE);
-				   dateLL.addView(creationDate);
+				   profileLL.addView(creationDate, rlpDate);
 				   
 				   likes.setText(params[4]);
 				   likesLL.addView(likes);
 				   heart.setImageResource(R.drawable.heart);
 				   heart.setLayoutParams(heartSize);
 				   likesLL.addView(heart);
+				   
 				   likesLL.setOnClickListener(new View.OnClickListener() {
 		    	    	@Override
 		    	        public void onClick(View v) {
@@ -235,12 +263,12 @@ public class StreamTab1 extends Fragment {
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
-			    	        	postGifLay.setPadding(0, 50, 0, 60);
-			    	        	post.addView(profileLL);
+			    	        	postGifLay.setPadding(0, 200, 0, 60);
+			    	        	post.addView(profileLL, prof);
 			    	        	post.addView(postGifLay);
-			    	        	post.addView(dateLL);
+			    	        	//post.addView(dateLL);
 			    	        	post.addView(likesLL, lp);
-			    	        	posts.addView(post);
+			    	        	posts.addView(post, matchParent);
 			    	        }
 			    	   });
 				   } catch(Exception e) {
@@ -251,7 +279,11 @@ public class StreamTab1 extends Fragment {
 		}
 		
 		protected void onPostExecute(Void v) {
-			this.progressDialog.dismiss();
+			//this.progressDialog.dismiss();
+			
+	    	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	    	
+	    	posts.removeView(loader);
 		}
 	}
 	
@@ -259,9 +291,15 @@ public class StreamTab1 extends Fragment {
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
 	    String result = "";
+	    
+	    final PreviewGifPlayer loader = new PreviewGifPlayer(getActivity());
+	    final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	    
 	    protected void onPreExecute() {
-	       progressDialog.setMessage("Fetching data...");
-	       progressDialog.show();
+	    	loader.setMovieResource(R.drawable.loading);
+	    	posts.addView(loader);
+	    	//progressDialog.setMessage("Fetching data...");
+	       //progressDialog.show();
 	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
 			 @Override
 			  public void onCancel(DialogInterface arg0) {
@@ -324,8 +362,11 @@ public class StreamTab1 extends Fragment {
 			   
 			   new displayAllPosts().execute(fields);
 		   }
-		   this.progressDialog.dismiss();
-	
+		   //this.progressDialog.dismiss();
+		   	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	    	
+	    	posts.removeView(loader);
+
 		  } catch (Exception e) {
 		   // TODO: handle exception
 		   Log.e("log_tag", "Error parsing data "+e.toString());
@@ -585,5 +626,12 @@ public class StreamTab1 extends Fragment {
 		}
 		} catch (Exception w) {}
 		return null;
+	}
+	
+	private int generateViewId() {
+		String viewId = null;
+		Random rand = new Random(); 
+		
+		return rand.nextInt(999999999);
 	}
 }

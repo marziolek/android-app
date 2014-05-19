@@ -484,8 +484,10 @@ ConnectionCallbacks, OnConnectionFailedListener {
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
-            showFragment(SELECTION, false);
-            userSkippedLogin = false;
+            //showFragment(SELECTION, false);
+            //userSkippedLogin = false;
+        	Intent intent = new Intent(this, SwipeTabs.class);
+            startActivity(intent);
         } else if (userSkippedLogin) {
             showFragment(SELECTION, false);
         } else {

@@ -3,10 +3,13 @@ package com.project.mgr.fragments.tabs;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
+import com.facebook.Session;
+import com.project.mgr.MainActivity;
 import com.project.mgr.R;
 
 public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener {
@@ -82,5 +85,4 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
     }
-    
 }

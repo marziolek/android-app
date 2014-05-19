@@ -3,8 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#fff"
-    android:textColor="#000"
-    tools:context=".MainActivity$DummySectionFragment" >
+    android:textColor="#000" >
 
     <LinearLayout
         android:id="@+id/myPosts"

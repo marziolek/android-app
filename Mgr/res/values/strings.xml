@@ -33,7 +33,7 @@
     <string name="play_services_error">Google Play services is not available.  This application will close.</string>
     <string name="close">Close</string>
     <string name="profile_picture">User\'s profile picture.</string>
-    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_logout_from_facebook">Sign out</string>
     <string name="btn_revoke_access">Revoke Access</string>
     <string name="record_button">Record</string>
     <string name="play_audio">Play recorded sounds</string>

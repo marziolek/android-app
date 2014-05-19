@@ -108,9 +108,14 @@ public class UserStreamTab2 extends Fragment {
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
 	    InputStream is = null ;
 	    String result = "";
+	    final PreviewGifPlayer myLoader = new PreviewGifPlayer(getActivity());
+	    final LinearLayout myPosts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
+	    
 	    protected void onPreExecute() {
-	       progressDialog.setMessage("Downloading files...");
-	       progressDialog.show();
+	    	myLoader.setMovieResource(R.drawable.loading);
+	    	myPosts.addView(myLoader);
+	       //progressDialog.setMessage("Downloading files...");
+	       //progressDialog.show();
 	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
 			 @Override
 			  public void onCancel(DialogInterface arg0) {
@@ -245,17 +250,24 @@ public class UserStreamTab2 extends Fragment {
 		}
 		
 		protected void onPostExecute(Void v) {
-			this.progressDialog.dismiss();
+			//this.progressDialog.dismiss();
+			myPosts.removeView(myLoader);
 		}
 	}
 	
 	class RetrivePosts extends AsyncTask<String, String, Void> {
 		private ProgressDialog progressDialog = new ProgressDialog(getActivity());
-	    InputStream is = null ;
+	    InputStream is = null;
 	    String result = "";
+	    
+	    final PreviewGifPlayer myLoader = new PreviewGifPlayer(getActivity());
+	    final LinearLayout myPosts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
+	    
 	    protected void onPreExecute() {
-	       progressDialog.setMessage("Fetching data...");
-	       progressDialog.show();
+	    	myLoader.setMovieResource(R.drawable.loading);
+	    	myPosts.addView(myLoader);
+	       //progressDialog.setMessage("Fetching data...");
+	       //progressDialog.show();
 	       /*progressDialog.setOnCancelListener(new OnCancelListener() {
 			 @Override
 			  public void onCancel(DialogInterface arg0) {
@@ -333,8 +345,8 @@ public class UserStreamTab2 extends Fragment {
 				   String audio_name = Jasonobject.getString("audio");
 			   }*/
 		   }
-		   this.progressDialog.dismiss();
-	
+		   //this.progressDialog.dismiss();
+		   myPosts.removeView(myLoader);
 		  } catch (Exception e) {
 		   // TODO: handle exception
 		   Log.e("log_tag", "Error parsing data "+e.toString());
