@@ -78,7 +78,7 @@ public class AudioRecorder {
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             mMediaRecorder.setOutputFile(getTemporaryFileName());
             mMediaRecorder.setAudioEncoder(mMediaRecorderConfig.mAudioEncoder);
-
+            
             Exception exception = null;
             try {
                 mMediaRecorder.prepare();
@@ -111,6 +111,7 @@ public class AudioRecorder {
             Exception exception = null;
             try {
                 mMediaRecorder.stop();
+                mMediaRecorder.reset();
                 mMediaRecorder.release();
             } catch (Exception e) {
                 exception = e;

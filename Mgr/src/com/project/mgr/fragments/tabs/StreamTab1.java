@@ -682,4 +682,6 @@ public class StreamTab1 extends Fragment {
 	    targetHeight), null);
 	  return targetBitmap;
 	 }
+	 
+	 
 }
