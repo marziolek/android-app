@@ -36,8 +36,11 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Movie;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -532,7 +535,7 @@ public class UserStreamTab2 extends Fragment {
 			bis.close();
 			is.close();
 			connection.disconnect();
-			userPicture.setImageBitmap(bm);
+			userPicture.setImageBitmap(getRoundedShape(bm));
 			return userPicture;
 		} catch (Exception e) {
 			System.out.print(e);
@@ -571,4 +574,32 @@ public class UserStreamTab2 extends Fragment {
 		
 		return rand.nextInt(999999999);
 	}
+	
+	 /*
+	  * Making image in circular shape
+	  */
+	 public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+	  // TODO Auto-generated method stub
+	  int targetWidth = 200;
+	  int targetHeight = 200;
+	  Bitmap targetBitmap = Bitmap.createBitmap(targetWidth, 
+	                            targetHeight,Bitmap.Config.ARGB_8888);
+	  
+	                Canvas canvas = new Canvas(targetBitmap);
+	  Path path = new Path();
+	  path.addCircle(((float) targetWidth - 1) / 2,
+	  ((float) targetHeight - 1) / 2,
+	  (Math.min(((float) targetWidth), 
+	                ((float) targetHeight)) / 2),
+	          Path.Direction.CCW);
+	  
+	                canvas.clipPath(path);
+	  Bitmap sourceBitmap = scaleBitmapImage;
+	  canvas.drawBitmap(sourceBitmap, 
+	                                new Rect(0, 0, sourceBitmap.getWidth(),
+	    sourceBitmap.getHeight()), 
+	                                new Rect(0, 0, targetWidth,
+	    targetHeight), null);
+	  return targetBitmap;
+	 }
 }
