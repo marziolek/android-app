@@ -379,14 +379,12 @@ public class StreamTab1 extends Fragment {
 	    			new displayAllPosts().execute(fields);
 	    		}
 	    		//this.progressDialog.dismiss();
-				LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
-			    posts.removeView(loader);
+				posts.removeView(loader);
 		
 	    	} catch (Exception e) {
 	    		// TODO: handle exception
 	    		//Log.e("log_tag", "Error parsing data "+e.toString());
 	    		//this.progressDialog.dismiss();
-			   	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
 			   	posts.removeView(loader);
 	    	}
 	    }
