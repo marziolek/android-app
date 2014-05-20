@@ -32,10 +32,6 @@ public class DetectScrollView extends ScrollView {
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 	    mOnScrollViewListener.onScrollChanged( this, l, t, oldl, oldt );
 	    super.onScrollChanged( l, t, oldl, oldt );
-	    View view = (View) getChildAt(getChildCount()-1);
-        int diff = (view.getBottom()-(getHeight()+getScrollY()));// Calculate the scrolldiff
-        if( diff == 0 ){  // if diff is zero, then the bottom has been reached
-            System.out.println("Bottom has been reached" );
-        }
+	    
 	}
 }

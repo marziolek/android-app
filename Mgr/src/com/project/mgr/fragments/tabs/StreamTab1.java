@@ -73,20 +73,14 @@ public class StreamTab1 extends Fragment {
 	private String calculatedMins = null;
 	private String calculatedSecs = null;
 	private String calculatedTime = null;
+	private int currentPost = 0;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
 
-    		View rootView = inflater.inflate(R.layout.stream_tab1, container, false);
+    		final View rootView = inflater.inflate(R.layout.stream_tab1, container, false);
     		    		
-    		DetectScrollView detectScrollView = (DetectScrollView) rootView.findViewById(R.id.postsScroll);
-    		detectScrollView.setOnScrollViewListener( new OnScrollViewListener() {
-    		    public void onScrollChanged( DetectScrollView v, int l, int t, int oldl, int oldt ) {
-    		    	
-    		    }
-    		});
-    		
     		final Session session = Session.getActiveSession();
         	if (session != null && session.isOpened()) {
         		// If the session is open, make an API call to get user data
@@ -97,10 +91,27 @@ public class StreamTab1 extends Fragment {
     	    	               // If the response is successful
     		    	    if (session == Session.getActiveSession()) {
     		    	    	if (user != null) {
-    		    	    		String user_id = user.getId();//user id
-    		    	    		final String[] params = {user_id};
+    		    	    		final String user_id = user.getId();//user id
+    		    	    		final String[] params = {user_id, "0"};
     		    	            
     		    	            new RetriveAllPosts().execute(params);
+    		    	            
+    		    	            DetectScrollView detectScrollView = (DetectScrollView) rootView.findViewById(R.id.postsScroll);
+    		    	    		detectScrollView.setOnScrollViewListener( new OnScrollViewListener() {
+    		    	    		    public void onScrollChanged( DetectScrollView v, int l, int t, int oldl, int oldt ) {
+    		    	    		    	//int a = v.getScrollY();
+    		    	    		    	View view = (View) v.getChildAt(v.getChildCount()-1);
+    		    	    		        int diff = (view.getBottom()-(v.getHeight()+v.getScrollY()));// Calculate the scrolldiff
+    		    	    		        
+    		    	    		        if( diff == 0 ){  // if diff is zero, then the bottom has been reached
+    		    	    		        	currentPost+=2;
+    		    	    		        	
+    		    	    		        	String current_post = Integer.toString(currentPost);
+    		    	    		        	String[] newParams = {user_id, current_post};
+    		    	    		        	new RetriveAllPosts().execute(newParams);
+    		    	    		        }
+    		    	    		    }
+    		    	    		});
     		    	    	}   
     		    	    }   
     	    	    }   
@@ -321,6 +332,7 @@ public class StreamTab1 extends Fragment {
 	    	HttpPost httpPost = new HttpPost(url_select);
 	    	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>();
 	    	param.add(new BasicNameValuePair("user_id",params[0]));
+	    	param.add(new BasicNameValuePair("current_post",params[1]));
 	        try {
 	        	httpPost.setEntity(new UrlEncodedFormEntity(param));
 			    HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -347,36 +359,37 @@ public class StreamTab1 extends Fragment {
 	    }
 	    
 	    protected void onPostExecute(Void v) {
-		  // ambil data dari Json database
-		  try {
-		   JSONArray Jarray = new JSONArray(result);
-		   //LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
-		  // String[] fields = {"user_id","created_at","gif","audio"};
-		   for(int i=0;i<Jarray.length();i++) {
-			   JSONObject Jasonobject = null;
-			   Jasonobject = Jarray.getJSONObject(i);
-			   
-			   String id = Jasonobject.getString("id");
-			   String user_id = Jasonobject.getString("user_id");
-			   String created_at = Jasonobject.getString("created_at");
-			   String gif = Jasonobject.getString("gif");
-			   String audio = Jasonobject.getString("audio");
-			   String likes = Jasonobject.getString("likes");
-			   
-			   String[] fields = {user_id,created_at,gif,audio,likes,id};
-			   
-			   new displayAllPosts().execute(fields);
-		   }
-		   //this.progressDialog.dismiss();
-		   	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
-	    	
-	    	posts.removeView(loader);
-
-		  } catch (Exception e) {
-		   // TODO: handle exception
-		   Log.e("log_tag", "Error parsing data "+e.toString());
-		  }
-		}
+	    	try {
+	    		JSONArray Jarray = new JSONArray(result);
+	    		//LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+	    		//String[] fields = {"user_id","created_at","gif","audio"};
+	    		for(int i=0;i<Jarray.length();i++) {
+	    			JSONObject Jasonobject = null;
+	    			Jasonobject = Jarray.getJSONObject(i);
+					   
+	    			String id = Jasonobject.getString("id");
+	    			String user_id = Jasonobject.getString("user_id");
+	    			String created_at = Jasonobject.getString("created_at");
+	    			String gif = Jasonobject.getString("gif");
+	    			String audio = Jasonobject.getString("audio");
+	    			String likes = Jasonobject.getString("likes");
+					   
+	    			String[] fields = {user_id,created_at,gif,audio,likes,id};
+					
+	    			new displayAllPosts().execute(fields);
+	    		}
+	    		//this.progressDialog.dismiss();
+				LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+			    posts.removeView(loader);
+		
+	    	} catch (Exception e) {
+	    		// TODO: handle exception
+	    		//Log.e("log_tag", "Error parsing data "+e.toString());
+	    		//this.progressDialog.dismiss();
+			   	LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+			   	posts.removeView(loader);
+	    	}
+	    }
 	}
 	
 	public boolean downloadAllPosts(String user_id, String fileName) {
