@@ -8,18 +8,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.Chronometer;
 
 import com.project.mgr.R;
 
@@ -29,8 +35,9 @@ public class RecordTab3 extends Fragment {
      private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
      private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
      private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
-     private static final int RECORDER_SAMPLERATE = 44100;
-     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_STEREO;
+     private static final String AUDIO_RECORDER_TEMP_FILE_2 = "record_temp2.raw";
+     private static final int RECORDER_SAMPLERATE = 16000;
+     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
      private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
      
      private AudioRecord recorder = null;
@@ -38,34 +45,66 @@ public class RecordTab3 extends Fragment {
      private Thread recordingThread = null;
      private boolean isRecording = false;
      
+     private Button mRecordButton = null;
+     private boolean mMaxDuration = false;
+     Chronometer mChronometer;
+     private long mChronometerPause = 0;
+     
      @Override
      public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-    	 View v= inflater.inflate(R.layout.crecord_tab2, container, false);
+    	 View v= inflater.inflate(R.layout.record_tab2, container, false);
      	 	     
-	     setButtonHandlers(v);
-	     //enableButtons(false, v);
-	     
+    	 Button cre = (Button) v.findViewById(R.id.create_button);
+    	 cre.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				makeWave();
+			}
+		});
+    	 
+    	 mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
+    	 mRecordButton = (Button) v.findViewById(R.id.record_button);
+			mRecordButton.setOnTouchListener(new OnTouchListener() {
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					if (elapsedTime() >= 10.000) {
+            			stopRecording();
+            			
+            			mRecordButton.setEnabled(false);
+            			mMaxDuration = true;
+            			Log.d("more than", "10 sec");
+            			
+            			return true;
+         			}
+					//if (!mMaxDuration) {
+	                	switch ( event.getAction() ) {
+	                    	case MotionEvent.ACTION_DOWN:
+	                    		
+		                    	startRecording();			                    	
+		                    	//int recordingStatusHeight = recording_status.getHeight();
+		                    	//animView.startAnimation(recordingStatusHeight);
+	                    		break;
+	                    	case MotionEvent.ACTION_UP:
+	                 			
+	                 			stopRecording();
+	                 			//int recordingStatusHeightActual = recording_status.getHeight();
+	                    		//animView.cancelAnimation(recordingStatusHeightActual);
+		                        break;
+	                	}
+						
+					//}
+					return false;
+				}
+			});
+			
 	     bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING);
      
 	     return v;
      }
 
-     private void setButtonHandlers(View v) {
-             ((Button) v.findViewById(R.id.btnStart)).setOnClickListener(btnClick);
-     ((Button) v.findViewById(R.id.btnStop)).setOnClickListener(btnClick);
-     }
-     
-     private void enableButton(int id,boolean isEnable, View v){
-             ((Button) v.findViewById(id)).setEnabled(isEnable);
-     }
-     
-     private void enableButtons(boolean isRecording, View v) {
-             enableButton(R.id.btnStart,!isRecording, v);
-             enableButton(R.id.btnStop,isRecording, v);
-     }
-     
-     private String getFilename(){
+    private String getFilename(){
              String filepath = Environment.getExternalStorageDirectory().getPath();
              File file = new File(filepath,AUDIO_RECORDER_FOLDER);
              
@@ -81,22 +120,36 @@ public class RecordTab3 extends Fragment {
              File file = new File(filepath,AUDIO_RECORDER_FOLDER);
              
              if(!file.exists()){
-                     file.mkdirs();
+            	 file.mkdirs();
              }
              
-             File tempFile = new File(filepath,AUDIO_RECORDER_TEMP_FILE);
+             //if(tempFile.exists()) tempFile.delete();
              
-             if(tempFile.exists())
-                     tempFile.delete();
-             
-             return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE);
+             return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE_2);
      }
      
+     private String getTempFilenameTemp(){
+         String filepath = Environment.getExternalStorageDirectory().getPath();
+         File file = new File(filepath,AUDIO_RECORDER_FOLDER);
+         
+         if(!file.exists()){
+        	 file.mkdirs();
+         }
+         
+         //if(tempFile.exists()) tempFile.delete();
+         
+         return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE_2);
+ }
+     
      private void startRecording(){
+    	 try {
              recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                                              RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
              
              recorder.startRecording();
+             
+             mChronometer.setBase(SystemClock.elapsedRealtime() + mChronometerPause);
+         	 mChronometer.start();
              
              isRecording = true;
              
@@ -109,23 +162,96 @@ public class RecordTab3 extends Fragment {
              },"AudioRecorder Thread");
              
              recordingThread.start();
+    	 } catch (Exception e) {
+    		
+    	 }
      }
      
      private void writeAudioDataToFile(){
              byte data[] = new byte[bufferSize];
              String filename = getTempFilename();
+             String filenameTemp = getTempFilenameTemp();
              FileOutputStream os = null;
+             FileOutputStream osTemp = null;
+             InputStream current = null;
+             File file = new File(filename);
+             
+             int read = 0;
+             int readCurrent = 0;
              
              try {
+            	 if (!file.exists()) {
                      os = new FileOutputStream(filename);
-             } catch (FileNotFoundException e) {
+                     while(isRecording){
+                         read = recorder.read(data, 0, bufferSize);
+                         if(AudioRecord.ERROR_INVALID_OPERATION != read){
+                        	 try {
+                        		 os.write(data);
+                        	 } catch (IOException e) {
+                        		 e.printStackTrace();
+                        	 }
+                         }
+	                 }
+	                 
+	                 try {
+	                         os.close();
+	                 } catch (IOException e) {
+	                         e.printStackTrace();
+	                 }
+                     Log.d("gitara", "gt");
+            	 } else {
+            		 os = new FileOutputStream(filename, true);
+            		 while(isRecording){
+                         read = recorder.read(data, 0, bufferSize);
+                         if(AudioRecord.ERROR_INVALID_OPERATION != read){
+                        	 try {
+                        		 os.write(data);
+                        	 } catch (IOException e) {
+                        		 e.printStackTrace();
+                        	 }
+                         }
+	                 }
+	                 
+	                 try {
+	                         os.close();
+	                 } catch (IOException e) {
+	                         e.printStackTrace();
+	                 }
+                     Log.d("gitara", "gt");
+            	 }
+            	 /*} else {
+            		 osTemp = new FileOutputStream(filenameTemp);
+            		 current = new FileInputStream(filename); 
+            		 while (readCurrent != -1) {
+            				 readCurrent = current.read();
+            				 osTemp.write(readCurrent);
+            			 }
+            		 while(isRecording){
+            			 
+                         read = recorder.read(data, 0, bufferSize);
+                         if(AudioRecord.ERROR_INVALID_OPERATION != read){
+                        	 try {
+                        		 osTemp.write(data);
+                        	 } catch (IOException e) {
+                        		 e.printStackTrace();
+                        	 }
+                         }
+	                 }
+	                 
+	                 try {
+	                         osTemp.close();
+	                 } catch (IOException e) {
+	                         e.printStackTrace();
+	                 }
+            	 }*/
+             } catch (Exception e) {
                      // TODO Auto-generated catch block
                      e.printStackTrace();
              }
              
-             int read = 0;
              
-             if(null != os){
+             
+             /*if(null != os){
                      while(isRecording){
                              read = recorder.read(data, 0, bufferSize);
                              
@@ -143,22 +269,32 @@ public class RecordTab3 extends Fragment {
                      } catch (IOException e) {
                              e.printStackTrace();
                      }
-             }
+             }*/
      }
      
      private void stopRecording(){
              if(null != recorder){
                      isRecording = false;
                      
+                     mChronometerPause = mChronometer.getBase() - SystemClock.elapsedRealtime();
+          			 mChronometer.stop();
+                     
                      recorder.stop();
                      recorder.release();
                      
                      recorder = null;
                      recordingThread = null;
+                     
+                     Log.d("CHRONOMETER******", Double.toString(elapsedTime()));
+                     
              }
              
-             copyWaveFile(getTempFilename(),getFilename());
-             deleteTempFile();
+             
+     }
+     
+     private void makeWave() {
+    	 copyWaveFile(getTempFilename(),getFilename());
+    	 Log.d("ZROBIONE", "heheuhosnjnrkjgkwe");
      }
 
      private void deleteTempFile() {
@@ -171,9 +307,9 @@ public class RecordTab3 extends Fragment {
              FileInputStream in = null;
              FileOutputStream out = null;
              long totalAudioLen = 0;
-             long totalDataLen = totalAudioLen + 36;
+             long totalDataLen = totalAudioLen;
              long longSampleRate = RECORDER_SAMPLERATE;
-             int channels = 2;
+             int channels = 1;
              long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels/8;
              
              byte[] data = new byte[bufferSize];
@@ -181,8 +317,8 @@ public class RecordTab3 extends Fragment {
              try {
                      in = new FileInputStream(inFilename);
                      out = new FileOutputStream(outFilename);
-                     totalAudioLen = in.getChannel().size();
-                     totalDataLen = totalAudioLen + 36;
+                     totalAudioLen += in.getChannel().size();
+                     totalDataLen += totalAudioLen;
                      
                      System.out.println("File size: " + totalDataLen);
                      
@@ -195,11 +331,13 @@ public class RecordTab3 extends Fragment {
                      
                      in.close();
                      out.close();
+                     
              } catch (FileNotFoundException e) {
                      e.printStackTrace();
              } catch (IOException e) {
                      e.printStackTrace();
              }
+             deleteTempFile();
      }
 
      private void WriteWaveFileHeader(
@@ -257,204 +395,16 @@ public class RecordTab3 extends Fragment {
              out.write(header, 0, 44);
      }
      
-     private View.OnClickListener btnClick = new View.OnClickListener() {
-             @Override
-             public void onClick(View v) {
-                     switch(v.getId()){
-                             case R.id.btnStart:{
-                                     System.out.println("*****Start Recording******");
-                                     
-                                     //enableButtons(true, v);
-                                     startRecording();
-                                                     
-                                     break;
-                             }
-                             case R.id.btnStop:{
-                            	 	System.out.println("*****Start Recording*****");
-                                     
-                                     //enableButtons(false, v);
-                                     stopRecording();
-                                     
-                                     break;
-                             }
-                     }
-             }
-     }; 
-	
-/*	private static final String LOG_TAG = "AudioRecordTest";
-    private static String mFileName = null;
-
-    private RecordButton mRecordButton = null;
-    private MediaRecorder mRecorder = null;
-
-    private PlayButton   mPlayButton = null;
-    private MediaPlayer   mPlayer = null;
-
-    private void onRecord(boolean start) {
-        if (start) {
-            record.start();
-        } else {
-            stopRecord.start();
-        }
-    }
-    
-    private void onPlay(boolean start) {
-        if (start) {
-            startPlaying();
-        } else {
-            stopPlaying();
-        }
-    }
-    
-    private void startPlaying() {
-        mPlayer = new MediaPlayer();
-        try {
-            mPlayer.setDataSource(mFileName);
-            mPlayer.prepare();
-            mPlayer.start();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
-        }
-    }
-
-    private void stopPlaying() {
-        mPlayer.release();
-        mPlayer = null;
-    }
-
-    
-    class RecordButton extends Button {
-        boolean mStartRecording = true;
-
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                onRecord(mStartRecording);
-                if (mStartRecording) {
-                    //setText("Stop recording");
-                	System.out.println("started");
-                } else {
-                    //setText("Start recording");
-                	System.out.println("stopped");
-                }
-                mStartRecording = !mStartRecording;
-            }
-        };
-
-        public RecordButton(Context ctx) {
-            super(ctx);
-            setText("Start recording");
-            setOnClickListener(clicker);
-        }
-    }
-    
-    class PlayButton extends Button {
-        boolean mStartPlaying = true;
-
-        OnClickListener clicker = new OnClickListener() {
-            public void onClick(View v) {
-                onPlay(mStartPlaying);
-                if (mStartPlaying) {
-                    setText("Stop playing");
-                } else {
-                    setText("Start playing");
-                }
-                mStartPlaying = !mStartPlaying;
-            }
-        };
-
-        public PlayButton(Context ctx) {
-            super(ctx);
-            setText("Start playing");
-            setOnClickListener(clicker);
-        }
-    }
-    
-    Thread record = new Thread(new Runnable() {
-        @Override
-        public void run() { 
-        	//Your recording portion of the code goes here.
-        	startRecording();
-		}
-	});
-    
-    Thread stopRecord = new Thread(new Runnable() {
-        @Override
-        public void run() { 
-        	//Your recording portion of the code goes here.
-        	stopRecording();
-		}
-	});
-    
-    private void startRecording() {
-        mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mRecorder.setOutputFile(mFileName);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        try {
-            mRecorder.prepare();
-            mRecorder.start();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
-        }
-    }
-
-    private void stopRecording() {
-        mRecorder.stop();
-        mRecorder.release();
-        mRecorder = null;
-    }
-    
-    
-    
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-    	View v= inflater.inflate(R.layout.crecord_tab2, container, false);
-        
-    	   mFileName = Environment.getExternalStorageDirectory().getAbsolutePath();
-           mFileName += "/audiorecordtest.3gp";
-       
-    	
-        LinearLayout ll = new LinearLayout(getActivity());
-        mRecordButton = new RecordButton(getActivity());
-        ll.addView(mRecordButton,
-            new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                0));
-        mPlayButton = new PlayButton(getActivity());
-        ll.addView(mPlayButton,
-            new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                0));
-        LinearLayout cre = (LinearLayout) v.findViewById(R.id.cre);
-        
-        cre.addView(ll);
-        
-        return v;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mRecorder != null) {
-            mRecorder.release();
-            mRecorder = null;
-        }
-
-        if (mPlayer != null) {
-            mPlayer.release();
-            mPlayer = null;
-        }
-    }
-	
-	
-	*/	
-	
-	        /*private String mFileName = null;
+     //Animation functions
+     private double elapsedTime() {
+         long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
+         double elapsedTime = elapsedMillis / 1000.0;
+         
+         return elapsedTime;
+     }
+     
+     /*
+	        private String mFileName = null;
 	        private Button mRecordButton = null;
 	        private boolean mMaxDuration = false;
 	        Chronometer mChronometer;
@@ -462,7 +412,7 @@ public class RecordTab3 extends Fragment {
 	    	Animation animMove;
 	    	private long mChronometerPause = 0;
 	    	private AudioRecorder mAudioRecorder;
-	        
+	       
 	        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 	        	View v= inflater.inflate(R.layout.record_tab2, container, false);
@@ -514,6 +464,26 @@ public class RecordTab3 extends Fragment {
 				return v;
 	        }
 	                
+	        private void invalidateButtons() {
+	            switch (mAudioRecorder.getStatus()) {
+	                case STATUS_UNKNOWN:
+	                	mRecordButton.setEnabled(false);
+	                    break;
+	                case STATUS_READY_TO_RECORD:
+	                	mRecordButton.setEnabled(true);
+	                    
+	                    break;
+	                case STATUS_RECORDING:
+	                    
+	                    break;
+	                case STATUS_RECORD_PAUSED:
+	                	mRecordButton.setEnabled(true);
+	                    break;
+	                default:
+	                    break;
+	            }
+	        }
+	        
 	        protected void onStart(Bundle savedInstanceState) {
 	        	super.onStart();
 	        	
@@ -526,10 +496,7 @@ public class RecordTab3 extends Fragment {
     	    	recording_status.setLayoutParams(params);
 	        }
 	        
-	        **
-	         * recording and playing
-	         *
-	        
+	       
 	        private String getNextFileName() {
 	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
                 File dir = new File(mFileName);
@@ -547,12 +514,14 @@ public class RecordTab3 extends Fragment {
 	        	    @Override
 	        	    public void onStarted() {
 	        	        // started
+	        	    	invalidateButtons();
 	        	    	Log.v("**rec**", "new recorder started");
 	        	    }
 
 	        	    @Override
 	        	    public void onException(Exception e) {
 	        	        // error
+	        	    	invalidateButtons();
 	        	    	Log.v("**rec**", "error!!!!!!!!!!!!");
 	        	    }
 	        	});
@@ -563,12 +532,14 @@ public class RecordTab3 extends Fragment {
 	        	    @Override
 	        	    public void onPaused(String activeRecordFileName) {
 	        	        // paused
+	        	    	invalidateButtons();
 	        	    	Log.v("**rec**", "new recorder paused");
 	        	    }
 
 	        	    @Override
 	        	    public void onException(Exception e) {
 	        	        // error
+	        	    	invalidateButtons();
 	        	    	Log.v("**rec**", "PUASE ERROR!!!!!");
 	        	    }
 	        	});
@@ -579,9 +550,7 @@ public class RecordTab3 extends Fragment {
 		    }
 	        
 	        
-	      **
-	         * Animating recording progress
-	         *
+	      
 	        //Animation functions
 	        private double elapsedTime() {
 	            long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
