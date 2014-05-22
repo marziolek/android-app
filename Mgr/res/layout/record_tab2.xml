@@ -48,15 +48,6 @@
 	        android:layout_centerHorizontal="true"
 	        android:layout_marginBottom="75dp"
 	         />
-
-	    <Button
-	        android:id="@+id/create_button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:layout_alignParentTop="true"
-	        android:text="create_button" />
-
 	</RelativeLayout>
 
 </FrameLayout>

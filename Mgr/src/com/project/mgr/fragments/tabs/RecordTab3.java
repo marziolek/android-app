@@ -8,8 +8,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Canvas;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -17,24 +23,23 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.Chronometer.OnChronometerTickListener;
+import android.widget.LinearLayout;
 
 import com.project.mgr.R;
 
 public class RecordTab3 extends Fragment {
 	
 	 private static final int RECORDER_BPP = 16;
-     private static final String AUDIO_RECORDER_FILE_EXT_WAV = ".wav";
      private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
-     private static final String AUDIO_RECORDER_TEMP_FILE = "record_temp.raw";
      private static final String AUDIO_RECORDER_TEMP_FILE_2 = "record_temp2.raw";
      private static final int RECORDER_SAMPLERATE = 16000;
      private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
@@ -46,75 +51,58 @@ public class RecordTab3 extends Fragment {
      private boolean isRecording = false;
      
      private Button mRecordButton = null;
-     private boolean mMaxDuration = false;
      Chronometer mChronometer;
      private long mChronometerPause = 0;
+     
+     private String mFileName = null;
+     private boolean mChronometerStarted = false;
+     private LinearLayout recording_status;
      
      @Override
      public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
     	 View v= inflater.inflate(R.layout.record_tab2, container, false);
      	 	     
-    	 Button cre = (Button) v.findViewById(R.id.create_button);
-    	 cre.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				makeWave();
-			}
-		});
+    	 final MyAnimationView animView = new MyAnimationView(getActivity());
+    	 recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
     	 
     	 mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
     	 mRecordButton = (Button) v.findViewById(R.id.record_button);
-			mRecordButton.setOnTouchListener(new OnTouchListener() {
-				@Override
-				public boolean onTouch(View v, MotionEvent event) {
-					if (elapsedTime() >= 10.000) {
-            			stopRecording();
-            			
-            			mRecordButton.setEnabled(false);
-            			mMaxDuration = true;
-            			Log.d("more than", "10 sec");
-            			
-            			return true;
-         			}
-					//if (!mMaxDuration) {
-	                	switch ( event.getAction() ) {
-	                    	case MotionEvent.ACTION_DOWN:
-	                    		
-		                    	startRecording();			                    	
-		                    	//int recordingStatusHeight = recording_status.getHeight();
-		                    	//animView.startAnimation(recordingStatusHeight);
-	                    		break;
-	                    	case MotionEvent.ACTION_UP:
-	                 			
-	                 			stopRecording();
-	                 			//int recordingStatusHeightActual = recording_status.getHeight();
-	                    		//animView.cancelAnimation(recordingStatusHeightActual);
-		                        break;
-	                	}
-						
-					//}
-					return false;
-				}
-			});
+    	 mRecordButton.setOnTouchListener(new OnTouchListener() {
+    		 @Override
+    		 public boolean onTouch(View v, MotionEvent event) {
+    			 mChronometer.setOnChronometerTickListener(new OnChronometerTickListener() {
+    				 @Override
+    				 public void onChronometerTick(Chronometer chronometer) {
+    					 if (SystemClock.elapsedRealtime() - mChronometer.getBase() >= 10000 || mChronometer.getText() == "0:10") {
+    						 stopRecording();
+					         mRecordButton.setEnabled(false);
+					         makeWave();
+    					 }
+    				 }
+    			 });
+    			 switch ( event.getAction() ) {
+	             	case MotionEvent.ACTION_DOWN:
+	             		startRecording(mChronometerStarted);                    	
+		                int recordingStatusHeight = recording_status.getHeight();
+		                animView.startAnimation(recordingStatusHeight);
+	                    break;
+	             	case MotionEvent.ACTION_UP:
+	             		mChronometerStarted = true;
+	                 	stopRecording();
+	                 	int recordingStatusHeightActual = recording_status.getHeight();
+	                    animView.cancelAnimation(recordingStatusHeightActual);
+		                break;
+    			 }
+    			 return false;
+    		 }
+    	 });
 			
 	     bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING);
      
 	     return v;
      }
 
-    private String getFilename(){
-             String filepath = Environment.getExternalStorageDirectory().getPath();
-             File file = new File(filepath,AUDIO_RECORDER_FOLDER);
-             
-             if(!file.exists()){
-                     file.mkdirs();
-             }
-             
-             return (file.getAbsolutePath() + "/" + System.currentTimeMillis() + AUDIO_RECORDER_FILE_EXT_WAV);
-     }
-     
      private String getTempFilename(){
              String filepath = Environment.getExternalStorageDirectory().getPath();
              File file = new File(filepath,AUDIO_RECORDER_FOLDER);
@@ -123,33 +111,22 @@ public class RecordTab3 extends Fragment {
             	 file.mkdirs();
              }
              
-             //if(tempFile.exists()) tempFile.delete();
-             
              return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE_2);
      }
      
-     private String getTempFilenameTemp(){
-         String filepath = Environment.getExternalStorageDirectory().getPath();
-         File file = new File(filepath,AUDIO_RECORDER_FOLDER);
-         
-         if(!file.exists()){
-        	 file.mkdirs();
-         }
-         
-         //if(tempFile.exists()) tempFile.delete();
-         
-         return (file.getAbsolutePath() + "/" + AUDIO_RECORDER_TEMP_FILE_2);
- }
-     
-     private void startRecording(){
+     private void startRecording(boolean mChronometerStarted){
     	 try {
              recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                                              RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
              
              recorder.startRecording();
-             
-             mChronometer.setBase(SystemClock.elapsedRealtime() + mChronometerPause);
-         	 mChronometer.start();
+             if (!mChronometerStarted) {
+	             mChronometer.setBase(SystemClock.elapsedRealtime());
+	         	 mChronometer.start();
+             } else {
+            	 mChronometer.setBase(SystemClock.elapsedRealtime() + mChronometerPause);
+            	 mChronometer.start();
+             }
              
              isRecording = true;
              
@@ -170,14 +147,10 @@ public class RecordTab3 extends Fragment {
      private void writeAudioDataToFile(){
              byte data[] = new byte[bufferSize];
              String filename = getTempFilename();
-             String filenameTemp = getTempFilenameTemp();
              FileOutputStream os = null;
-             FileOutputStream osTemp = null;
-             InputStream current = null;
              File file = new File(filename);
              
              int read = 0;
-             int readCurrent = 0;
              
              try {
             	 if (!file.exists()) {
@@ -198,7 +171,6 @@ public class RecordTab3 extends Fragment {
 	                 } catch (IOException e) {
 	                         e.printStackTrace();
 	                 }
-                     Log.d("gitara", "gt");
             	 } else {
             		 os = new FileOutputStream(filename, true);
             		 while(isRecording){
@@ -217,59 +189,10 @@ public class RecordTab3 extends Fragment {
 	                 } catch (IOException e) {
 	                         e.printStackTrace();
 	                 }
-                     Log.d("gitara", "gt");
             	 }
-            	 /*} else {
-            		 osTemp = new FileOutputStream(filenameTemp);
-            		 current = new FileInputStream(filename); 
-            		 while (readCurrent != -1) {
-            				 readCurrent = current.read();
-            				 osTemp.write(readCurrent);
-            			 }
-            		 while(isRecording){
-            			 
-                         read = recorder.read(data, 0, bufferSize);
-                         if(AudioRecord.ERROR_INVALID_OPERATION != read){
-                        	 try {
-                        		 osTemp.write(data);
-                        	 } catch (IOException e) {
-                        		 e.printStackTrace();
-                        	 }
-                         }
-	                 }
-	                 
-	                 try {
-	                         osTemp.close();
-	                 } catch (IOException e) {
-	                         e.printStackTrace();
-	                 }
-            	 }*/
              } catch (Exception e) {
-                     // TODO Auto-generated catch block
-                     e.printStackTrace();
+            	 e.printStackTrace();
              }
-             
-             
-             
-             /*if(null != os){
-                     while(isRecording){
-                             read = recorder.read(data, 0, bufferSize);
-                             
-                             if(AudioRecord.ERROR_INVALID_OPERATION != read){
-                                     try {
-                                             os.write(data);
-                                     } catch (IOException e) {
-                                             e.printStackTrace();
-                                     }
-                             }
-                     }
-                     
-                     try {
-                             os.close();
-                     } catch (IOException e) {
-                             e.printStackTrace();
-                     }
-             }*/
      }
      
      private void stopRecording(){
@@ -284,9 +207,6 @@ public class RecordTab3 extends Fragment {
                      
                      recorder = null;
                      recordingThread = null;
-                     
-                     Log.d("CHRONOMETER******", Double.toString(elapsedTime()));
-                     
              }
              
              
@@ -294,7 +214,9 @@ public class RecordTab3 extends Fragment {
      
      private void makeWave() {
     	 copyWaveFile(getTempFilename(),getFilename());
-    	 Log.d("ZROBIONE", "heheuhosnjnrkjgkwe");
+    	 deleteTempFile();
+    	 Intent intent = new Intent(getActivity(), PreviewAudio.class);
+    	 startActivity(intent);
      }
 
      private void deleteTempFile() {
@@ -397,11 +319,120 @@ public class RecordTab3 extends Fragment {
      
      //Animation functions
      private double elapsedTime() {
-         long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
+         long elapsedMillis = mChronometer.getBase();
          double elapsedTime = elapsedMillis / 1000.0;
          
          return elapsedTime;
      }
+     
+     private String getFilename() {
+    	 mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
+         File dir = new File(mFileName);
+         if (!dir.exists()) {
+         	dir.mkdirs();
+         }
+         String currentTime = String.valueOf(System.currentTimeMillis());
+         mFileName += "/audiorecord" + currentTime + ".wav";
+         
+         return mFileName;
+     }
+     
+     public class MyAnimationView extends View implements Animator.AnimatorListener,
+ 	ValueAnimator.AnimatorUpdateListener {
+ 		
+ 		public MyAnimationView(Context context) {
+				super(context);	
+			}
+
+			Animator animation;
+         boolean endImmediately = false;
+
+         private void createAnimation(int recordingStatusHeight) {
+             if (animation == null) {
+                 ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
+                         recording_status.getY(), getHeight() - recordingStatusHeight).setDuration(10000);
+                 yAnim.setRepeatCount(0);
+                 yAnim.setRepeatMode(ValueAnimator.REVERSE);
+                 yAnim.setInterpolator(new AccelerateInterpolator(1f));
+                 yAnim.addUpdateListener(this);
+                 yAnim.addListener(this);
+
+                 animation = new AnimatorSet();
+                 ((AnimatorSet) animation).play(yAnim);
+                 animation.addListener(this);
+             }
+         }
+
+         public void startAnimation(int recordingStatusHeight) {
+             createAnimation(recordingStatusHeight);
+             animation.start();
+         }
+
+         public void cancelAnimation(int recordingStatusHeight) {
+             createAnimation(recordingStatusHeight);
+             animation.cancel();
+         }
+
+         public void endAnimation(int recordingStatusHeight) {
+             createAnimation(recordingStatusHeight);
+             animation.end();
+         }
+         
+         @Override
+         protected void onDraw(Canvas canvas) {
+             canvas.save();
+             canvas.translate(recording_status.getX(), recording_status.getY());
+             
+             canvas.restore();
+         }
+
+         public void onAnimationUpdate(ValueAnimator animation) {
+             invalidate();
+         }
+
+         public void onAnimationStart(Animator animation) {
+             if (animation instanceof AnimatorSet) {
+                 
+             } else {
+                 
+             }
+             if (endImmediately) {
+                 animation.end();
+             }
+         }
+
+         public void onAnimationEnd(Animator animation) {
+             if (animation instanceof AnimatorSet) {
+                 
+             } else {
+                 
+             }
+         }
+
+         public void onAnimationCancel(Animator animation) {
+             if (animation instanceof AnimatorSet) {
+                 
+             } else {
+                 
+             }
+         }
+
+         public void onAnimationPause(Animator animation) {
+             if (animation instanceof AnimatorSet) {
+                 
+             } else {
+                 
+             }
+         }
+         
+         public void onAnimationRepeat(Animator animation) {
+             if (animation instanceof AnimatorSet) {
+                 
+             } else {
+                 
+             }
+         }
+ 	}
      
      /*
 	        private String mFileName = null;
@@ -419,6 +450,7 @@ public class RecordTab3 extends Fragment {
 	        	
 	        	final MyAnimationView animView = new MyAnimationView(getActivity());
 				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
+				private LinearLayout recording_status;
 				recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
 				mAudioRecorder = AudioRecorder.build(getActivity(), getNextFileName());
 				mRecordButton = (Button) v.findViewById(R.id.record_button);
@@ -559,102 +591,7 @@ public class RecordTab3 extends Fragment {
 	            return elapsedTime;
 	        }
 
-	    	public class MyAnimationView extends View implements Animator.AnimatorListener,
-        	ValueAnimator.AnimatorUpdateListener {
-	    		
-	    		public MyAnimationView(Context context) {
-					super(context);	
-				}
-
-				Animator animation;
-	            boolean endImmediately = false;
-	
-	            private void createAnimation(int recordingStatusHeight) {
-	                if (animation == null) {
-	                    ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-	                            recording_status.getY(), getHeight() - recordingStatusHeight).setDuration(10000);
-	                    yAnim.setRepeatCount(0);
-	                    yAnim.setRepeatMode(ValueAnimator.REVERSE);
-	                    yAnim.setInterpolator(new AccelerateInterpolator(1f));
-	                    yAnim.addUpdateListener(this);
-	                    yAnim.addListener(this);
-	
-	                    animation = new AnimatorSet();
-	                    ((AnimatorSet) animation).play(yAnim);
-	                    animation.addListener(this);
-	                }
-	            }
-	
-	            public void startAnimation(int recordingStatusHeight) {
-	                createAnimation(recordingStatusHeight);
-	                animation.start();
-	            }
-	
-	            public void cancelAnimation(int recordingStatusHeight) {
-	                createAnimation(recordingStatusHeight);
-	                animation.cancel();
-	            }
-
-	            public void endAnimation(int recordingStatusHeight) {
-	                createAnimation(recordingStatusHeight);
-	                animation.end();
-	            }
-	            
-	            @Override
-	            protected void onDraw(Canvas canvas) {
-	                canvas.save();
-	                canvas.translate(recording_status.getX(), recording_status.getY());
-	                
-	                canvas.restore();
-	            }
-	
-	            public void onAnimationUpdate(ValueAnimator animation) {
-	                invalidate();
-	            }
-	
-	            public void onAnimationStart(Animator animation) {
-	                if (animation instanceof AnimatorSet) {
-	                    
-	                } else {
-	                    
-	                }
-	                if (endImmediately) {
-	                    animation.end();
-	                }
-	            }
-	
-	            public void onAnimationEnd(Animator animation) {
-	                if (animation instanceof AnimatorSet) {
-	                    
-	                } else {
-	                    
-	                }
-	            }
-	
-	            public void onAnimationCancel(Animator animation) {
-	                if (animation instanceof AnimatorSet) {
-	                    
-	                } else {
-	                    
-	                }
-	            }
-	
-	            public void onAnimationPause(Animator animation) {
-	                if (animation instanceof AnimatorSet) {
-	                    
-	                } else {
-	                    
-	                }
-	            }
-	            
-	            public void onAnimationRepeat(Animator animation) {
-	                if (animation instanceof AnimatorSet) {
-	                    
-	                } else {
-	                    
-	                }
-	            }
-	    	}
+	    	
 
 	    	 class Recording extends AsyncTask<Void, Void, Void> {
 	 			
