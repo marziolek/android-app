@@ -1,68 +1,106 @@
 package com.project.mgr;
 
-import java.io.File;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.pm.Signature;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.util.Base64;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.AppEventsLogger;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.plus.Plus;
-import com.google.android.gms.plus.model.people.Person;
+import com.facebook.widget.LoginButton;
 import com.project.mgr.fragments.tabs.SwipeTabs;
 
-public class MainActivity extends FragmentActivity implements OnClickListener,
-ConnectionCallbacks, OnConnectionFailedListener {
-    /**
+public class MainActivity extends Activity {
+    
+	private String TAG = "Facebook";
+	private UiLifecycleHelper uiHelper;
+	
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+	    super.onCreate(savedInstanceState);
+
+	    setContentView(R.layout.main);
+	    
+	    uiHelper = new UiLifecycleHelper(this, callback);
+	    uiHelper.onCreate(savedInstanceState);
+	    
+	    LoginButton authButton = (LoginButton) findViewById(R.id.fbLoginBtn);
+	    authButton.setReadPermissions(Arrays.asList("user_status"));
+	    
+	    
+	}
+	
+	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+	    if (state.isOpened()) {
+	        Log.i(TAG, "Logged in...");
+	        Intent intent = new Intent(this, SwipeTabs.class);
+	        startActivity(intent);
+	    } else if (state.isClosed()) {
+	        Log.i(TAG, "Logged out...");
+	    }
+	}
+	
+	private Session.StatusCallback callback = new Session.StatusCallback() {
+	    @Override
+	    public void call(Session session, SessionState state, Exception exception) {
+	        onSessionStateChange(session, state, exception);
+	    }
+	};
+	
+	@Override
+	public void onResume() {
+	    super.onResume();
+	    Session session = Session.getActiveSession();
+	    if (session != null &&
+	           (session.isOpened() || session.isClosed()) ) {
+	        onSessionStateChange(session, session.getState(), null);
+	    }
+
+	    uiHelper.onResume();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    super.onActivityResult(requestCode, resultCode, data);
+	    uiHelper.onActivityResult(requestCode, resultCode, data);
+	}
+
+	@Override
+	public void onPause() {
+	    super.onPause();
+	    uiHelper.onPause();
+	}
+
+	@Override
+	public void onDestroy() {
+	    super.onDestroy();
+	    uiHelper.onDestroy();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+	    super.onSaveInstanceState(outState);
+	    uiHelper.onSaveInstanceState(outState);
+	}
+	
+	
+	
+	/**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
      * will keep every loaded fragment in memory. If this becomes too memory
      * intensive, it may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+     *
     
-    /**
+    **
      * The {@link ViewPager} that will host the section contents.
-     */
+     *
     ViewPager mViewPager;
     
     private static final String USER_SKIPPED_LOGIN_KEY = "user_skipped_login";
@@ -97,7 +135,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     /**
      * A flag indicating that a PendingIntent is in progress and prevents us
      * from starting further intents.
-     */
+     *
     private boolean mIntentInProgress;
  
     private boolean mSignInClicked;
@@ -221,7 +259,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     
     /**
      * Button on click listener
-     * */
+     * *
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -242,7 +280,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     
     /**
      * Sign-in into google
-     * */
+     * *
     private void signInWithGplus() {
         if (!mGoogleApiClient.isConnecting()) {
             mSignInClicked = true;
@@ -252,7 +290,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     
     /**
      * Sign-out from google
-     * */
+     * *
     private void signOutFromGplus() {
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
@@ -264,7 +302,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
  
     /**
      * Revoking access from google
-     * */
+     * *
     private void revokeGplusAccess() {
         if (mGoogleApiClient.isConnected()) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
@@ -284,7 +322,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     
     /**
      * Method to resolve any signin errors
-     * */
+     * *
     private void resolveSignInError() {
         if (mConnectionResult.hasResolution()) {
             try {
@@ -342,7 +380,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
      
     /**
      * Updating the UI, showing/hiding buttons and profile layout
-     * */
+     * *
     private void updateUI(boolean isSignedIn) {
         if (isSignedIn) {
             btnSignIn.setVisibility(View.GONE);
@@ -361,7 +399,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
     
     /**
      * Fetching user's information name, email, profile pic
-     * */
+     * *
     private void getProfileInformation() {
         try {
             if (Plus.PeopleApi.getCurrentPerson(mGoogleApiClient) != null) {
@@ -399,7 +437,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
      
     /**
      * Background Async task to load user profile picture from url
-     * */
+     * *
     private class LoadProfileImage extends AsyncTask<String, Void, Bitmap> {
         ImageView bmImage;
      
@@ -558,7 +596,7 @@ ConnectionCallbacks, OnConnectionFailedListener {
         }
         transaction.commit();
     }
-    
+    */
 }
 /*
  * DB 

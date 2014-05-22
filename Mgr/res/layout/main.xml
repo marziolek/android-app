@@ -6,17 +6,9 @@
     android:layout_height="fill_parent"
     android:background="#fff">
 
-    <fragment android:name="com.project.mgr.SelectionFragment"
-        android:id="@+id/selectionFragment"
+     <com.facebook.widget.LoginButton
+        android:id="@+id/fbLoginBtn"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-    <fragment android:name="com.project.mgr.SplashFragment"
-        android:id="@+id/splashFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-     <fragment android:name="com.facebook.widget.UserSettingsFragment"
-    	android:id="@+id/userSettingsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content" />
     
 </LinearLayout>
