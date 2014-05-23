@@ -32,6 +32,10 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
 public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSelectedListener {
@@ -53,6 +57,9 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
         // requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.take_photos);
+        
+        File pictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
+        deleteFolder(pictures);
         
         // Spinner for preview sizes
         Spinner spinnerSize = (Spinner) findViewById(R.id.spinner_size);
@@ -206,7 +213,14 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		protected Void doInBackground(Void... arg0) {
 			FileOutputStream outStream = null;
 	        try{
-	            outStream = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName);
+	        	File gifDir = new File(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/");
+	        	if (gifDir.exists()) {
+	        		deleteFolder(gifDir);
+	        		gifDir.mkdirs();
+	        	} else {
+	        		gifDir.mkdirs();
+	        	}
+	            outStream = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/"+fileName);
 	            outStream.write(generateGIF());
 	            outStream.close();
 	        }catch(Exception e){
@@ -223,11 +237,31 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		 
 		    @Override
 		    protected void onPostExecute(Void result) {
-		    	startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
-		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
-		        Intent intent = new Intent(TakePhotos.this, PreviewGif.class);
-		        intent.putExtra("fileName", fileName);
-		    	startActivity(intent);
+		    	final Intent intent = new Intent(TakePhotos.this, PreviewGif.class);
+		    	final Session session = Session.getActiveSession();
+		    	if (session != null && session.isOpened()) {
+		    		// If the session is open, make an API call to get user data
+		    	    // and define a new callback to handle the response
+		    	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+			    	    @Override
+			    	    public void onCompleted(GraphUser user, Response response) {
+			    	               // If the response is successful
+				    	    if (session == Session.getActiveSession()) {
+				    	    	if (user != null) {
+				    	    		Bundle extras = new Bundle();
+				    	    		extras.putString("user_id", user.getId());
+				    	    		extras.putString("fileName", fileName);
+				    	    		intent.putExtras(extras);
+				    	    		startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
+				    		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
+				    		        startActivity(intent);
+				    	    	}   
+				    	    }   
+			    	    }   
+		    	    }); 
+		    	    Request.executeBatchAsync(request);
+		    	} 
+		    	
 		    }
 		    
 		    @Override
@@ -244,6 +278,20 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 	    String fileName = "GIF_"+formatter.format(now) + ".gif";
 	    return fileName;
+	}
+	
+	public static void deleteFolder(File folder) {
+	    File[] files = folder.listFiles();
+	    if(files!=null) { //some JVMs return null for empty dirs
+	        for(File f: files) {
+	            if(f.isDirectory()) {
+	                deleteFolder(f);
+	            } else {
+	                f.delete();
+	            }
+	        }
+	    }
+	    folder.delete();
 	}
 
 }

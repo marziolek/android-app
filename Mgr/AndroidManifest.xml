@@ -15,10 +15,16 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <permission android:name="com.project.mgr.permission.C2D_MESSAGE" 
+        android:protectionLevel="signature" />
+    
     <uses-feature android:name="android.hardware.camera" />
 	<uses-feature android:name="android.hardware.camera.autofocus" />
 
     <application
+        android:name="com.project.mgr.Controller"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -52,6 +58,27 @@
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
 		<activity android:name="com.project.mgr.fragments.tabs.FilesUploader"></activity>
+		<activity android:name="com.project.mgr.MainActivityGCM"></activity>
+		<activity android:name="com.project.mgr.RegisterActivity"></activity>
+		<activity android:name="com.project.mgr.GCMIntentService"></activity>
+		<activity android:name="com.project.mgr.Controller"></activity>
+		<activity android:name="com.project.mgr.Config"></activity>
+		
+		<receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+
+                <!-- Receives the actual messages. -->
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <!-- Receives the registration id. -->
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.project.mgr" />
+            </intent-filter>
+            
+        </receiver>
+        <service android:name="com.project.mgr.GCMIntentService" />
 	</application>
 
 </manifest>

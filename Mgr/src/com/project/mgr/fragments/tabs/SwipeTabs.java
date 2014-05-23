@@ -26,6 +26,8 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
  
         // Initilization
         viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.setOffscreenPageLimit(4);
+        
         actionBar = getActionBar();
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
  

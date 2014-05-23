@@ -195,6 +195,7 @@ public class UserStreamTab2 extends Fragment {
 				   heart.setLayoutParams(heartSize);
 				   likesLL.addView(heart);
 				   
+				   final RelativeLayout post = new RelativeLayout(getActivity());
 				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.myPosts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/myStream/"+params[2]);
@@ -251,7 +252,6 @@ public class UserStreamTab2 extends Fragment {
 			    	    getActivity().runOnUiThread(new Runnable() {
 			    	        @Override
 			    	        public void run() {			    	        	
-			    	        	RelativeLayout post = new RelativeLayout(getActivity());
 			    	        	//post.setPadding(0, 0, 0, 0);
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);

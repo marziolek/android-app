@@ -33,7 +33,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -46,6 +50,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -62,6 +68,7 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+import com.project.mgr.MainActivity;
 import com.project.mgr.R;
 import com.project.mgr.fragments.tabs.DetectScrollView.OnScrollViewListener;
 
@@ -77,7 +84,7 @@ public class StreamTab1 extends Fragment {
 	private String calculatedSecs = null;
 	private String calculatedTime = null;
 	private int currentPost = 0;
-	
+		
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
@@ -220,7 +227,7 @@ public class StreamTab1 extends Fragment {
 		    	        	}
 		    	    	}
 				   });
-				   
+				   final RelativeLayout post = new RelativeLayout(getActivity());
 				   final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
 				   try {
 			        	InputStream is = new FileInputStream(Environment.getExternalStorageDirectory().getPath() + "/MgrApp/stream/"+params[2]);
@@ -233,51 +240,51 @@ public class StreamTab1 extends Fragment {
 			    	    	@Override
 			    	        public void onClick(View v) {
 			    	    		PreviewGifPlayer temp = (PreviewGifPlayer) v;
-			    	    		if (lastPlayed != null) {
-			    	    			if (lastPlayed == temp) {
-			    	    				lastPlayed.setPaused(!lastPlayed.isPaused());
-			    	    				if (!mPlaying) {
-					    	    			preparePlaying(params[3]);
-					    	    			mPlaying = !mPlaying;
-					    	    		} else {
-					    	    			stopPlaying();
-					    	    			mPlaying = !mPlaying;
-					    	    		}
-			    	    			} else {
-				    	    			lastPlayed.setPaused(true);
-				    	    			temp.setPaused(false);
-					    	    		lastPlayed = temp;
-					    	    		if (mPlaying) {
-						    	    		stopPlaying();
-						    	    		mPlaying = !mPlaying;
-					    	    		}
-					    	    		if (!mPlaying) {
-					    	    			preparePlaying(params[3]);
-					    	    			mPlaying = !mPlaying;
-					    	    		} else {
-					    	    			stopPlaying();
-					    	    			mPlaying = !mPlaying;
-					    	    		}
-			    	    			}
-			    	    		} else {
-			    	    			temp.setPaused(!temp.isPaused());
-			    	    			lastPlayed = temp;
-			    	    			if (!mPlaying) {
-				    	    			preparePlaying(params[3]);
-				    	    			mPlaying = !mPlaying;
+			    	    		if (temp != null){
+				    	    		if (lastPlayed != null) {
+				    	    			if (lastPlayed == temp) {
+				    	    				lastPlayed.setPaused(!lastPlayed.isPaused());
+				    	    				if (!mPlaying) {
+						    	    			preparePlaying(params[3]);
+						    	    			mPlaying = !mPlaying;
+						    	    		} else {
+						    	    			stopPlaying();
+						    	    			mPlaying = !mPlaying;
+						    	    		}
+				    	    			} else {
+					    	    			lastPlayed.setPaused(true);
+					    	    			temp.setPaused(false);
+						    	    		lastPlayed = temp;
+						    	    		if (mPlaying) {
+							    	    		stopPlaying();
+							    	    		mPlaying = !mPlaying;
+						    	    		}
+						    	    		if (!mPlaying) {
+						    	    			preparePlaying(params[3]);
+						    	    			mPlaying = !mPlaying;
+						    	    		} else {
+						    	    			stopPlaying();
+						    	    			mPlaying = !mPlaying;
+						    	    		}
+				    	    			}
 				    	    		} else {
-				    	    			stopPlaying();
-				    	    			mPlaying = !mPlaying;
+				    	    			temp.setPaused(!temp.isPaused());
+				    	    			lastPlayed = temp;
+				    	    			if (!mPlaying) {
+					    	    			preparePlaying(params[3]);
+					    	    			mPlaying = !mPlaying;
+					    	    		} else {
+					    	    			stopPlaying();
+					    	    			mPlaying = !mPlaying;
+					    	    		}
 				    	    		}
 			    	    		}
-			    	    		
 			    	        }
 			        	});
 			        	
 			    	    getActivity().runOnUiThread(new Runnable() {
 			    	        @Override
 			    	        public void run() {
-			    	        	RelativeLayout post = new RelativeLayout(getActivity());
 			    	        	//post.setPadding(0, 0, 0, 0);
 			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
 			    	        	postGifLay.addView(postGif);
@@ -682,6 +689,5 @@ public class StreamTab1 extends Fragment {
 	    targetHeight), null);
 	  return targetBitmap;
 	 }
-	 
 	 
 }

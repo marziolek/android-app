@@ -63,6 +63,10 @@ public class RecordTab3 extends Fragment {
 
     	 View v= inflater.inflate(R.layout.record_tab2, container, false);
      	 	     
+    	 File audio = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio");
+         deleteFolder(audio);
+         audio.mkdirs();
+         
     	 final MyAnimationView animView = new MyAnimationView(getActivity());
     	 recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
     	 
@@ -433,6 +437,22 @@ public class RecordTab3 extends Fragment {
              }
          }
  	}
+     
+ 	
+ 	public static void deleteFolder(File folder) {
+ 	    File[] files = folder.listFiles();
+ 	    if(files!=null) { //some JVMs return null for empty dirs
+ 	        for(File f: files) {
+ 	            if(f.isDirectory()) {
+ 	                deleteFolder(f);
+ 	            } else {
+ 	                f.delete();
+ 	            }
+ 	        }
+ 	    }
+ 	    folder.delete();
+ 	}
+
      
      /*
 	        private String mFileName = null;

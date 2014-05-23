@@ -16,4 +16,12 @@
         android:layout_height="wrap_content"
         android:text="Upload GIF" />
     
+    <Button
+	    android:id="@+id/shareButton"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:gravity="center"
+	    android:layout_marginTop="10dp"
+	    android:text="@string/publish_and_share" />
+    
 </LinearLayout>

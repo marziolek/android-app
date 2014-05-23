@@ -10,11 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import com.facebook.Session;
 import com.project.mgr.MainActivity;
 import com.project.mgr.R;
+import com.project.mgr.RegisterActivity;
 
 public class SettingsTab4 extends Fragment {
     
@@ -27,6 +27,15 @@ public class SettingsTab4 extends Fragment {
 	    	@Override
 	        public void onClick(View v) {
 	    		signOut();
+	    	}
+		});
+		
+		Button gcm = (Button) rootView.findViewById(R.id.gcm);
+		gcm.setOnClickListener(new View.OnClickListener() {
+	    	@Override
+	        public void onClick(View v) {
+	    		Intent intent = new Intent(getActivity(),RegisterActivity.class);
+	    		startActivity(intent);
 	    	}
 		});
 		

@@ -83,7 +83,7 @@ public class FilesUploader extends Activity {
     public void UploadFile(String user_id){
     	try
     	{
-    		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/"+fileName();
+    		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/"+fileName();
     	    FileInputStream fileInputStream = new FileInputStream(new File(gifPath) );
     	 
     	    URL url = new URL(urlServer);
