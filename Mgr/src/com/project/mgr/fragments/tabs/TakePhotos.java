@@ -97,9 +97,9 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.w("CameraPreviewTestActivity", "onItemSelected invoked");
-        Log.w("CameraPreviewTestActivity", "position: " + position);
-        Log.w("CameraPreviewTestActivity", "parent.getId(): " + parent.getId());
+        Log.d("CameraPreviewTestActivity", "onItemSelected invoked");
+        Log.d("CameraPreviewTestActivity", "position: " + position);
+        Log.d("CameraPreviewTestActivity", "parent.getId(): " + parent.getId());
         switch (parent.getId()) {
             case R.id.spinner_size:
             Rect rect = new Rect();

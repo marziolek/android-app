@@ -77,6 +77,17 @@ public class ResizableCameraPreview extends CameraPreview {
         boolean portrait = isPortrait();
         
         Camera.Size previewSize = mPreviewSizeList.get(index);
+        
+        List<Camera.Size> sizes = mPreviewSizeList;
+        int length = sizes.size();
+        
+        for (int i =0; i < length; i++) {
+        	if((sizes.get(i).width) == 800 && (sizes.get(i).width) > 750 && sizes.get(i).height <= 480 && (sizes.get(i).height) > 370) {
+        		System.out.println(sizes.get(i).width);
+        		System.out.println(sizes.get(i).height);
+        	}
+        }
+        
         Camera.Size pictureSize = determinePictureSize(previewSize);
         if (DEBUGGING) { Log.v(LOG_TAG, "Requested Preview Size - w: " + previewSize.width + ", h: " + previewSize.height); }
         mPreviewSize = previewSize;
