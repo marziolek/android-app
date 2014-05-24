@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gcm.GCMBaseIntentService;
-import com.project.mgr.R;
 
 public class GCMIntentService extends GCMBaseIntentService {
 
@@ -33,8 +32,8 @@ public class GCMIntentService extends GCMBaseIntentService {
     	
         Log.i(TAG, "Device registered: regId = " + registrationId);
         aController.displayMessageOnScreen(context, "Your device registred with GCM");
-        Log.d("NAME", MainActivityGCM.name);
-        aController.register(context, MainActivityGCM.name, MainActivityGCM.email, registrationId);
+        Log.d("FACEBOOK ID", MainActivity.fbId);
+        aController.register(context, MainActivity.fbId, registrationId);
     }
 
     /**
@@ -120,7 +119,7 @@ public class GCMIntentService extends GCMBaseIntentService {
         
         String title = context.getString(R.string.app_name);
         
-        Intent notificationIntent = new Intent(context, MainActivityGCM.class);
+        Intent notificationIntent = new Intent(context, MainActivity.class);
         // set intent so it does not start a new activity
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);

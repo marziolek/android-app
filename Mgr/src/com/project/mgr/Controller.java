@@ -18,11 +18,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.google.android.gcm.GCMRegistrar;
-import com.project.mgr.R;
+import com.project.mgr.fragments.tabs.TakePhotos;
 
 public class Controller extends Application {
 	
@@ -32,16 +38,17 @@ public class Controller extends Application {
 	
     
 	 // Register this account with the server.
-    void register(final Context context, String name, String email, final String regId) {
+    public void register(final Context context, final String fbId, final String regId) {
     	 
         Log.i(Config.TAG, "registering device (regId = " + regId + ")");
         
         String serverUrl = Config.YOUR_SERVER_URL;
         
-        Map<String, String> params = new HashMap<String, String>();
+        final Map<String, String> params = new HashMap<String, String>();
         params.put("regId", regId);
-        params.put("name", name);
-        params.put("email", email);
+        params.put("fbId", fbId);
+        //params.put("name", name);
+        //params.put("email", email);
         
         long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000); 
         
