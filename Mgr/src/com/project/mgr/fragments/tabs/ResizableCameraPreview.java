@@ -27,9 +27,12 @@ public class ResizableCameraPreview extends CameraPreview {
             List<Camera.Size> sizes = mPreviewSizeList;
             int length = sizes.size();
             for (int i = 0; i < length; i++) {
-                Camera.Size size = sizes.get(i);
-                Camera.Size revSize = mCamera.new Size(size.height, size.width);
-                sizes.add(revSize);
+            	if((sizes.get(i).width) == 800 && sizes.get(i).height <= 480) {// && (sizes.get(i).width) > 750 && sizes.get(i).height <= 480 && (sizes.get(i).height) > 370) {
+            		Camera.Size size = sizes.get(i);
+                    Camera.Size revSize = mCamera.new Size(size.height, size.width);
+                    System.out.println("CameraPreview ********* "+size);
+                    sizes.add(revSize);
+            	}
             }
         }
     }
@@ -51,6 +54,7 @@ public class ResizableCameraPreview extends CameraPreview {
             if (mSurfaceConfiguring) {
                 return;
             }
+            
         }
 
         configureCameraParameters(cameraParams, portrait);
@@ -76,20 +80,21 @@ public class ResizableCameraPreview extends CameraPreview {
         Camera.Parameters cameraParams = mCamera.getParameters();
         boolean portrait = isPortrait();
         
-        Camera.Size previewSize = mPreviewSizeList.get(index);
+        Camera.Size previewSize = null;
         
         List<Camera.Size> sizes = mPreviewSizeList;
         int length = sizes.size();
         
         for (int i =0; i < length; i++) {
-        	if((sizes.get(i).width) == 800 && (sizes.get(i).width) > 750 && sizes.get(i).height <= 480 && (sizes.get(i).height) > 370) {
+        	if((sizes.get(i).width) == 800 && sizes.get(i).height <= 480) {
         		System.out.println(sizes.get(i).width);
         		System.out.println(sizes.get(i).height);
+        		previewSize = sizes.get(i);
         	}
         }
         
         Camera.Size pictureSize = determinePictureSize(previewSize);
-        if (DEBUGGING) { Log.v(LOG_TAG, "Requested Preview Size - w: " + previewSize.width + ", h: " + previewSize.height); }
+        if (DEBUGGING) { Log.v("MÓJ CI ON JEST!", "Requested Preview Size - w: " + previewSize.width + ", h: " + previewSize.height); }
         mPreviewSize = previewSize;
         mPictureSize = pictureSize;
         boolean layoutChanged = adjustSurfaceLayoutSize(previewSize, portrait, width, height);

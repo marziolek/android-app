@@ -1,11 +1,15 @@
 package com.project.mgr;
 
+import java.io.File;
 import java.util.Arrays;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -15,12 +19,15 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.project.mgr.fragments.tabs.SwipeTabs;
+import com.project.mgr.fragments.tabs.TakePhotos;
 
 public class MainActivity extends Activity {
     
 	private String TAG = "Facebook";
 	private UiLifecycleHelper uiHelper;
 	public static String fbId;
+	private String mFileName = null;
+    private String mFileNamePics = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -28,11 +35,26 @@ public class MainActivity extends Activity {
 
 	    setContentView(R.layout.main);
 	    
+	    File mMainDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp");
+	    deleteFolder(mMainDir);
+        File mMainDirAudio = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio");
+        File mMainDirPictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
+        if (!mMainDir.isDirectory()) {
+        	mMainDir.mkdir();	
+        }
+        if (!mMainDirAudio.isDirectory()) {
+        	mMainDirAudio.mkdir();	
+        }
+        if (!mMainDirPictures.isDirectory()) {
+        	mMainDirPictures.mkdir();	
+        }
+                
 	    uiHelper = new UiLifecycleHelper(this, callback);
 	    uiHelper.onCreate(savedInstanceState);
 	    
 	    LoginButton authButton = (LoginButton) findViewById(R.id.fbLoginBtn);
-	    authButton.setReadPermissions(Arrays.asList("user_status")); 
+	    authButton.setReadPermissions(Arrays.asList("user_status"));
+	   
 	}
 	
 	private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
@@ -108,6 +130,19 @@ public class MainActivity extends Activity {
 	    uiHelper.onSaveInstanceState(outState);
 	}
 	
+	public static void deleteFolder(File folder) {
+	    File[] files = folder.listFiles();
+	    if(files!=null) { //some JVMs return null for empty dirs
+	        for(File f: files) {
+	            if(f.isDirectory()) {
+	                deleteFolder(f);
+	            } else {
+	                f.delete();
+	            }
+	        }
+	    }
+	    folder.delete();
+	}
 	
 }
 /*

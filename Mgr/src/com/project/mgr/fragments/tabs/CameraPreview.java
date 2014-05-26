@@ -200,12 +200,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         float deltaRatioMin = Float.MAX_VALUE;
         Camera.Size retSize = null;
         for (Camera.Size size : mPreviewSizeList) {
-            curRatio = ((float) size.width) / size.height;
-            deltaRatio = Math.abs(reqRatio - curRatio);
-            if (deltaRatio < deltaRatioMin) {
-                deltaRatioMin = deltaRatio;
-                retSize = size;
-            }
+        	if (size.width == 800 && size.height <=480) {
+        		curRatio = ((float) size.width) / size.height;
+                deltaRatio = Math.abs(reqRatio - curRatio);
+                if (deltaRatio < deltaRatioMin) {
+                    deltaRatioMin = deltaRatio;
+                    retSize = size;
+                }	
+        	}
         }
 
         return retSize;
@@ -214,9 +216,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     protected Camera.Size determinePictureSize(Camera.Size previewSize) {
         Camera.Size retSize = null;
         for (Camera.Size size : mPictureSizeList) {
-            if (size.equals(previewSize)) {
-                return size;
+            if (size.width == 800 && size.height <=480) {
+            	return size;
             }
+        	/*if (size.equals(previewSize)) {
+                return size;
+            }*/
         }
         
         if (DEBUGGING) { Log.v(LOG_TAG, "Same picture size not found."); }

@@ -60,6 +60,11 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
         
         File pictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
         deleteFolder(pictures);
+        if (pictures.mkdirs()) {
+        	System.out.println("gitara");
+        } else {
+        	System.out.println("nie ba³dzo");
+        }
         
         // Spinner for preview sizes
         Spinner spinnerSize = (Spinner) findViewById(R.id.spinner_size);
@@ -75,6 +80,7 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 		    	mPreview.takePictureFromPreview();
 		    }
 		});
+		
     }
 
     @Override
@@ -104,7 +110,7 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
             case R.id.spinner_size:
             Rect rect = new Rect();
             mLayout.getDrawingRect(rect);
-
+            
             if (0 == position) { // "Auto" selected
                 mPreview.surfaceChanged(null, 0, rect.width(), rect.height());
             } else {
