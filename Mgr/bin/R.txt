@@ -699,7 +699,8 @@ int layout splash 0x7f030045
 int layout stream_tab1 0x7f030046
 int layout support_simple_spinner_dropdown_item 0x7f030047
 int layout take_photos 0x7f030048
-int layout user_stream_tab2 0x7f030049
+int layout user_profile 0x7f030049
+int layout user_stream_tab2 0x7f03004a
 int menu login 0x7f0c0000
 int menu main 0x7f0c0001
 int menu options 0x7f0c0002

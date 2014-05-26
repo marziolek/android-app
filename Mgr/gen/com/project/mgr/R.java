@@ -2000,7 +2000,8 @@ containing a value of this type.
         public static final int stream_tab1=0x7f030046;
         public static final int support_simple_spinner_dropdown_item=0x7f030047;
         public static final int take_photos=0x7f030048;
-        public static final int user_stream_tab2=0x7f030049;
+        public static final int user_profile=0x7f030049;
+        public static final int user_stream_tab2=0x7f03004a;
     }
     public static final class menu {
         public static final int login=0x7f0c0000;

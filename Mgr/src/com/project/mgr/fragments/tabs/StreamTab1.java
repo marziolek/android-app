@@ -183,6 +183,18 @@ public class StreamTab1 extends Fragment {
 				   
 				   fullName.setId(generateViewId());
 				   profilePicture.setId(generateViewId());
+
+				   profilePicture.setOnClickListener(new View.OnClickListener() {
+		    	    	@Override
+		    	        public void onClick(View v) {
+		    	    		Intent intent = new Intent(getActivity(), UserProfile.class);
+		    	    		Bundle user_id = new Bundle();
+		    	    		user_id.putString("user_id", params[0]);
+		                    intent.putExtras(user_id);
+		                    startActivity(intent);
+		    	    	}
+				   });
+				   
 				   rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 				   rlp.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
 				   rlpDate.addRule(RelativeLayout.BELOW, fullName.getId());

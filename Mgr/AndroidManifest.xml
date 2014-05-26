@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <permission android:name="com.project.mgr.permission.C2D_MESSAGE" 
         android:protectionLevel="signature" />
@@ -58,6 +59,7 @@
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
 		<activity android:name="com.project.mgr.fragments.tabs.FilesUploader"></activity>
+		<activity android:name="com.project.mgr.fragments.tabs.UserProfile"></activity>
 		<activity android:name="com.project.mgr.GCMIntentService"></activity>
 		<activity android:name="com.project.mgr.Controller"></activity>
 		<activity android:name="com.project.mgr.Config"></activity>
@@ -76,7 +78,7 @@
             </intent-filter>
             
         </receiver>
-        <service android:name="com.project.mgr.GCMIntentService" />
+        <service android:name=".GCMIntentService" />
 	</application>
 
 </manifest>
