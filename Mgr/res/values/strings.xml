@@ -40,9 +40,9 @@
     <string name="rec_progress">Recording progress</string>
     <string name="chronometer_initial_format">Initial format:<xliff:g id="initial-format">%</xliff:g></string>
     <string name="title_activity_take_photos">Take Photos</string>
-    <string name="take_photos">Take photos</string>
+    <string name="take_photos">Take pictures</string>
     <string name="skip_photos">Skip photos</string>
-    <string name="GIFpreview">GIF preview</string>
+    <string name="GIFpreview">Preview GIF</string>
     <string name="publish_and_share">Publish and share</string>
     
     <string name="hello_world">Hello world!</string>
@@ -65,4 +65,8 @@
     <string name="options_unregister">Unregister</string>
     <string name="options_clear">Clear</string>
     <string name="options_exit">Exit</string>
+    <string name="preview_audio">Preview audio</string>
+    <string name="profile">Profile</string>
+    <string name="empty"></string>
+    <string name="gifit">GIF it! ></string>
 </resources>

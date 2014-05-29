@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="13"
+        android:minSdkVersion="14"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -49,17 +49,45 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-        <activity android:name="com.project.mgr.fragments.tabs.SwipeTabs" >
-        </activity>
+        <activity 
+            android:name="com.project.mgr.fragments.tabs.SwipeTabs"
+            android:launchMode="singleTop" ></activity>
         <activity 
             android:name="com.project.mgr.fragments.tabs.TakePhotos"
-            android:screenOrientation="landscape"></activity>
-        <activity android:name="com.project.mgr.fragments.tabs.PreviewAudio"></activity>
-        <activity android:name="com.project.mgr.fragments.tabs.PreviewGif"></activity>
+            android:label="@string/take_photos"
+            android:screenOrientation="landscape"
+            android:parentActivityName="com.project.mgr.fragments.tabs.PreviewAudio">
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.project.mgr.fragments.tabs.PreviewAudio" />
+        </activity>
+        <activity 
+            android:name="com.project.mgr.fragments.tabs.PreviewAudio"
+            android:label="@string/preview_audio"
+            android:parentActivityName="com.project.mgr.fragments.tabs.SwipeTabs">
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.project.mgr.fragments.tabs.SwipeTabs" />
+        </activity>
+        <activity 
+            android:name="com.project.mgr.fragments.tabs.PreviewGif"
+            android:label="@string/GIFpreview"
+            android:parentActivityName="com.project.mgr.tabs.TakePhotos">
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.project.mgr.fragments.tabs.TakePhotos" />
+        </activity>
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
 		<activity android:name="com.project.mgr.fragments.tabs.FilesUploader"></activity>
-		<activity android:name="com.project.mgr.fragments.tabs.UserProfile"></activity>
+		<activity 
+		    android:name="com.project.mgr.fragments.tabs.UserProfile"
+		    android:label="@string/profile"
+		    android:parentActivityName="com.project.mgr.fragments.tabs.SwipeTabs">
+		    <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="com.project.mgr.fragments.tabs.SwipeTabs" />
+		</activity>
 		<activity android:name="com.project.mgr.GCMIntentService"></activity>
 		<activity android:name="com.project.mgr.Controller"></activity>
 		<activity android:name="com.project.mgr.Config"></activity>

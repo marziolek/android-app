@@ -18,17 +18,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.model.GraphUser;
 import com.google.android.gcm.GCMRegistrar;
-import com.project.mgr.fragments.tabs.TakePhotos;
 
 public class Controller extends Application {
 	

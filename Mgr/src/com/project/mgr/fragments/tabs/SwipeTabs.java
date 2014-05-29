@@ -43,7 +43,10 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
  
         viewPager.setAdapter(mAdapter);
         //actionBar.setHomeButtonEnabled(false);
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);        
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        
+        final Intent i = getIntent();
+        final String fbId = i.getStringExtra("fbId");
  
         // Adding Tabs
         for (String tab_name : tabs) {
@@ -103,7 +106,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
       		}
       		
       		// Getting name, email from intent
-      		final Intent i = getIntent();
+      		
       		
       		//name = i.getStringExtra("name");
       		//email = i.getStringExtra("email");
@@ -123,7 +126,6 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
       		
       		// Get GCM registration id
       		final String regId = GCMRegistrar.getRegistrationId(this);
-      		final String fbId = i.getStringExtra("fbId");
       		System.out.println(regId);
       		System.out.println(fbId);
       		// Check if regid already presents

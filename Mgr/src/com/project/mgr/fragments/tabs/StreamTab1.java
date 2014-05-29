@@ -33,10 +33,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -50,8 +50,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -68,12 +66,11 @@ import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
-import com.project.mgr.MainActivity;
 import com.project.mgr.R;
 import com.project.mgr.fragments.tabs.DetectScrollView.OnScrollViewListener;
 
-public class StreamTab1 extends Fragment {
-	
+public class StreamTab1 extends Fragment implements OnRefreshListener {
+		 
 	private MediaPlayer mPlayer;
 	private boolean mPlaying = false;
 	
@@ -85,6 +82,8 @@ public class StreamTab1 extends Fragment {
 	private String calculatedTime = null;
 	private int currentPost = 0;
 		
+	private PullToRefreshLayout mPullToRefreshLayout;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
     		Bundle savedInstanceState) {
@@ -120,6 +119,17 @@ public class StreamTab1 extends Fragment {
     		    	    		        	String[] newParams = {user_id, current_post};
     		    	    		        	new RetriveAllPosts().execute(newParams);
     		    	    		        }
+    		    	    		     // Now find the PullToRefreshLayout to setup
+    		    	    	            mPullToRefreshLayout = (PullToRefreshLayout) getActivity().findViewById(R.id.ptr_layoutMy);
+
+    		    	    	            // Now setup the PullToRefreshLayout
+    		    	    	            ActionBarPullToRefresh.from(getActivity())
+    		    	    	                    // Mark All Children as pullable
+    		    	    	                    .theseChildrenArePullable(R.id.postsScroll)
+    		    	    	                    // Set a OnRefreshListener
+    		    	    	                    .listener(StreamTab1.this)
+    		    	    	                    // Finally commit the setup to our PullToRefreshLayout
+    		    	    	                    .setup(mPullToRefreshLayout);
     		    	    		    }
     		    	    		});
     		    	    	}   
@@ -128,7 +138,7 @@ public class StreamTab1 extends Fragment {
         	    }); 
         	    Request.executeBatchAsync(request);
         	}
-    		
+            
         	return rootView;
     }
         	
@@ -701,5 +711,9 @@ public class StreamTab1 extends Fragment {
 	    targetHeight), null);
 	  return targetBitmap;
 	 }
-	 
+
+	 @Override
+	 public void onRefreshStarted(View view) {
+	       
+	 }
 }

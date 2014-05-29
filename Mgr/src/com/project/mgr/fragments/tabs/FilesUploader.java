@@ -283,7 +283,7 @@ public class FilesUploader extends Activity {
 	    protected void onPostExecute(Void v) {
 	    	startingActivity.removeDialog(FilesUploader.PLEASE_WAIT_DIALOG);
 	    	Toast.makeText(getApplicationContext(), "Your post is now online!", 2000).show();
-	    	Intent stream = new Intent(FilesUploader.this, SwipeTabs.class);
+	    	Intent stream = new Intent(FilesUploader.this, MainActivity.class);
 	    	startActivity(stream);
 	    }
 	}

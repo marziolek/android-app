@@ -28,7 +28,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
@@ -39,7 +38,7 @@ import com.project.mgr.R;
 public class RecordTab3 extends Fragment {
 	
 	 private static final int RECORDER_BPP = 16;
-     private static final String AUDIO_RECORDER_FOLDER = "AudioRecorder";
+     private static final String AUDIO_RECORDER_FOLDER = "MgrApp/audio";
      private static final String AUDIO_RECORDER_TEMP_FILE_2 = "record_temp2.raw";
      private static final int RECORDER_SAMPLERATE = 16000;
      private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
@@ -89,13 +88,15 @@ public class RecordTab3 extends Fragment {
 	             	case MotionEvent.ACTION_DOWN:
 	             		startRecording(mChronometerStarted);                    	
 		                int recordingStatusHeight = recording_status.getHeight();
+		                float asd = recording_status.getY();
 		                animView.startAnimation(recordingStatusHeight);
 	                    break;
 	             	case MotionEvent.ACTION_UP:
 	             		mChronometerStarted = true;
 	                 	stopRecording();
 	                 	int recordingStatusHeightActual = recording_status.getHeight();
-	                    animView.cancelAnimation(recordingStatusHeightActual);
+	                 	recording_status.getY();
+		                animView.cancelAnimation(recordingStatusHeightActual);
 		                break;
     			 }
     			 return false;
@@ -106,7 +107,7 @@ public class RecordTab3 extends Fragment {
      
 	     return v;
      }
-
+     
      private String getTempFilename(){
              String filepath = Environment.getExternalStorageDirectory().getPath();
              File file = new File(filepath,AUDIO_RECORDER_FOLDER);
@@ -342,7 +343,7 @@ public class RecordTab3 extends Fragment {
      }
      
      public class MyAnimationView extends View implements Animator.AnimatorListener,
- 	ValueAnimator.AnimatorUpdateListener {
+ 														  ValueAnimator.AnimatorUpdateListener {
  		
  		public MyAnimationView(Context context) {
 				super(context);	
@@ -354,10 +355,30 @@ public class RecordTab3 extends Fragment {
          private void createAnimation(int recordingStatusHeight) {
              if (animation == null) {
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-                         recording_status.getY(), getHeight() - recordingStatusHeight).setDuration(10000);
+                         recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000);
+                 System.out.println("*************");
+                 System.out.println(recording_status);
+                 System.out.println(recording_status.getY());
+                 System.out.println(getHeight());
+                 System.out.println(recordingStatusHeight);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
-                 yAnim.setInterpolator(new AccelerateInterpolator(1f));
+                 //yAnim.setInterpolator(new AccelerateInterpolator(1f));
+                 yAnim.addUpdateListener(this);
+                 yAnim.addListener(this);
+
+                 animation = new AnimatorSet();
+                 ((AnimatorSet) animation).play(yAnim);
+                 animation.addListener(this);
+             } else {
+            	 System.out.println(animation.getDuration());
+            	 long duration = SystemClock.elapsedRealtime() - mChronometer.getBase();
+            	 animation.end();
+                 ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
+                		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000-duration);
+                 yAnim.setRepeatCount(0);
+                 yAnim.setRepeatMode(ValueAnimator.REVERSE);
+                 //yAnim.setInterpolator(new AccelerateInterpolator(1f));
                  yAnim.addUpdateListener(this);
                  yAnim.addListener(this);
 
@@ -373,7 +394,7 @@ public class RecordTab3 extends Fragment {
          }
 
          public void cancelAnimation(int recordingStatusHeight) {
-             createAnimation(recordingStatusHeight);
+             //createAnimation(recordingStatusHeight);
              animation.cancel();
          }
 
@@ -452,181 +473,4 @@ public class RecordTab3 extends Fragment {
  	    }
  	    folder.delete();
  	}
-
-     
-     /*
-	        private String mFileName = null;
-	        private Button mRecordButton = null;
-	        private boolean mMaxDuration = false;
-	        Chronometer mChronometer;
-	        private LinearLayout recording_status;
-	    	Animation animMove;
-	    	private long mChronometerPause = 0;
-	    	private AudioRecorder mAudioRecorder;
-	       
-	        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-	        	View v= inflater.inflate(R.layout.record_tab2, container, false);
-	        	
-	        	final MyAnimationView animView = new MyAnimationView(getActivity());
-				mChronometer = (Chronometer) v.findViewById(R.id.chronometer);
-				private LinearLayout recording_status;
-				recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
-				mAudioRecorder = AudioRecorder.build(getActivity(), getNextFileName());
-				mRecordButton = (Button) v.findViewById(R.id.record_button);
-				mRecordButton.setOnTouchListener(new OnTouchListener() {
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						if (elapsedTime() >= 10.000) {
-                   			stopRecording();
-                   			mChronometer.stop();
-                   			mRecordButton.setEnabled(false);
-                   			mMaxDuration = true;
-                   			int recordingStatusHeightActual = recording_status.getHeight();
-                    		animView.cancelAnimation(recordingStatusHeightActual);
-                    		Log.d("more than", "10 sec");
-                   			Intent intent = new Intent(getActivity(), PreviewAudio.class);
-							startActivity(intent);
-                   			return true;
-                		}
-						if (!mMaxDuration) {
-		                	switch ( event.getAction() ) {
-		                    	case MotionEvent.ACTION_DOWN:
-		                    		mChronometer.setBase(SystemClock.elapsedRealtime() + mChronometerPause);
-			                    	mChronometer.start();
-			                    	startRecording();			                    	
-			                    	int recordingStatusHeight = recording_status.getHeight();
-			                    	animView.startAnimation(recordingStatusHeight);
-		                    		break;
-		                    	case MotionEvent.ACTION_UP:
-	                    			mChronometerPause = mChronometer.getBase() - SystemClock.elapsedRealtime();
-	                    			mChronometer.stop();
-	                    			stopRecording();
-	                    			int recordingStatusHeightActual = recording_status.getHeight();
-		                    		animView.cancelAnimation(recordingStatusHeightActual);
-			                        break;
-		                	}
-							
-						}
-						return false;
-					}
-				});
-				
-				
-				return v;
-	        }
-	                
-	        private void invalidateButtons() {
-	            switch (mAudioRecorder.getStatus()) {
-	                case STATUS_UNKNOWN:
-	                	mRecordButton.setEnabled(false);
-	                    break;
-	                case STATUS_READY_TO_RECORD:
-	                	mRecordButton.setEnabled(true);
-	                    
-	                    break;
-	                case STATUS_RECORDING:
-	                    
-	                    break;
-	                case STATUS_RECORD_PAUSED:
-	                	mRecordButton.setEnabled(true);
-	                    break;
-	                default:
-	                    break;
-	            }
-	        }
-	        
-	        protected void onStart(Bundle savedInstanceState) {
-	        	super.onStart();
-	        	
-	        	final LayoutParams params = new LayoutParams(
-        				LayoutParams.MATCH_PARENT,      
-    			        LayoutParams.MATCH_PARENT
-    		    );
-    		    int recordingStatusHeight = recording_status.getHeight();
-    		    params.setMargins(0, recordingStatusHeight, 0, 0);
-    	    	recording_status.setLayoutParams(params);
-	        }
-	        
-	       
-	        private String getNextFileName() {
-	        	mFileName = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio";
-                File dir = new File(mFileName);
-                if (!dir.exists()) {
-                	dir.mkdir();
-                }
-                String currentTime = String.valueOf(System.currentTimeMillis());
-                mFileName += "/audiorecord" + currentTime + ".mp4";
-                
-                return mFileName;
-	        }
-
-	        private void startRecording() {
-	        	mAudioRecorder.start(new AudioRecorder.OnStartListener() {
-	        	    @Override
-	        	    public void onStarted() {
-	        	        // started
-	        	    	invalidateButtons();
-	        	    	Log.v("**rec**", "new recorder started");
-	        	    }
-
-	        	    @Override
-	        	    public void onException(Exception e) {
-	        	        // error
-	        	    	invalidateButtons();
-	        	    	Log.v("**rec**", "error!!!!!!!!!!!!");
-	        	    }
-	        	});
-	        }
-
-	        private void stopRecording() {
-	        	mAudioRecorder.pause(new AudioRecorder.OnPauseListener() {
-	        	    @Override
-	        	    public void onPaused(String activeRecordFileName) {
-	        	        // paused
-	        	    	invalidateButtons();
-	        	    	Log.v("**rec**", "new recorder paused");
-	        	    }
-
-	        	    @Override
-	        	    public void onException(Exception e) {
-	        	        // error
-	        	    	invalidateButtons();
-	        	    	Log.v("**rec**", "PUASE ERROR!!!!!");
-	        	    }
-	        	});
-	        }
-	        
-	        public static interface AudioRecorderResultListener {
-		        void onReceiveAudio();
-		    }
-	        
-	        
-	      
-	        //Animation functions
-	        private double elapsedTime() {
-	            long elapsedMillis = SystemClock.elapsedRealtime() - mChronometer.getBase();
-	            double elapsedTime = elapsedMillis / 1000.0;
-	            
-	            return elapsedTime;
-	        }
-
-	    	
-
-	    	 class Recording extends AsyncTask<Void, Void, Void> {
-	 			
-	 		    protected void onPreExecute() {
-	 		    	
-	 		    }
-	 		    
-	 		    @Override
-	 		    protected Void doInBackground(Void... arg0) {
-	 		    	
-	 		    	return null;
-	 		    }
-
-	 		    protected void onPostExecute(Void v) {
-	 			   
-	 		   	}
-	    	 }*/
-	    }	
+}	

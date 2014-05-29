@@ -26,9 +26,10 @@
 
 	    <Button
 	        android:id="@+id/record_button"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/record_button" />
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:text="@string/empty"
+	        android:background="@android:color/transparent" />
 	    
 	    <Chronometer
 	        android:id="@+id/chronometer"
@@ -38,16 +39,10 @@
 	        android:layout_centerVertical="true"
 	        android:format="@string/chronometer_initial_format"
 	        android:paddingBottom="30dip"
-	        android:paddingTop="30dip" />
+	        android:paddingTop="30dip"
+	        android:textSize="130dip" />
 
-	    <TextView
-	        android:id="@+id/time"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentBottom="true"
-	        android:layout_centerHorizontal="true"
-	        android:layout_marginBottom="75dp"
-	         />
+	    
 	</RelativeLayout>
 
 </FrameLayout>

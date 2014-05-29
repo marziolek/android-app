@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +39,7 @@ import com.facebook.Session;
 import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
-public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSelectedListener {
+public class TakePhotos extends FragmentActivity {
     private ResizableCameraPreview mPreview;
     private ArrayAdapter<String> mAdapter;
     private RelativeLayout mLayout;
@@ -57,21 +58,11 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
         // requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.take_photos);
+
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         
         File pictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
         deleteFolder(pictures);
-        if (pictures.mkdirs()) {
-        	System.out.println("gitara");
-        } else {
-        	System.out.println("nie ba³dzo");
-        }
-        
-        // Spinner for preview sizes
-        Spinner spinnerSize = (Spinner) findViewById(R.id.spinner_size);
-        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSize.setAdapter(mAdapter);
-        spinnerSize.setOnItemSelectedListener(this);
         
         mLayout = (RelativeLayout) findViewById(R.id.layout);		
 		mLayout.setOnClickListener(new View.OnClickListener() {
@@ -94,36 +85,15 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
 	  public boolean onOptionsItemSelected(MenuItem item) {
 	    if (item.getItemId() == R.id.see_pictures) {
 	    	new GIF(this).execute();
-	    	//Intent intent = new Intent(getBaseContext(), PreviewGif.class);
-	    	//startActivity(intent);
 	    }
-
+	    switch (item.getItemId()) {
+  	     // Respond to the action bar's Up/Home button
+  	    	case android.R.id.home:
+  	    		NavUtils.navigateUpFromSameTask(this);
+  	    		return true;
+  	    }
 	    return(super.onOptionsItemSelected(item));
 	  }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.d("CameraPreviewTestActivity", "onItemSelected invoked");
-        Log.d("CameraPreviewTestActivity", "position: " + position);
-        Log.d("CameraPreviewTestActivity", "parent.getId(): " + parent.getId());
-        switch (parent.getId()) {
-            case R.id.spinner_size:
-            Rect rect = new Rect();
-            mLayout.getDrawingRect(rect);
-            
-            if (0 == position) { // "Auto" selected
-                mPreview.surfaceChanged(null, 0, rect.width(), rect.height());
-            } else {
-                mPreview.setPreviewSize(position - 1, rect.width(), rect.height());
-            }
-            break;
-        }
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // do nothing
-    }
 
     @Override
     protected void onResume() {
@@ -148,13 +118,6 @@ public class TakePhotos extends FragmentActivity implements AdapterView.OnItemSe
         mPreview = new ResizableCameraPreview(this, mCameraId, CameraPreview.LayoutMode.FitToParent, false);
         LayoutParams previewLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         mLayout.addView(mPreview, 0, previewLayoutParams);
-
-        mAdapter.clear();
-        mAdapter.add("Auto");
-        List<Camera.Size> sizes = mPreview.getSupportedPreivewSizes();
-        for (Camera.Size size : sizes) {
-            mAdapter.add(size.width + " x " + size.height);
-        }
     }
     
     /**

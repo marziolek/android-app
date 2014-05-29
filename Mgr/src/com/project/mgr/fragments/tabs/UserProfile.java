@@ -47,11 +47,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -79,7 +79,7 @@ public class UserProfile extends FragmentActivity {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.user_profile);
 
-    		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
     		
     		final String[] params = {userId(), "0"};
     		    	            
@@ -586,5 +586,16 @@ public class UserProfile extends FragmentActivity {
 	   		 } else {
 	   			 return null;
 	   		 }
+	 }
+	 
+	 @Override
+	 public boolean onOptionsItemSelected(MenuItem item) {
+	     switch (item.getItemId()) {
+	     // Respond to the action bar's Up/Home button
+	     case android.R.id.home:
+	         NavUtils.navigateUpFromSameTask(this);
+	         return true;
+	     }
+	     return super.onOptionsItemSelected(item);
 	 }
 }
