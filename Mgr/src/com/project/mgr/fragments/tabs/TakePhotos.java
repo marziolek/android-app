@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -14,23 +13,20 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
-import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.facebook.Request;
@@ -43,6 +39,7 @@ public class TakePhotos extends FragmentActivity {
     private ResizableCameraPreview mPreview;
     private ArrayAdapter<String> mAdapter;
     private RelativeLayout mLayout;
+    private ImageView mSwitchCam;
     private int mCameraId = 0;
     private Boolean makingGif = false;
     private String fileName = generateFileName();
@@ -62,13 +59,29 @@ public class TakePhotos extends FragmentActivity {
         getActionBar().setDisplayHomeAsUpEnabled(true);
         
         File pictures = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/pictures");
+        pictures.delete();
         deleteFolder(pictures);
+        pictures.mkdirs();
         
         mLayout = (RelativeLayout) findViewById(R.id.layout);		
 		mLayout.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
-		    	//Camera.takePicture(null, null, photoCallback);
 		    	mPreview.takePictureFromPreview();
+		    }
+		});
+		
+		mSwitchCam = (ImageView) findViewById(R.id.switchCamera);
+		mSwitchCam.setOnClickListener(new View.OnClickListener() {
+		    public void onClick(View v) {
+		    	mPreview.stop();
+		    	mLayout.removeView(mPreview);
+		    	if (mCameraId == 0) {
+		    		mCameraId = 1;
+		    	} else {
+		    		mCameraId = 0;
+		    	}
+		    	mPreview = null;
+		    	createCameraPreview();
 		    }
 		});
 		

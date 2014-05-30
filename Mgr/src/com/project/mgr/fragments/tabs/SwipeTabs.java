@@ -229,4 +229,5 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
 		}
 		super.onDestroy();
 	}
+
 }

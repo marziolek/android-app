@@ -28,6 +28,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.Chronometer.OnChronometerTickListener;
@@ -56,16 +57,16 @@ public class RecordTab3 extends Fragment {
      private String mFileName = null;
      private boolean mChronometerStarted = false;
      private LinearLayout recording_status;
-     
+          
      @Override
-     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
 
-    	 View v= inflater.inflate(R.layout.record_tab2, container, false);
+    	 View v= inflater.inflate(R.layout.record_tab3, container, false);
      	 	     
     	 File audio = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/audio");
          deleteFolder(audio);
          audio.mkdirs();
-         
+                  
     	 final MyAnimationView animView = new MyAnimationView(getActivity());
     	 recording_status = (LinearLayout) v.findViewById(R.id.recording_status);
     	 
@@ -88,13 +89,19 @@ public class RecordTab3 extends Fragment {
 	             	case MotionEvent.ACTION_DOWN:
 	             		startRecording(mChronometerStarted);                    	
 		                int recordingStatusHeight = recording_status.getHeight();
-		                float asd = recording_status.getY();
 		                animView.startAnimation(recordingStatusHeight);
 	                    break;
 	             	case MotionEvent.ACTION_UP:
 	             		mChronometerStarted = true;
 	                 	stopRecording();
 	                 	int recordingStatusHeightActual = recording_status.getHeight();
+	                 	recording_status.getY();
+		                animView.cancelAnimation(recordingStatusHeightActual);
+		                break;
+	             	case MotionEvent.ACTION_CANCEL:
+	             		mChronometerStarted = true;
+	                 	stopRecording();
+	                 	recordingStatusHeightActual = recording_status.getHeight();
 	                 	recording_status.getY();
 		                animView.cancelAnimation(recordingStatusHeightActual);
 		                break;
@@ -356,14 +363,9 @@ public class RecordTab3 extends Fragment {
              if (animation == null) {
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
                          recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000);
-                 System.out.println("*************");
-                 System.out.println(recording_status);
-                 System.out.println(recording_status.getY());
-                 System.out.println(getHeight());
-                 System.out.println(recordingStatusHeight);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
-                 //yAnim.setInterpolator(new AccelerateInterpolator(1f));
+                 yAnim.setInterpolator(new LinearInterpolator());
                  yAnim.addUpdateListener(this);
                  yAnim.addListener(this);
 
@@ -378,7 +380,7 @@ public class RecordTab3 extends Fragment {
                 		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000-duration);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
-                 //yAnim.setInterpolator(new AccelerateInterpolator(1f));
+                 yAnim.setInterpolator(new LinearInterpolator());
                  yAnim.addUpdateListener(this);
                  yAnim.addListener(this);
 

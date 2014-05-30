@@ -714,6 +714,57 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 
 	 @Override
 	 public void onRefreshStarted(View view) {
-	       
+		 final LinearLayout posts = (LinearLayout) getActivity().findViewById(R.id.posts);
+		 if(posts.getChildCount() > 0) 
+			    posts.removeAllViews(); 
+		
+		 final Session session = Session.getActiveSession();
+     	 if (session != null && session.isOpened()) {
+     		// If the session is open, make an API call to get user data
+     	    // and define a new callback to handle the response
+     	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+ 	    	    @Override
+ 	    	    public void onCompleted(GraphUser user, Response response) {
+ 	    	               // If the response is successful
+ 		    	    if (session == Session.getActiveSession()) {
+ 		    	    	if (user != null) {
+ 		    	    		final String user_id = user.getId();//user id
+ 		    	    		final String[] params = {user_id, "0"};
+ 		    	            
+ 		    	            new RetriveAllPosts().execute(params);
+ 		    	            DetectScrollView detectScrollView= (DetectScrollView) getActivity().findViewById(R.id.postsScroll);
+ 		    	            currentPost = 0;
+		    	    		detectScrollView.setOnScrollViewListener( new OnScrollViewListener() {
+		    	    		    public void onScrollChanged( DetectScrollView v, int l, int t, int oldl, int oldt ) {
+		    	    		    	//int a = v.getScrollY();
+		    	    		    	View view = (View) v.getChildAt(v.getChildCount()-1);
+		    	    		        int diff = (view.getBottom()-(v.getHeight()+v.getScrollY()));// Calculate the scrolldiff
+		    	    		        
+		    	    		        if( diff == 0 ){  // if diff is zero, then the bottom has been reached
+		    	    		        	currentPost+=2;
+		    	    		        	
+		    	    		        	String current_post = Integer.toString(currentPost);
+		    	    		        	String[] newParams = {user_id, current_post};
+		    	    		        	new RetriveAllPosts().execute(newParams);
+		    	    		        }
+		    	    		     // Now find the PullToRefreshLayout to setup
+		    	    	            mPullToRefreshLayout = (PullToRefreshLayout) getActivity().findViewById(R.id.ptr_layoutMy);
+
+		    	    	            // Now setup the PullToRefreshLayout
+		    	    	            ActionBarPullToRefresh.from(getActivity())
+		    	    	                    // Mark All Children as pullable
+		    	    	                    .theseChildrenArePullable(R.id.postsScroll)
+		    	    	                    // Set a OnRefreshListener
+		    	    	                    .listener(StreamTab1.this)
+		    	    	                    // Finally commit the setup to our PullToRefreshLayout
+		    	    	                    .setup(mPullToRefreshLayout);
+		    	    		    }
+		    	    		});		    	            
+ 		    	    	}
+ 		    	    }
+ 	    	    }
+     	    });
+     	    Request.executeBatchAsync(request);
+     	 }
 	 }
 }

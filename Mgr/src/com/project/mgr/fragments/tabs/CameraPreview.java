@@ -43,11 +43,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private LayoutMode mLayoutMode;
     private int mCenterPosX = -1;
     private int mCenterPosY;
-    
-    NumberFormat fileCountFormatter = new DecimalFormat("00");
-	String formattedFileCount;
-	int fileCount = 0;
-    
+        
     PreviewReadyCallback mPreviewReadyCallback = null;
     
     public static enum LayoutMode {
@@ -73,21 +69,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             if (Camera.getNumberOfCameras() > cameraId) {
                 mCameraId = cameraId;
             } else {
                 mCameraId = 0;
             }
-        } else {*/
+        } else {
             mCameraId = 0;
-        //}
+        }
 
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             mCamera = Camera.open(mCameraId);
-        } else {*/
+        } else {
             mCamera = Camera.open();
-        //}
+        }
         Camera.Parameters cameraParams = mCamera.getParameters();
         mPreviewSizeList = cameraParams.getSupportedPreviewSizes();
         mPictureSizeList = cameraParams.getSupportedPictureSizes();
@@ -409,14 +405,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 	    	if (!dir.exists()) {
 	    		dir.mkdir();
 	    	}
-	    	formattedFileCount = fileCountFormatter.format(fileCount);  
+	    	
 	    	File photo = new File(Environment.getExternalStorageDirectory()+"/MgrApp/pictures",
-		                 "photo_"+formattedFileCount+".jpg");
-	    	fileCount++;
-		    if (photo.exists()) {
-		        photo.delete();
-		    }
-	
+		                 "photo_"+System.currentTimeMillis()+".jpg");
+	    	
 		    try {
 		    	FileOutputStream fos=new FileOutputStream(photo.getPath());
 	
