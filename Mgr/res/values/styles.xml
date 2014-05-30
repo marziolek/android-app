@@ -11,12 +11,13 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+        
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:actionBarTabStyle">@style/ActionBar</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTab</item>
     </style>
 
     <style name="LoginFormContainer">
@@ -27,8 +28,11 @@
 
     <style name="Widget.PreviewGif" parent="@android:style/Widget"></style>   
     
-    <style name="ActionBar" parent="@android:style/Widget.Holo.ActionBar.TabView">
-        <item name="android:padding">0dp</item>
+    <style name="ActionBarTab" parent="@android:style/Widget.Holo.ActionBar.TabView">
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
         <item name="android:layout_width">wrap_content</item>
     </style>
 </resources>

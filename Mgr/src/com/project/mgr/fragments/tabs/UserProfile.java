@@ -57,7 +57,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 import com.project.mgr.fragments.tabs.DetectScrollView.OnScrollViewListener;
 
@@ -169,6 +174,31 @@ public class UserProfile extends FragmentActivity {
 				   heart.setImageResource(R.drawable.heart);
 				   heart.setLayoutParams(heartSize);
 				   likesLL.addView(heart);
+				   
+				   likesLL.setOnClickListener(new View.OnClickListener() {
+		    	    	@Override
+		    	        public void onClick(View v) {
+		    	    		final Session session = Session.getActiveSession();
+		    	        	if (session != null && session.isOpened()) {
+		    	        		// If the session is open, make an API call to get user data
+		    	        	    // and define a new callback to handle the response
+		    	        	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+		    	    	    	    @Override
+		    	    	    	    public void onCompleted(GraphUser user, Response response) {
+		    	    	    	               // If the response is successful
+		    	    		    	    if (session == Session.getActiveSession()) {
+		    	    		    	    	if (user != null) {
+		    	    		    	    		String user_id = user.getId();//user id
+		    	    		    	            String[] likeParams = {params[5],user_id};
+		    	    		    	    		new AddLike().execute(likeParams);
+		    	    		    	    	}   
+		    	    		    	    }   
+		    	    	    	    }   
+		    	        	    }); 
+		    	        	    Request.executeBatchAsync(request);
+		    	        	}
+		    	    	}
+				   });
 				   
 				   final RelativeLayout post = new RelativeLayout(UserProfile.this);
 				   final LinearLayout posts = (LinearLayout) UserProfile.this.findViewById(R.id.myPosts);
@@ -598,4 +628,54 @@ public class UserProfile extends FragmentActivity {
 	     }
 	     return super.onOptionsItemSelected(item);
 	 }
+	 
+	 class AddLike extends AsyncTask<String, String, Void> {
+			InputStream is = null;
+			String result = "";
+			
+		    @Override
+		    protected Void doInBackground(String... params) {
+		    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/addLike.php";
+
+		      	HttpClient httpClient = new DefaultHttpClient();
+		      	HttpPost httpPost = new HttpPost(url_select);
+		      	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
+		      	param.add(new BasicNameValuePair("post_id", params[0]));
+		      	param.add(new BasicNameValuePair("user_id", params[1]));
+		      	System.out.println(params[0]);
+		      	System.out.println(params[1]);
+		        try {
+				     httpPost.setEntity(new UrlEncodedFormEntity(param));
+				     HttpResponse httpResponse = httpClient.execute(httpPost);
+				     HttpEntity httpEntity = httpResponse.getEntity();
+			
+				     //read content
+				     is =  httpEntity.getContent();     
+
+		        } catch (Exception e) {
+		        	Log.e("log_tag", "Error in http connection "+e.toString());
+		        }
+		        try {
+			        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+				     StringBuilder sb = new StringBuilder();
+				     String line = "";
+				     while((line=br.readLine())!=null)
+				     {
+				        sb.append(line+"\n");
+				     }
+				      is.close();
+				      result=sb.toString();    
+
+			       } catch (Exception e) {
+			        // TODO: handle exception
+			        Log.e("log_tag", "Error converting result "+e.toString());
+			       }
+		        return null;
+		    }
+		    
+		    protected void onPostExecute(Void v) {
+		    	Toast.makeText(UserProfile.this, "Thanks for like", 1500).show();
+		    }
+		}
+
 }

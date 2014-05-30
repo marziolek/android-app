@@ -24,7 +24,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
     private TabsPagerAdapter mAdapter;
     private ActionBar actionBar;
     // Tab titles
-    private String[] tabs = { "Stream", "My stream", "Record", "Settings" };
+    private String[] tabs = { "Stream", "Record", "Settings", "My stream" };
     
     Controller aController;
 	AsyncTask<Void, Void, Void> mRegisterTask;

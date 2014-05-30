@@ -2514,7 +2514,7 @@ containing a value of this type.
         public static final int welcome_msg=0x7f090055;
     }
     public static final class style {
-        public static final int ActionBar=0x7f0b0097;
+        public static final int ActionBarTab=0x7f0b0097;
         /** 
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.

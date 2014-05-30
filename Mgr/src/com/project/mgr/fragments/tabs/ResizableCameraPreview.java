@@ -94,7 +94,6 @@ public class ResizableCameraPreview extends CameraPreview {
         }
         
         Camera.Size pictureSize = determinePictureSize(previewSize);
-        if (DEBUGGING) { Log.v("MÓJ CI ON JEST!", "Requested Preview Size - w: " + previewSize.width + ", h: " + previewSize.height); }
         mPreviewSize = previewSize;
         mPictureSize = pictureSize;
         boolean layoutChanged = adjustSurfaceLayoutSize(previewSize, portrait, width, height);

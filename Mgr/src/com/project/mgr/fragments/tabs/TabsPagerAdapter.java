@@ -17,11 +17,11 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
         case 0:
             return new StreamTab1();
         case 1:
-        	return new UserStreamTab2();
+        	return new RecordTab3();
         case 2:
-            return new RecordTab3();
-        case 3:
             return new SettingsTab4();
+        case 3:
+            return new UserStreamTab2();
 	    }
  
         return null;

@@ -50,7 +50,7 @@ public class FilesUploader extends Activity {
      
     int bytesRead, bytesAvailable, bufferSize;
     byte[] buffer;
-    int maxBufferSize = 1*1024*1024;
+    int maxBufferSize = 10*1024*1024;
      
     @Override
 	protected void onCreate(Bundle savedInstanceState) {

@@ -26,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
@@ -78,7 +79,7 @@ public class RecordTab3 extends Fragment {
     			 mChronometer.setOnChronometerTickListener(new OnChronometerTickListener() {
     				 @Override
     				 public void onChronometerTick(Chronometer chronometer) {
-    					 if (SystemClock.elapsedRealtime() - mChronometer.getBase() >= 10000 || mChronometer.getText() == "0:10") {
+    					 if (SystemClock.elapsedRealtime() - mChronometer.getBase() >= 8000 || mChronometer.getText() == "0:08") {
     						 stopRecording();
 					         mRecordButton.setEnabled(false);
 					         makeWave();
@@ -111,7 +112,7 @@ public class RecordTab3 extends Fragment {
     	 });
 			
 	     bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING);
-     
+      
 	     return v;
      }
      
@@ -362,7 +363,7 @@ public class RecordTab3 extends Fragment {
          private void createAnimation(int recordingStatusHeight) {
              if (animation == null) {
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-                         recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000);
+                         recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(9000);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
                  yAnim.setInterpolator(new LinearInterpolator());
@@ -377,7 +378,7 @@ public class RecordTab3 extends Fragment {
             	 long duration = SystemClock.elapsedRealtime() - mChronometer.getBase();
             	 animation.end();
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-                		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(11000-duration);
+                		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(9000-duration);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
                  yAnim.setInterpolator(new LinearInterpolator());

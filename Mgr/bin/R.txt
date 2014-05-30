@@ -912,7 +912,7 @@ int string title_section4 0x7f090052
 int string unknown_person 0x7f090064
 int string wallet_buy_button_place_holder 0x7f090030
 int string welcome_msg 0x7f090055
-int style ActionBar 0x7f0b0097
+int style ActionBarTab 0x7f0b0097
 int style AppBaseTheme 0x7f0b0093
 int style AppTheme 0x7f0b0094
 int style LoginFormContainer 0x7f0b0095

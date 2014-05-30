@@ -149,6 +149,7 @@ public class TakePhotos extends FragmentActivity {
 		}
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    GIFEncoder encoder = new GIFEncoder();
+	    encoder.setFrameRate(6);
 	    encoder.start(bos);
 	    for (Bitmap bitmap : bitmaps) {
 	        encoder.addFrame(bitmap);
