@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.project.mgr.R;
 
@@ -23,7 +24,7 @@ public class PreviewAudio extends FragmentActivity {
 	private MediaPlayer mPlayer = null;
 	private Button mPlay;
 	private boolean mStartPlaying = true;
-	private Button mTakePhoto;
+	private ImageButton mTakePhoto;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class PreviewAudio extends FragmentActivity {
         
         getActionBar().setDisplayHomeAsUpEnabled(true);
         
-        mTakePhoto = (Button) findViewById(R.id.take_photo);
+        mTakePhoto = (ImageButton) findViewById(R.id.take_photo);
         mTakePhoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getBaseContext(), TakePhotos.class);

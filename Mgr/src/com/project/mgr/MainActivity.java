@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -54,7 +55,8 @@ public class MainActivity extends Activity {
 	
 	private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
 	    if (state.isOpened()) {
-	       
+	    	LoginButton authButton = (LoginButton) findViewById(R.id.fbLoginBtn);
+	    	authButton.setVisibility(View.GONE);
 	        //final Session session = Session.getActiveSession();
 	    	if (session != null && session.isOpened()) {
 	    		// If the session is open, make an API call to get user data

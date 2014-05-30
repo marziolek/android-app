@@ -140,7 +140,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
       			if (GCMRegistrar.isRegisteredOnServer(this)) {
       				
       				// Skips registration.				
-      				Toast.makeText(getApplicationContext(), "Already registered with GCM Server", Toast.LENGTH_LONG).show();
+      				//Toast.makeText(getApplicationContext(), "Already registered with GCM Server", Toast.LENGTH_LONG).show();
       			
       			} else {
       				
@@ -189,7 +189,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
  			// Display message on the screen
  			//lblMessage.append(newMessage + "\n");			
  			
- 			Toast.makeText(getApplicationContext(), "Got Message: " + newMessage, Toast.LENGTH_LONG).show();
+ 			Toast.makeText(getApplicationContext(), newMessage, Toast.LENGTH_LONG).show();
  			
  			// Releasing wake lock
  			aController.releaseWakeLock();
