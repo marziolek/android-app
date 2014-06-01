@@ -42,7 +42,7 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
         mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
  
         viewPager.setAdapter(mAdapter);
-        //actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         
         final Intent i = getIntent();
@@ -205,10 +205,36 @@ public class SwipeTabs extends FragmentActivity implements ActionBar.TabListener
         // on tab selected
         // show respected fragment view
         viewPager.setCurrentItem(tab.getPosition());
+            if (tab.getPosition() == 0) {
+            	tab.setIcon(R.drawable.users_current);
+            }
+            if (tab.getPosition() == 1) {
+            	tab.setIcon(R.drawable.mic_current);
+            }
+            if (tab.getPosition() == 2) {
+            	tab.setIcon(R.drawable.settings_current);
+            }
+            if (tab.getPosition() == 3) {
+            	tab.setIcon(R.drawable.user_current);
+            }
+        
     }
  
     @Override
     public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+    	System.out.println(tab.getPosition());
+    	if (tab.getPosition() == 0) {
+        	tab.setIcon(R.drawable.users);
+        }
+        if (tab.getPosition() == 1) {
+        	tab.setIcon(R.drawable.mic);
+        }
+        if (tab.getPosition() == 2) {
+        	tab.setIcon(R.drawable.settings);
+        }
+        if (tab.getPosition() == 3) {
+        	tab.setIcon(R.drawable.user);
+        }
     }
     
     @Override

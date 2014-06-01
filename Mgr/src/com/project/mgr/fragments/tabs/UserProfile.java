@@ -133,8 +133,9 @@ public class UserProfile extends FragmentActivity {
 				   final LinearLayout postGifLay = new LinearLayout(UserProfile.this);
 				   final RelativeLayout profileLL = new RelativeLayout(UserProfile.this);
 				   final LinearLayout dateLL = new LinearLayout(UserProfile.this);
-				   final TextView creationDate = new TextView(UserProfile.this);
-				   final TextView fullName = new TextView(UserProfile.this);
+				   final TextView creationDate = (TextView) getLayoutInflater().inflate(R.layout.date, null);
+				   final TextView fullName = (TextView) getLayoutInflater().inflate(R.layout.full_name, null);
+				   final RelativeLayout likesRL = (RelativeLayout) getLayoutInflater().inflate(R.layout.like, null);
 				   final LinearLayout likesLL = new LinearLayout(UserProfile.this);
 				   final TextView likes = new TextView(UserProfile.this);
 				   final ImageView heart = new ImageView(UserProfile.this);
@@ -147,7 +148,8 @@ public class UserProfile extends FragmentActivity {
 				   prof.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 				   final RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams
 				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-				   
+				   final RelativeLayout.LayoutParams likesToRight = new RelativeLayout.LayoutParams
+				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				   final RelativeLayout.LayoutParams rlpDate = new RelativeLayout.LayoutParams
 				            (LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 				   final RelativeLayout.LayoutParams matchParent = new RelativeLayout.LayoutParams
@@ -155,6 +157,7 @@ public class UserProfile extends FragmentActivity {
 				   
 				   fullName.setId(generateViewId());
 				   profilePicture.setId(generateViewId());
+				   profilePicture.setPadding(20, 0, 20, 0);
 				   rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 				   rlp.addRule(RelativeLayout.RIGHT_OF, profilePicture.getId());
 				   rlpDate.addRule(RelativeLayout.BELOW, fullName.getId());
@@ -166,13 +169,18 @@ public class UserProfile extends FragmentActivity {
 				   profileLL.addView(fullName, rlp);
 				   
 				   creationDate.setText(calculateDate(params[1]));
-				   creationDate.setTextColor(Color.WHITE);
+				   creationDate.setTextColor(Color.rgb(120, 120, 120));
 				   profileLL.addView(creationDate, rlpDate);
+				   profileLL.setPadding(0, 0, 0, 20);
 				   
+				   likesToRight.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+				   likesLL.setLayoutParams(likesToRight);
+				   likesRL.addView(likesLL);
 				   likes.setText(params[4]);
 				   likesLL.addView(likes);
 				   heart.setImageResource(R.drawable.heart);
 				   heart.setLayoutParams(heartSize);
+				   heart.setPadding(10, 0, 0, 0);
 				   likesLL.addView(heart);
 				   
 				   likesLL.setOnClickListener(new View.OnClickListener() {
@@ -258,14 +266,15 @@ public class UserProfile extends FragmentActivity {
 			    	        @Override
 			    	        public void run() {			    	        	
 			    	        	//post.setPadding(0, 0, 0, 0);
-			    	        	post.setBackgroundColor(Color.rgb(51,181,229));
+			    	        	post.setBackgroundColor(Color.rgb(242,242,242));
+			    	        	post.setPadding(0, 20, 0, 0);
 			    	        	postGifLay.addView(postGif);
 			    	        	postGifLay.setGravity(Gravity.CENTER);
-			    	        	postGifLay.setPadding(0, 200, 0, 60);
+			    	        	postGifLay.setPadding(0, 220, 0, 60);
 			    	        	post.addView(profileLL, prof);
 			    	        	post.addView(postGifLay);
 			    	        	//post.addView(dateLL);
-			    	        	post.addView(likesLL, lp);
+			    	        	post.addView(likesRL, lp);
 			    	        	posts.addView(post, matchParent);
 			    	        }
 			    	   });

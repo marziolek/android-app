@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:orientation="vertical">
+	android:orientation="vertical"
+	android:background="#FF6138">
 	<RelativeLayout
 	    android:id="@+id/recording_status_relative"
 	    android:layout_width="fill_parent"
@@ -14,7 +15,7 @@
 	        android:layout_width="fill_parent"
 	        android:layout_height="fill_parent"
 	        android:orientation="vertical"
-	        android:background="#33b5e5">	        
+	        android:background="#F2F2F2">	        
 	    </LinearLayout>
 	    
 	    	        

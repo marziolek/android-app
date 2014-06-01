@@ -17,15 +17,20 @@ import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
 public class PreviewAudio extends FragmentActivity {
 	private String mAllFiles;
 	private MediaPlayer mPlayer = null;
-	private Button mPlay;
+	private ImageButton mPlay;
 	private boolean mStartPlaying = true;
 	private ImageButton mTakePhoto;
-
+	private String user_id;
+	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,14 +38,35 @@ public class PreviewAudio extends FragmentActivity {
         
         getActionBar().setDisplayHomeAsUpEnabled(true);
         
+        final Session session = Session.getActiveSession();
+    	if (session != null && session.isOpened()) {
+    		// If the session is open, make an API call to get user data
+    	    // and define a new callback to handle the response
+    	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+	    	    @Override
+	    	    public void onCompleted(GraphUser user, Response response) {
+	    	               // If the response is successful
+		    	    if (session == Session.getActiveSession()) {
+		    	    	if (user != null) {
+		    	    		user_id = user.getId();
+		    	    	}   
+		    	    }   
+	    	    }   
+    	    }); 
+    	    Request.executeBatchAsync(request);
+    	} 
+        
         mTakePhoto = (ImageButton) findViewById(R.id.take_photo);
         mTakePhoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), TakePhotos.class);
+            	Intent intent = new Intent(getBaseContext(), TakePhotos.class);
+            	Bundle extras = new Bundle();
+            	extras.putString("user_id", user_id);
+	    		intent.putExtras(extras);
                 startActivity(intent);
             }
         });
-        mPlay = (Button) findViewById(R.id.play); 
+        mPlay = (ImageButton) findViewById(R.id.play); 
         
         mPlay.setOnTouchListener(new OnTouchListener() {
 			@Override

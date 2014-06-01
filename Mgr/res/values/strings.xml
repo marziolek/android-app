@@ -43,7 +43,7 @@
     <string name="take_photos">Take pictures</string>
     <string name="skip_photos">Skip photos</string>
     <string name="GIFpreview">Preview GIF</string>
-    <string name="publish_and_share">Publish and share</string>
+    <string name="publish_and_share">Publish and share to Facebook</string>
     
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -70,4 +70,5 @@
     <string name="empty"></string>
     <string name="gifit">GIF it! ></string>
     <string name="camera_switch_button">Camera switch button</string>
+    <string name="publish">Publish</string>
 </resources>

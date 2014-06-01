@@ -11,37 +11,33 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Toast;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.model.GraphUser;
 import com.project.mgr.R;
 
 public class TakePhotos extends FragmentActivity {
     private ResizableCameraPreview mPreview;
-    private ArrayAdapter<String> mAdapter;
     private RelativeLayout mLayout;
     private ImageView mSwitchCam;
     private int mCameraId = 0;
-    private Boolean makingGif = false;
+    private Boolean makingGif = false, photosTaken = false;
     private String fileName = generateFileName();
 	
     @Override
@@ -67,6 +63,7 @@ public class TakePhotos extends FragmentActivity {
 		mLayout.setOnClickListener(new View.OnClickListener() {
 		    public void onClick(View v) {
 		    	mPreview.takePictureFromPreview();
+		    	photosTaken = true;
 		    }
 		});
 		
@@ -94,10 +91,14 @@ public class TakePhotos extends FragmentActivity {
 	    return(super.onCreateOptionsMenu(menu));
 	  }
 
-	  @Override
+    @Override
 	  public boolean onOptionsItemSelected(MenuItem item) {
-	    if (item.getItemId() == R.id.see_pictures) {
-	    	new GIF(this).execute();
+    	if (item.getItemId() == R.id.see_pictures) {
+	    	if (photosTaken) {
+	    		new GIF(this).execute();
+	    	} else {
+	    		Toast.makeText(this, "You need to take some photos", 2000).show();
+	    	}
 	    }
 	    switch (item.getItemId()) {
   	     // Respond to the action bar's Up/Home button
@@ -130,8 +131,15 @@ public class TakePhotos extends FragmentActivity {
         // If the OS is pre-gingerbreak, this does not have any effect.
         mPreview = new ResizableCameraPreview(this, mCameraId, CameraPreview.LayoutMode.FitToParent, false);
         LayoutParams previewLayoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        /*Display display = getWindowManager().getDefaultDisplay();
+        final Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int centerX = width/2;
+        mPreview.setCenterPosition(centerX, -1);*/
         mLayout.addView(mPreview, 0, previewLayoutParams);
     }
+    
     
     /**
      * Async GIF creation before previewing
@@ -221,30 +229,13 @@ public class TakePhotos extends FragmentActivity {
 		    @Override
 		    protected void onPostExecute(Void result) {
 		    	final Intent intent = new Intent(TakePhotos.this, PreviewGif.class);
-		    	final Session session = Session.getActiveSession();
-		    	if (session != null && session.isOpened()) {
-		    		// If the session is open, make an API call to get user data
-		    	    // and define a new callback to handle the response
-		    	    Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
-			    	    @Override
-			    	    public void onCompleted(GraphUser user, Response response) {
-			    	               // If the response is successful
-				    	    if (session == Session.getActiveSession()) {
-				    	    	if (user != null) {
-				    	    		Bundle extras = new Bundle();
-				    	    		extras.putString("user_id", user.getId());
-				    	    		extras.putString("fileName", fileName);
-				    	    		intent.putExtras(extras);
-				    	    		startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
-				    		        Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
-				    		        startActivity(intent);
-				    	    	}   
-				    	    }   
-			    	    }   
-		    	    }); 
-		    	    Request.executeBatchAsync(request);
-		    	} 
-		    	
+				Bundle extras = new Bundle();
+				extras.putString("user_id", userId());
+				extras.putString("fileName", fileName);
+				intent.putExtras(extras);
+		    	startingActivity.removeDialog(TakePhotos.PLEASE_WAIT_DIALOG);
+		    	Toast.makeText(startingActivity, "GIF created!", Toast.LENGTH_SHORT).show();
+				startActivity(intent);    	
 		    }
 		    
 		    @Override
@@ -256,6 +247,16 @@ public class TakePhotos extends FragmentActivity {
 		    }
 	}
 
+	public String userId() {
+		Intent extras = this.getIntent();
+    	if (extras != null) {
+    	    String user_id = extras.getStringExtra("user_id");
+    	    return user_id;
+    	} else {
+    		return null;
+    	}
+	}
+	
 	public String generateFileName() {
 		Date now = new Date();
 	    SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");

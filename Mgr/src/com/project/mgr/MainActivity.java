@@ -152,7 +152,7 @@ public class MainActivity extends Activity {
  	 gif varchar(27) not null, 
  	 audio varchar(35) not null, 
  	 geo varchar(20) null,
- 	 likes int null, 
+ 	 likes int null default 0, 
  	 primary key (id));
  	 
  drop table if exists likes;

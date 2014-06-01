@@ -14,14 +14,19 @@
         android:id="@+id/uploadGif"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Upload GIF" />
+        android:text="@string/publish"
+        android:layout_weight="1"
+        android:background="#FF6138"
+        android:textColor="#F2F2F2" />
     
     <Button
 	    android:id="@+id/shareButton"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:gravity="center"
-	    android:layout_marginTop="10dp"
-	    android:text="@string/publish_and_share" />
+	    android:text="@string/publish_and_share"
+	    android:layout_weight="1"
+	    android:background="@color/com_facebook_blue"
+	    android:textColor="#F2F2F2" />
     
 </LinearLayout>

@@ -79,7 +79,7 @@ public class RecordTab3 extends Fragment {
     			 mChronometer.setOnChronometerTickListener(new OnChronometerTickListener() {
     				 @Override
     				 public void onChronometerTick(Chronometer chronometer) {
-    					 if (SystemClock.elapsedRealtime() - mChronometer.getBase() >= 8000 || mChronometer.getText() == "0:08") {
+    					 if (elapsedTime() >= 8000 || SystemClock.elapsedRealtime() - mChronometer.getBase() >= 8000 || mChronometer.getText() == "0:08") {
     						 stopRecording();
 					         mRecordButton.setEnabled(false);
 					         makeWave();
@@ -93,6 +93,7 @@ public class RecordTab3 extends Fragment {
 		                animView.startAnimation(recordingStatusHeight);
 	                    break;
 	             	case MotionEvent.ACTION_UP:
+	             		System.out.println(elapsedTime());
 	             		mChronometerStarted = true;
 	                 	stopRecording();
 	                 	int recordingStatusHeightActual = recording_status.getHeight();
@@ -331,11 +332,10 @@ public class RecordTab3 extends Fragment {
      }
      
      //Animation functions
-     private double elapsedTime() {
-         long elapsedMillis = mChronometer.getBase();
-         double elapsedTime = elapsedMillis / 1000.0;
+     private long elapsedTime() {
+    	 long duration = SystemClock.elapsedRealtime() - mChronometer.getBase();
          
-         return elapsedTime;
+         return duration;
      }
      
      private String getFilename() {
@@ -363,7 +363,7 @@ public class RecordTab3 extends Fragment {
          private void createAnimation(int recordingStatusHeight) {
              if (animation == null) {
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-                         recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(9000);
+                         recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(8000);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
                  yAnim.setInterpolator(new LinearInterpolator());
@@ -378,7 +378,7 @@ public class RecordTab3 extends Fragment {
             	 long duration = SystemClock.elapsedRealtime() - mChronometer.getBase();
             	 animation.end();
                  ObjectAnimator yAnim = ObjectAnimator.ofFloat(recording_status, "y",
-                		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(9000-duration);
+                		 		recording_status.getY(), getHeight() + recordingStatusHeight).setDuration(8000-duration);
                  yAnim.setRepeatCount(0);
                  yAnim.setRepeatMode(ValueAnimator.REVERSE);
                  yAnim.setInterpolator(new LinearInterpolator());

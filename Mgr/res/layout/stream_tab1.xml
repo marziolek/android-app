@@ -10,7 +10,7 @@
 	android:id="@+id/postsScroll"
 	android:layout_width="fill_parent"
 	android:layout_height="fill_parent"
-	android:background="#fff"
+	android:background="#F2F2F2"
 	android:textColor="#000">
 	
 	<LinearLayout
