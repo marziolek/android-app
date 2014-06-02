@@ -79,133 +79,7 @@ public class FilesUploader extends Activity {
     	    Request.executeBatchAsync(request);
     	}  
     }
-    
-    public void UploadFile(String user_id){
-    	try
-    	{
-    		Log.d("uploadFile", user_id);
-    		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/"+fileName();
-    	    FileInputStream fileInputStream = new FileInputStream(new File(gifPath) );
-    	 
-    	    URL url = new URL(urlServer);
-    	    connection = (HttpURLConnection) url.openConnection();
-    	 
-    	    // Allow Inputs &amp; Outputs.
-    	    connection.setDoInput(true);
-    	    connection.setDoOutput(true);
-    	    connection.setUseCaches(false);
-    	 
-    	    // Set HTTP method to POST.
-    	    connection.setRequestMethod("POST");
-    	 
-    	    connection.setRequestProperty("Connection", "Keep-Alive");
-    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-    	    connection.setRequestProperty("UserId", user_id);
-    	 
-    	    outputStream = new DataOutputStream( connection.getOutputStream() );
-    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + gifPath +"\"" + lineEnd);
-    	    outputStream.writeBytes(lineEnd);
-    	    
-    	    bytesAvailable = fileInputStream.available();
-    	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-    	    buffer = new byte[bufferSize];
-    	 
-    	    // Read file
-    	    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-    	 
-    	    while (bytesRead > 0)
-    	    {
-    	        outputStream.write(buffer, 0, bufferSize);
-    	        bytesAvailable = fileInputStream.available();
-    	        bufferSize = Math.min(bytesAvailable, maxBufferSize);
-    	        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-    	    }
-    	 
-    	    outputStream.writeBytes(lineEnd);
-    	    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-    	 
-    	    // Responses from the server (code and message)
-    	    Integer serverResponseCode = connection.getResponseCode();
-    	    String serverResponseMessage = connection.getResponseMessage();
-    	 
-    	    Log.d("response code", serverResponseCode.toString());
-    	    Log.d("response msg", serverResponseMessage.toString());
-    	    
-    	    fileInputStream.close();
-    	    outputStream.flush();
-    	    outputStream.close();
-    	}
-    	catch (Exception ex)
-    	{
-    	    //Exception handling
-    		Log.d("upload error", ex.toString());
-    	}
-    }
-    
-    public void UploadAudioFile(String user_id){
-    	try
-    	{
-    		Log.d("uploadFile", user_id);
-    		String audioPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/audio/"+fileNameAudio();
-    	    FileInputStream fileInputStreamAudio = new FileInputStream(new File(audioPath) );
-    	 
-    	    URL url = new URL(urlServer);
-    	    connection = (HttpURLConnection) url.openConnection();
-    	 
-    	    // Allow Inputs &amp; Outputs.
-    	    connection.setDoInput(true);
-    	    connection.setDoOutput(true);
-    	    connection.setUseCaches(false);
-    	 
-    	    // Set HTTP method to POST.
-    	    connection.setRequestMethod("POST");
-    	 
-    	    connection.setRequestProperty("Connection", "Keep-Alive");
-    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
-    	    connection.setRequestProperty("UserId", user_id);
-    	    
-    	    outputStream = new DataOutputStream( connection.getOutputStream() );
-    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
-    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + audioPath +"\"" + lineEnd);
-    	    outputStream.writeBytes(lineEnd);
-    	 
-    	    bytesAvailable = fileInputStreamAudio.available();
-    	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-    	    buffer = new byte[bufferSize];
-    	 
-    	    // Read file
-    	    bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
-    	 
-    	    while (bytesRead > 0)
-    	    {
-    	        outputStream.write(buffer, 0, bufferSize);
-    	        bytesAvailable = fileInputStreamAudio.available();
-    	        bufferSize = Math.min(bytesAvailable, maxBufferSize);
-    	        bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
-    	    }
-    	 
-    	    outputStream.writeBytes(lineEnd);
-    	    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-    	 
-    	    // Responses from the server (code and message)
-    	    Integer serverResponseCode = connection.getResponseCode();
-    	    String serverResponseMessage = connection.getResponseMessage();
-    	 
-    	    Log.d("response code", serverResponseCode.toString());
-    	    Log.d("response msg", serverResponseMessage.toString());
-    	    
-    	    fileInputStreamAudio.close();
-    	    outputStream.flush();
-    	    outputStream.close();
-    	}
-    	catch (Exception ex)
-    	{
-    	    //Exception handling
-    		Log.d("upload error", ex.toString());
-    	}
-    }
-    
+        
     public static final int PLEASE_WAIT_DIALOG = 1;
 
     @Override
@@ -241,9 +115,128 @@ public class FilesUploader extends Activity {
 	    
 	    @Override
 	    protected Void doInBackground(String... params) {
-	    	UploadFile(params[0]);
-			UploadAudioFile(params[0]);
-			Log.d("Asd", params[0]);
+	    	try
+	    	{
+	    		Log.d("uploadFile", params[0]);
+	    		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/"+fileName();
+	    	    FileInputStream fileInputStream = new FileInputStream(new File(gifPath) );
+	    	 
+	    	    URL url = new URL(urlServer);
+	    	    connection = (HttpURLConnection) url.openConnection();
+	    	 
+	    	    // Allow Inputs &amp; Outputs.
+	    	    connection.setDoInput(true);
+	    	    connection.setDoOutput(true);
+	    	    connection.setUseCaches(false);
+	    	 
+	    	    // Set HTTP method to POST.
+	    	    connection.setRequestMethod("POST");
+	    	 
+	    	    connection.setRequestProperty("Connection", "Keep-Alive");
+	    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+	    	    connection.setRequestProperty("UserId", params[0]);
+	    	 
+	    	    outputStream = new DataOutputStream( connection.getOutputStream() );
+	    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+	    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + gifPath +"\"" + lineEnd);
+	    	    outputStream.writeBytes(lineEnd);
+	    	    
+	    	    bytesAvailable = fileInputStream.available();
+	    	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	    	    buffer = new byte[bufferSize];
+	    	 
+	    	    // Read file
+	    	    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+	    	 
+	    	    while (bytesRead > 0)
+	    	    {
+	    	        outputStream.write(buffer, 0, bufferSize);
+	    	        bytesAvailable = fileInputStream.available();
+	    	        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	    	        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+	    	    }
+	    	 
+	    	    outputStream.writeBytes(lineEnd);
+	    	    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+	    	 
+	    	    // Responses from the server (code and message)
+	    	    Integer serverResponseCode = connection.getResponseCode();
+	    	    String serverResponseMessage = connection.getResponseMessage();
+	    	 
+	    	    Log.d("response code", serverResponseCode.toString());
+	    	    Log.d("response msg", serverResponseMessage.toString());
+	    	    
+	    	    fileInputStream.close();
+	    	    outputStream.flush();
+	    	    outputStream.close();
+	    	}
+	    	catch (Exception ex)
+	    	{
+	    	    //Exception handling
+	    		Log.d("upload error", ex.toString());
+	    	}
+	    	
+	    	try
+	    	{
+	    		Log.d("uploadFile", params[0]);
+	    		String audioPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/audio/"+fileNameAudio();
+	    	    FileInputStream fileInputStreamAudio = new FileInputStream(new File(audioPath) );
+	    	 
+	    	    URL url = new URL(urlServer);
+	    	    connection = (HttpURLConnection) url.openConnection();
+	    	 
+	    	    // Allow Inputs &amp; Outputs.
+	    	    connection.setDoInput(true);
+	    	    connection.setDoOutput(true);
+	    	    connection.setUseCaches(false);
+	    	 
+	    	    // Set HTTP method to POST.
+	    	    connection.setRequestMethod("POST");
+	    	 
+	    	    connection.setRequestProperty("Connection", "Keep-Alive");
+	    	    connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
+	    	    connection.setRequestProperty("UserId", params[0]);
+	    	    
+	    	    outputStream = new DataOutputStream( connection.getOutputStream() );
+	    	    outputStream.writeBytes(twoHyphens + boundary + lineEnd);
+	    	    outputStream.writeBytes("Content-Disposition: form-data; name=\"uploadedfile\";filename=\"" + audioPath +"\"" + lineEnd);
+	    	    outputStream.writeBytes(lineEnd);
+	    	 
+	    	    bytesAvailable = fileInputStreamAudio.available();
+	    	    bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	    	    buffer = new byte[bufferSize];
+	    	 
+	    	    // Read file
+	    	    bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
+	    	 
+	    	    while (bytesRead > 0)
+	    	    {
+	    	        outputStream.write(buffer, 0, bufferSize);
+	    	        bytesAvailable = fileInputStreamAudio.available();
+	    	        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+	    	        bytesRead = fileInputStreamAudio.read(buffer, 0, bufferSize);
+	    	    }
+	    	 
+	    	    outputStream.writeBytes(lineEnd);
+	    	    outputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+	    	 
+	    	    // Responses from the server (code and message)
+	    	    Integer serverResponseCode = connection.getResponseCode();
+	    	    String serverResponseMessage = connection.getResponseMessage();
+	    	 
+	    	    Log.d("response code", serverResponseCode.toString());
+	    	    Log.d("response msg", serverResponseMessage.toString());
+	    	    
+	    	    fileInputStreamAudio.close();
+	    	    outputStream.flush();
+	    	    outputStream.close();
+	    	}
+	    	catch (Exception ex)
+	    	{
+	    	    //Exception handling
+	    		Log.d("upload error", ex.toString());
+	    	}
+
 	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/insert.php";
 
 	      	HttpClient httpClient = new DefaultHttpClient();
