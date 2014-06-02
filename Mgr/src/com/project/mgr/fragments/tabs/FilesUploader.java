@@ -83,6 +83,7 @@ public class FilesUploader extends Activity {
     public void UploadFile(String user_id){
     	try
     	{
+    		Log.d("uploadFile", user_id);
     		String gifPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/GIF/"+fileName();
     	    FileInputStream fileInputStream = new FileInputStream(new File(gifPath) );
     	 
@@ -145,6 +146,7 @@ public class FilesUploader extends Activity {
     public void UploadAudioFile(String user_id){
     	try
     	{
+    		Log.d("uploadFile", user_id);
     		String audioPath = Environment.getExternalStorageDirectory().getPath() + "/MgrApp/audio/"+fileNameAudio();
     	    FileInputStream fileInputStreamAudio = new FileInputStream(new File(audioPath) );
     	 
@@ -241,6 +243,7 @@ public class FilesUploader extends Activity {
 	    protected Void doInBackground(String... params) {
 	    	UploadFile(params[0]);
 			UploadAudioFile(params[0]);
+			Log.d("Asd", params[0]);
 	    	String url_select = "http://wierzba.wzks.uj.edu.pl/~09_ziolekm/MgrApp/insert.php";
 
 	      	HttpClient httpClient = new DefaultHttpClient();

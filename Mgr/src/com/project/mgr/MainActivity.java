@@ -28,7 +28,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-
+	   
 	    setContentView(R.layout.main);
 	    
 	    File mMainDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp");

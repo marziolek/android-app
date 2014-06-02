@@ -226,6 +226,7 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 				   likesLL.setLayoutParams(likesToRight);
 				   likesRL.addView(likesLL);
 				   likes.setText(params[4]);
+				   likes.setId(999);
 				   likesLL.addView(likes);
 				   heart.setImageResource(R.drawable.heart);
 				   heart.setLayoutParams(heartSize);
@@ -234,7 +235,7 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 				   
 				   likesLL.setOnClickListener(new View.OnClickListener() {
 		    	    	@Override
-		    	        public void onClick(View v) {
+		    	        public void onClick(final View v) {
 		    	    		final Session session = Session.getActiveSession();
 		    	        	if (session != null && session.isOpened()) {
 		    	        		// If the session is open, make an API call to get user data
@@ -246,8 +247,9 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 		    	    		    	    if (session == Session.getActiveSession()) {
 		    	    		    	    	if (user != null) {
 		    	    		    	    		String user_id = user.getId();//user id
+		    	    		    	    		final TextView likess = (TextView) v.findViewById(999);
 		    	    		    	            String[] likeParams = {params[5],user_id};
-		    	    		    	    		new AddLike().execute(likeParams);
+		    	    		    	    		new AddLike(likess).execute(likeParams);
 		    	    		    	    	}   
 		    	    		    	    }   
 		    	    	    	    }   
@@ -589,9 +591,22 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 		return calculatedTime;
 	}
 	
-	class AddLike extends AsyncTask<String, String, Void> {
+	public class AddLike extends AsyncTask<String, String, Void> {
 		InputStream is = null;
 		String result = "";
+		public TextView likes;
+		public int nrL;
+		
+		public AddLike(TextView likess) {
+			this.likes = likess;
+		}
+		
+		protected void onPreExecute() {
+			String nrOfLikes = likes.getText().toString();
+			nrL = Integer.valueOf(nrOfLikes);
+			nrL+=1;
+			likes.setText(String.valueOf(nrL));
+		}
 		
 	    @Override
 	    protected Void doInBackground(String... params) {
@@ -602,16 +617,14 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 	      	ArrayList<NameValuePair> param = new ArrayList<NameValuePair>(1);
 	      	param.add(new BasicNameValuePair("post_id", params[0]));
 	      	param.add(new BasicNameValuePair("user_id", params[1]));
-	      	System.out.println(params[0]);
-	      	System.out.println(params[1]);
-	        try {
+	      	try {
 			     httpPost.setEntity(new UrlEncodedFormEntity(param));
 			     HttpResponse httpResponse = httpClient.execute(httpPost);
 			     HttpEntity httpEntity = httpResponse.getEntity();
 		
 			     //read content
 			     is =  httpEntity.getContent();     
-
+			     
 	        } catch (Exception e) {
 	        	Log.e("log_tag", "Error in http connection "+e.toString());
 	        }
@@ -625,7 +638,7 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 			     }
 			      is.close();
 			      result=sb.toString();    
-
+			      
 		       } catch (Exception e) {
 		        // TODO: handle exception
 		        Log.e("log_tag", "Error converting result "+e.toString());
@@ -634,7 +647,13 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
 	    }
 	    
 	    protected void onPostExecute(Void v) {
-	    	Toast.makeText(getActivity(), "Thanks for like", 1500).show();
+	    	if (result == "") {
+	    		nrL-=1;
+				likes.setText(String.valueOf(nrL));
+	    		Toast.makeText(getActivity(), "You already like it", 1500).show();
+	    	} else {
+	    		Toast.makeText(getActivity(), "Thanks for like", 1500).show();
+	    	}
 	    }
 	}
 
