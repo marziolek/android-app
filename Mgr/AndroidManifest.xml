@@ -87,6 +87,7 @@
         <activity android:name="com.project.mgr.fragments.tabs.PreviewGifPlayer"></activity>
         <activity android:name="com.project.mgr.fragments.tabs.GIFEncoder"></activity>
 		<activity android:name="com.project.mgr.fragments.tabs.FilesUploader"></activity>
+		<activity android:name="com.project.mgr.fragments.tabs.WaveHeader"></activity>
 		<activity 
 		    android:name="com.project.mgr.fragments.tabs.UserProfile"
 		    android:label="@string/profile"

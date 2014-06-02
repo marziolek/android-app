@@ -45,7 +45,9 @@ import android.graphics.Color;
 import android.graphics.Movie;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -523,13 +525,15 @@ public class StreamTab1 extends Fragment implements OnRefreshListener {
         mPlayer = new MediaPlayer();
         try {
         	String audioFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/MgrApp/stream/"+audio;
+        	System.out.println(audioFile);
         	//File dir = new File(mAllFiles);
         	//File[] files = dir.listFiles();
-        	mPlayer.setDataSource(audioFile);
+        	FileInputStream fis = new FileInputStream(audioFile);
+        	mPlayer.setDataSource(fis.getFD());
             mPlayer.prepare();
             mPlayer.start();
-        } catch (IOException e) {
-                Log.d("asdasd", "prepare() failed when trying to play recorded audio");
+        } catch (Exception e) {
+                Log.d("Audio playback error", e.toString());
         }
         //return mPlayer;
     }
